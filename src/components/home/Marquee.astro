@@ -1,0 +1,185 @@
+---
+// Prêmios, parceiros e imprensa — marquee duplo vertical (referência: "proud to have worked with", da truus).
+import Doodle from '../marca/Doodle.astro';
+import { PREMIOS, PARCEIROS } from '../../data/site';
+
+type Bloco = { titulo: string; sub: string; tipo: 'premio' | 'parceiro'; cor: string; tinta: string };
+const cores = [
+  { cor: 'var(--c-fior)', tinta: 'var(--c-cacau)' },
+  { cor: 'var(--c-ambar)', tinta: 'var(--c-cacau)' },
+  { cor: 'var(--c-pistache-creme)', tinta: 'var(--c-cacau)' },
+  { cor: 'var(--c-terracota)', tinta: 'var(--c-fior)' },
+  { cor: 'var(--c-cacau)', tinta: 'var(--c-fior)' },
+];
+const blocos: Bloco[] = [
+  ...PREMIOS.map((p) => ({ titulo: p.categoria, sub: `${p.titulo} ${p.ano} · ${p.resultado}`, tipo: 'premio' as const })),
+  ...PARCEIROS.map((p) => ({ titulo: p.nome, sub: p.papel, tipo: 'parceiro' as const })),
+].map((b, i) => ({ ...b, ...cores[i % cores.length] }));
+
+// duas colunas sem vizinhos repetidos (cor e item), inclusive na emenda do loop
+const colA = blocos.filter((_, i) => i % 2 === 0);
+const colB = blocos.filter((_, i) => i % 2 === 1).reverse();
+---
+
+<section class="marquee secao" data-mundo="rosa" aria-labelledby="marquee-titulo">
+  <div class="casca marquee__grade">
+    <div class="marquee__texto">
+      <h2 id="marquee-titulo" class="t-h2 marquee__titulo">
+        <span data-anim="titulo">Feito com quem</span>
+        <span class="marquee__admira">a gente admira<span class="marquee__sublinhado" data-rabisco="sublinhado" data-rabisco-cor="#2b211c"></span></span>
+      </h2>
+      <span class="marquee__ramo" aria-hidden="true"><Doodle nome="ramo" tracoPx={2.4} desenho /></span>
+      <p class="t-corpo marquee__intro" data-anim="subir">
+        Prêmios no primeiro ano de casa, uma fachada que virou notícia lá fora e parceiros de Curitiba que entram na
+        receita — do café ao limoncello.
+      </p>
+    </div>
+    <div class="marquee__colunas" aria-label="Prêmios e parceiros">
+      {
+        [colA, colB].map((col, c) => (
+          <div class:list={['marquee__coluna', c === 1 && 'marquee__coluna--desce']}>
+            <ul class="marquee__trilho" role="list">
+              {[...col, ...col].map((b, i) => (
+                <li class:list={['marquee__bloco', `marquee__bloco--${b.tipo}`]} style={`--cor:${b.cor};--tinta:${b.tinta}`} aria-hidden={i >= col.length ? 'true' : undefined}>
+                  {b.tipo === 'premio' && (
+                    <svg class="marquee__selo" viewBox="0 0 1359 2554" aria-hidden="true">
+                      <use href="#simbolo-monograma" />
+                    </svg>
+                  )}
+                  <span class="t-h3 marquee__nome">{b.titulo}</span>
+                  <span class="marquee__sub">{b.sub}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .marquee__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+  }
+  .marquee__texto {
+    position: relative;
+    display: grid;
+    gap: 26px;
+    justify-items: start;
+  }
+  .marquee__titulo {
+    display: grid;
+    justify-items: start;
+  }
+  .marquee__admira {
+    position: relative;
+    display: inline-block;
+  }
+  .marquee__sublinhado {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.06em;
+    height: 0.1em;
+  }
+  .marquee__ramo {
+    position: absolute;
+    right: 4%;
+    top: -40px;
+    width: clamp(70px, 8vw, 110px);
+    rotate: 14deg;
+  }
+  .marquee__intro {
+    max-width: 40ch;
+  }
+  .marquee__colunas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    height: clamp(460px, 44vw, 620px);
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  }
+  .marquee__trilho {
+    display: grid;
+    gap: 14px;
+    animation: marquee-sobe 30s linear infinite;
+  }
+  .marquee__coluna--desce .marquee__trilho {
+    animation-name: marquee-desce;
+  }
+  .marquee__colunas:hover .marquee__trilho {
+    animation-play-state: paused;
+  }
+  .marquee__bloco {
+    display: grid;
+    align-content: center;
+    gap: 8px;
+    min-height: 168px;
+    padding: 22px;
+    border-radius: 20px;
+    background: var(--cor);
+    color: var(--tinta);
+  }
+  .marquee__selo {
+    width: 22px;
+    fill: currentColor;
+  }
+  .marquee__nome {
+    font-size: clamp(1.02rem, 1.5vw, 1.3rem);
+  }
+  .marquee__sub {
+    font-size: 0.88rem;
+    opacity: 0.8;
+  }
+  @keyframes marquee-sobe {
+    to {
+      transform: translateY(calc(-50% - 7px));
+    }
+  }
+  @keyframes marquee-desce {
+    from {
+      transform: translateY(calc(-50% - 7px));
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @media (max-width: 899px) {
+    .marquee__grade {
+      grid-template-columns: 1fr;
+    }
+    .marquee__colunas {
+      height: 420px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__trilho {
+      animation: none;
+    }
+    .marquee__colunas {
+      height: auto;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .marquee__bloco[aria-hidden='true'] {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { ScrollTrigger } from '../../scripts/nucleo';
+  import { desenharTracos, esconderTracos } from '../../scripts/desenho';
+
+  const ramo = document.querySelector<SVGSVGElement>('.marquee__ramo svg');
+  if (ramo) {
+    esconderTracos(ramo);
+    ScrollTrigger.create({ trigger: ramo, start: 'top 85%', once: true, onEnter: () => desenharTracos(ramo, { stagger: 0.02 }) });
+  }
+</script>

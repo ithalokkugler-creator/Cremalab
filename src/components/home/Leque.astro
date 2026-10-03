@@ -1,0 +1,208 @@
+---
+// "Do que você precisa hoje?" — cartões que se abrem em leque no hover (referência: service cards da truus);
+// no celular empilham e se revelam com a rolagem.
+import Doodle from '../marca/Doodle.astro';
+import Seta from '../ui/Seta.astro';
+
+const cartoes = [
+  { titulo: 'Um gelato agora', texto: 'Veja a unidade mais perto e se ela está aberta agora.', href: '/unidades', mundo: 'terracota', doodle: 'arco', cursor: 'ir' },
+  { titulo: 'Café & affogato', texto: 'Espresso sobre baunilha bourbon. Precisa dizer mais?', href: '/sabores#cafes', mundo: 'cacau', doodle: 'xicara', cursor: 'ver' },
+  { titulo: 'Encomendas', texto: 'Sobremesas da estação e gelato para levar para casa.', href: '/eventos-e-encomendas#encomendas', mundo: 'rosa', doodle: 'prateleira', cursor: 'ver' },
+  { titulo: 'Carrinho para eventos', texto: 'Gelato — e drinks com gelato — na sua festa.', href: '/eventos-e-encomendas#carrinho', mundo: 'ambar', doodle: 'mesa', cursor: 'ver' },
+  { titulo: 'Experiências', texto: 'Exposições, festivais e lançamentos no laboratório.', href: '/laboratorio#experiencias', mundo: 'pistache-creme', doodle: 'ramo', cursor: 'ver' },
+] as const;
+---
+
+<section class="leque secao" data-mundo="fior" aria-labelledby="leque-titulo">
+  <div class="casca leque__cabeca">
+    <h2 id="leque-titulo" class="t-h2 leque__titulo">
+      <span data-anim="titulo">Do que você</span>
+      <span class="leque__hoje">precisa <span data-rabisco="elipse" data-rabisco-cor="#b26a5b" data-rabisco-atraso="0.4">hoje?</span></span>
+    </h2>
+  </div>
+  <ul class="leque__lista" role="list">
+    {
+      cartoes.map((c, i) => (
+        <li class="leque__item" style={`--i:${i}`}>
+          <a class="leque__cartao" href={c.href} data-mundo={c.mundo} data-cursor={c.cursor}>
+            <span class="leque__num t-rotulo">{String(i + 1).padStart(2, '0')}</span>
+            <span class="leque__arte" aria-hidden="true">
+              <Doodle nome={c.doodle} tracoPx={2.4} />
+            </span>
+            <span class="leque__textos">
+              <span class="t-h3 leque__nome">{c.titulo}</span>
+              <span class="leque__texto">{c.texto}</span>
+            </span>
+            <Seta class="leque__seta" />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .leque {
+    overflow: hidden;
+  }
+  .leque__titulo {
+    display: grid;
+    justify-items: start;
+    gap: 0.04em;
+  }
+  .leque__hoje {
+    margin-left: 1.2em;
+  }
+  .leque__lista {
+    position: relative;
+    height: clamp(420px, 34vw, 480px);
+    margin-top: clamp(48px, 6vw, 88px);
+  }
+  .leque__item {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: clamp(240px, 21vw, 300px);
+    translate: calc(-50% + (var(--i) - 2) * 15vw) 0;
+    rotate: calc((var(--i) - 2) * 4deg);
+    z-index: calc(1 + var(--i));
+  }
+  .leque__cartao {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    gap: 16px;
+    height: clamp(360px, 30vw, 420px);
+    padding: 22px 22px 24px;
+    border-radius: 24px;
+    box-shadow:
+      0 24px 50px -30px rgb(43 33 28 / 0.7),
+      0 2px 0 rgb(43 33 28 / 0.08);
+    overflow: hidden;
+  }
+  .leque__num {
+    font-size: 0.66rem;
+    opacity: 0.7;
+  }
+  .leque__arte {
+    display: grid;
+    place-items: center;
+    width: 52%;
+    justify-self: center;
+    align-self: center;
+  }
+  .leque__textos {
+    display: grid;
+    gap: 8px;
+  }
+  .leque__nome {
+    font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+  }
+  .leque__texto {
+    font-size: 0.95rem;
+    line-height: 1.45;
+    opacity: 0.88;
+  }
+  .leque__seta {
+    width: 34px;
+    height: 16px;
+    justify-self: end;
+  }
+
+  @media (max-width: 899px) {
+    .leque__lista {
+      height: auto;
+      display: grid;
+      gap: 14px;
+      padding-inline: var(--margem);
+    }
+    .leque__item {
+      position: relative;
+      left: auto;
+      width: auto;
+      translate: none;
+      rotate: none;
+    }
+    .leque__cartao {
+      height: auto;
+      grid-template-columns: 72px 1fr auto;
+      grid-template-rows: auto;
+      align-items: center;
+    }
+    .leque__num {
+      display: none;
+    }
+    .leque__arte {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido, ponteiroFino } from '../../scripts/nucleo';
+
+  const lista = document.querySelector<HTMLElement>('.leque__lista');
+  const desktop = window.matchMedia('(min-width: 900px)').matches;
+  if (lista && !reduzido) {
+    const itens = Array.from(lista.querySelectorAll<HTMLElement>('.leque__item'));
+    if (desktop) {
+      // posição e inclinação de repouso passam para o GSAP (o GSAP absorve translate/rotate do CSS)
+      const base = itens.map((_, i) => (i - 2) * 4);
+      const passo = () => Math.min(window.innerWidth * 0.17, 250);
+      const bx = (i: number) => (i - 2) * passo();
+      itens.forEach((it, i) => {
+        it.style.translate = 'none';
+        it.style.rotate = 'none';
+        gsap.set(it, { xPercent: -50, x: bx(i), rotation: base[i] });
+      });
+      // entrada: o leque se abre a partir do centro
+      gsap.set(itens, { y: 60, opacity: 0 });
+      ScrollTrigger.create({
+        trigger: lista,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => gsap.to(itens, { y: 0, opacity: 1, duration: 1, ease: 'elastic.out(1, 0.6)', stagger: { each: 0.07, from: 'center' } }),
+      });
+      if (ponteiroFino) {
+        itens.forEach((ativo, i) => {
+          ativo.addEventListener('mouseenter', () => {
+            itens.forEach((outro, j) => {
+              if (j === i) {
+                gsap.to(outro, { x: bx(j), y: -18, scale: 1.08, rotation: 0, zIndex: 20, duration: 0.9, ease: 'elastic.out(1, 0.5)' });
+              } else {
+                const lado = j < i ? -1 : 1;
+                const distancia = Math.abs(j - i);
+                gsap.to(outro, {
+                  x: bx(j) + lado * (70 + 26 * (3 - Math.min(distancia, 3))),
+                  y: 0,
+                  scale: 1,
+                  rotation: base[j],
+                  zIndex: j + 1,
+                  duration: 1,
+                  ease: 'elastic.out(1, 0.5)',
+                });
+              }
+            });
+          });
+        });
+        lista.addEventListener('mouseleave', () => {
+          itens.forEach((it, j) =>
+            gsap.to(it, { x: bx(j), y: 0, scale: 1, rotation: base[j], zIndex: j + 1, duration: 1, ease: 'elastic.out(1, 0.5)' }),
+          );
+        });
+      }
+    } else {
+      // celular: cada cartão sobe e assenta conforme a rolagem
+      itens.forEach((it) => {
+        gsap.from(it, {
+          y: 50,
+          rotation: gsap.utils.random(-4, 4),
+          opacity: 0,
+          duration: 0.8,
+          ease: 'creme',
+          scrollTrigger: { trigger: it, start: 'top 90%', once: true },
+        });
+      });
+    }
+  }
+</script>

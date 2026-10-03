@@ -1,0 +1,205 @@
+---
+// Fachada de micélio (versão 2.5D da Home): o padrão de losangos "cresce" com a rolagem e uma luz
+// rasante segue o cursor, revelando o relevo da casquinha. A versão em 3D fica no Laboratório.
+import Seta from '../ui/Seta.astro';
+
+// duas famílias de diagonais formam a grade de losangos
+const L = 1600;
+const A = 900;
+const passo = 74;
+const diagonais: { d: string; dist: number }[] = [];
+for (let k = -A; k <= L + A; k += passo) {
+  // "/" : x + y = k
+  diagonais.push({ d: `M${k} 0L${k - A} ${A}`, dist: Math.abs(k - A / 2 - L / 2) });
+  // "\" : x - y = k - A
+  diagonais.push({ d: `M${k - A} 0L${k} ${A}`, dist: Math.abs(k - A / 2 - L / 2) });
+}
+diagonais.sort((a, b) => a.dist - b.dist);
+const fatos = [
+  'resíduo agrícola vira painel',
+  'isolamento térmico e acústico',
+  'absorve CO₂ na produção',
+  'biodegrada em até 90 dias',
+];
+---
+
+<section class="fachada" data-mundo="terracota" data-nav="escuro" aria-labelledby="fachada-titulo">
+  <div class="fachada__padrao" aria-hidden="true">
+    <svg class="fachada__svg fachada__svg--base" viewBox={`0 0 ${L} ${A}`} preserveAspectRatio="xMidYMid slice">
+      <g stroke-linecap="round">
+        {
+          diagonais.map((l) => (
+            <g class="fachada__losango">
+              <path d={l.d} stroke="#5b2a20" stroke-opacity="0.38" stroke-width="5" transform="translate(2.5 2.5)" />
+              <path d={l.d} stroke="#f5efe6" stroke-opacity="0.12" stroke-width="3" />
+            </g>
+          ))
+        }
+      </g>
+    </svg>
+    <svg class="fachada__svg fachada__svg--luz" viewBox={`0 0 ${L} ${A}`} preserveAspectRatio="xMidYMid slice">
+      <g stroke="#f5efe6" stroke-opacity="0.7" stroke-width="3" stroke-linecap="round">
+        {diagonais.map((l) => <path d={l.d} />)}
+      </g>
+    </svg>
+  </div>
+
+  <div class="casca fachada__conteudo">
+    <p class="t-eyebrow fachada__eyebrow" data-anim="subir">Arquitetura que volta pra terra</p>
+    <h2 id="fachada-titulo" class="t-h2 fachada__titulo" data-anim="titulo">Uma fachada que nasceu de cogumelos.</h2>
+    <div class="fachada__painel" data-anim="subir">
+      <p class="t-corpo">
+        No Batel, a casquinha é a própria parede: painéis de micélio — a raiz dos cogumelos — cultivados a partir de
+        resíduos agrícolas. Isolam calor e som, absorvem CO₂ na produção e, um dia, voltam para a natureza.
+        A ideia se repete no ParkShoppingBarigui.
+      </p>
+      <ul class="fachada__fatos" role="list">
+        {fatos.map((f) => <li class="pilula">{f}</li>)}
+      </ul>
+      <p class="fachada__credito t-legenda">Fachada: Furf Design Studio + Mush · Interiores: Uza Design e Arquitetura</p>
+      <a class="botao fachada__botao" href="/laboratorio#fachada" data-rabisco="caixa" data-rabisco-cor="#f5efe6" data-ferver data-magnetico>
+        Ver a história completa <Seta />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fachada {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-block: var(--respiro);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .fachada__padrao {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    --mx: 50%;
+    --my: 40%;
+  }
+  .fachada__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+  .fachada__svg--luz {
+    mix-blend-mode: soft-light;
+    -webkit-mask-image: radial-gradient(circle 280px at var(--mx) var(--my), #000 0%, rgb(0 0 0 / 0.45) 45%, transparent 75%);
+    mask-image: radial-gradient(circle 280px at var(--mx) var(--my), #000 0%, rgb(0 0 0 / 0.45) 45%, transparent 75%);
+  }
+  .fachada__padrao::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle 420px at var(--mx) var(--my), rgb(245 239 230 / 0.16), transparent 70%),
+      linear-gradient(to right, rgb(142 79 66 / 0.85) 0%, rgb(142 79 66 / 0.35) 55%, transparent 100%);
+    pointer-events: none;
+  }
+  .fachada__conteudo {
+    display: grid;
+    gap: 26px;
+    justify-items: start;
+  }
+  .fachada__eyebrow {
+    color: var(--c-ambar);
+  }
+  .fachada__titulo {
+    max-width: 13ch;
+    font-size: clamp(2.4rem, 5.6vw, 5.6rem);
+  }
+  .fachada__painel {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+    max-width: 560px;
+    padding: clamp(22px, 2.6vw, 34px);
+    border-radius: 22px;
+    background: var(--c-telha);
+    color: var(--c-fior);
+    box-shadow: 0 30px 60px -30px rgb(43 33 28 / 0.6);
+  }
+  .fachada__fatos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .fachada__fatos .pilula {
+    --pilula-bg: var(--c-fior);
+    --pilula-tinta: var(--c-cacau);
+  }
+  .fachada__credito {
+    opacity: 0.8;
+  }
+  .fachada__botao {
+    color: var(--c-fior);
+  }
+  .fachada__botao:hover {
+    background: var(--c-fior);
+    color: var(--c-cacau);
+  }
+</style>
+
+<script>
+  import { gsap, reduzido, ponteiroFino } from '../../scripts/nucleo';
+
+  const secao = document.querySelector<HTMLElement>('.fachada');
+  if (secao) {
+    const padrao = secao.querySelector<HTMLElement>('.fachada__padrao')!;
+    const losangos = secao.querySelectorAll<SVGGElement>('.fachada__losango');
+    const luz = secao.querySelectorAll<SVGPathElement>('.fachada__svg--luz path');
+
+    if (!reduzido) {
+      // o padrão cresce do centro para fora, como micélio
+      gsap.set(losangos, { opacity: 0 });
+      gsap.set(luz, { drawSVG: '50% 50%' });
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: secao, start: 'top 85%', end: 'center 45%', scrub: 0.8 },
+      });
+      tl.to(losangos, { opacity: 1, duration: 0.4, stagger: { each: 0.01 } }, 0).to(
+        luz,
+        { drawSVG: '0% 100%', duration: 0.6, stagger: { each: 0.008 }, ease: 'power1.out' },
+        0,
+      );
+
+      // luz rasante: segue o cursor (ou passeia sozinha no toque)
+      if (ponteiroFino) {
+        const pos = { x: 50, y: 40 };
+        const mover = gsap.quickTo(pos, 'x', {
+          duration: 0.6,
+          ease: 'power3',
+          onUpdate: () => padrao.style.setProperty('--mx', `${pos.x}%`),
+        });
+        const moverY = gsap.quickTo(pos, 'y', {
+          duration: 0.6,
+          ease: 'power3',
+          onUpdate: () => padrao.style.setProperty('--my', `${pos.y}%`),
+        });
+        secao.addEventListener('pointermove', (e) => {
+          const r = secao.getBoundingClientRect();
+          mover(((e.clientX - r.left) / r.width) * 100);
+          moverY(((e.clientY - r.top) / r.height) * 100);
+        });
+      } else {
+        const pos = { x: 30, y: 30 };
+        gsap.to(pos, {
+          x: 78,
+          y: 70,
+          duration: 8,
+          ease: 'sine.inOut',
+          repeat: -1,
+          yoyo: true,
+          onUpdate: () => {
+            padrao.style.setProperty('--mx', `${pos.x}%`);
+            padrao.style.setProperty('--my', `${pos.y}%`);
+          },
+        });
+      }
+    }
+  }
+</script>

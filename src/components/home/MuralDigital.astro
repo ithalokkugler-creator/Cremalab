@@ -1,0 +1,272 @@
+---
+// Mural digital: o mural da loja do Batel se desenha conforme a rolagem (seção presa).
+// Lados = line art vetorizada do mural; centro = painel com wordmark e assinaturas.
+import { Image } from 'astro:assets';
+import mural from '../../assets/marca/mural.json';
+import wordmark from '../../assets/marca/wordmark.json';
+import fotoMural from '../../assets/fotos/mural-foto.jpg';
+
+const C = 1500; // largura do painel central
+const METADE = mural.viewBox[2] / 2;
+const W = mural.viewBox[2] + C;
+const H = mural.viewBox[3];
+const CX = METADE + C / 2;
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+const tracos = mural.tracos.map((t) => ({ ...t, dx: t.lado === 'dir' ? C : 0 }));
+const pontos = mural.pontos.map((p) => ({ ...p, dx: p.lado === 'dir' ? C : 0 }));
+
+// faixas de listras verticais (ripado) acima e abaixo do painel
+const listrasTopo: string[] = [];
+const listrasBase: string[] = [];
+for (let x = METADE + 60; x <= METADE + C - 60; x += 28) {
+  listrasTopo.push(`M${x} 40V470`);
+  listrasBase.push(`M${x} 1500V1700`);
+}
+// linhas pontilhadas com pontos
+const pontilhado = (y: number) => ({
+  linha: `M${METADE + 70} ${y}H${METADE + C - 70}`,
+  pontos: Array.from({ length: 16 }, (_, i) => METADE + 110 + (i * (C - 220)) / 15).map((x) => ({ cx: r1(x), cy: y })),
+});
+const pontTopo = pontilhado(590);
+const pontBase = pontilhado(1372);
+
+const largWm = 1040;
+const esc = largWm / wordmark.viewBox[2];
+const wmX = CX - largWm / 2;
+const wmY = 828;
+---
+
+<section class="mural-digital" data-mundo="fior" aria-labelledby="mural-titulo">
+  <div class="mural-digital__palco">
+    <div class="mural-digital__cabeca casca">
+      <p class="t-eyebrow" id="mural-titulo">O mural da casa</p>
+      <p class="mural-digital__legenda t-corpo">O traço que cobre a parede do Batel — agora se desenhando pra você.</p>
+    </div>
+    <div class="mural-digital__janela">
+      <svg
+        class="mural-digital__svg"
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-label="Mural da Crema Lab: arcos, xícaras de café, ramos, sol, nuvem, poltronas e, ao centro, o logotipo com 'gelato + café + experiências', 'felicidade atemporal' e 'chef gelatiere Harlen Brandão'."
+        focusable="false">
+        <g class="mural-digital__lados" fill="none" stroke="currentColor" stroke-width={mural.largura} stroke-linecap="butt" stroke-linejoin="round">
+          {tracos.map((t) => <path d={t.d} transform={t.dx ? `translate(${t.dx} 0)` : undefined} data-grupo={t.grupo} />)}
+        </g>
+        <g class="mural-digital__pontos" fill="currentColor">
+          {pontos.map((p) => <circle cx={p.cx + p.dx} cy={p.cy} r={p.r} data-grupo={p.grupo} />)}
+        </g>
+
+        <g class="mural-digital__centro" fill="none" stroke="currentColor" stroke-linecap="butt">
+          <g data-grupo="listras" stroke-width="7">{listrasTopo.map((d) => <path d={d} />)}</g>
+          <path data-grupo="reguas" d={`M${METADE + 30} 500H${METADE + C - 30}`} stroke-width="9" />
+          <path data-grupo="reguas" d={`M${METADE + 30} 1462H${METADE + C - 30}`} stroke-width="9" />
+          <g data-grupo="listras-base" stroke-width="7">{listrasBase.map((d) => <path d={d} />)}</g>
+          <path data-grupo="pontilhado" d={pontTopo.linha} stroke-width="5" />
+          <path data-grupo="pontilhado" d={pontBase.linha} stroke-width="5" />
+        </g>
+        <g class="mural-digital__bolinhas" fill="currentColor">
+          {[...pontTopo.pontos, ...pontBase.pontos].map((p) => <circle cx={p.cx} cy={p.cy} r="9" />)}
+        </g>
+
+        <g class="mural-digital__textos" fill="currentColor">
+          <text x={CX} y="772" text-anchor="middle" class="mural-digital__texto">GELATO + CAFÉ + EXPERIÊNCIAS</text>
+          <text x={CX} y="1132" text-anchor="middle" class="mural-digital__texto">FELICIDADE ATEMPORAL</text>
+          <text x={CX - 96} y="1272" text-anchor="end" class="mural-digital__texto mural-digital__texto--p">CHEF GELATIERE</text>
+          <text x={CX + 96} y="1272" text-anchor="start" class="mural-digital__texto mural-digital__texto--p">HARLEN BRANDÃO</text>
+          <use href="#simbolo-monograma" x={CX - 22} y="1214" width="44" height="82" class="mural-digital__mono"></use>
+        </g>
+
+        <g class="mural-digital__wordmark" transform={`translate(${r1(wmX)} ${wmY}) scale(${esc.toFixed(5)})`}>
+          <defs>
+            {
+              wordmark.partes.map((p, i) => (
+                <mask id={`mural-wm-m${i}`} maskUnits="userSpaceOnUse" x="0" y="0" width={wordmark.viewBox[2]} height={wordmark.viewBox[3]}>
+                  {p.esqueletos.map((e) => (
+                    <path class="marca__esqueleto" d={e.d} stroke="#fff" stroke-width={e.sw} fill="none" stroke-linecap="butt" stroke-linejoin="round" />
+                  ))}
+                </mask>
+              ))
+            }
+          </defs>
+          {wordmark.partes.map((p, i) => <path d={p.d} fill="currentColor" fill-rule="evenodd" mask={`url(#mural-wm-m${i})`} />)}
+        </g>
+      </svg>
+    </div>
+    <figure class="mural-digital__original">
+      <div class="mural-digital__polaroid">
+        <Image src={fotoMural} alt="Foto do mural real, na parede da Crema Lab do Batel" widths={[320, 480]} sizes="220px" />
+      </div>
+      <figcaption class="t-anotacao">o original, no Batel</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .mural-digital {
+    position: relative;
+    overflow: hidden;
+  }
+  .mural-digital__palco {
+    position: relative;
+    height: 100svh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    padding-top: calc(var(--nav-h) + 36px);
+    padding-bottom: 28px;
+  }
+  .mural-digital__cabeca {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+  }
+  .mural-digital__legenda {
+    max-width: 34ch;
+    text-align: right;
+    color: var(--suave);
+  }
+  .mural-digital__janela {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .mural-digital__svg {
+    position: absolute;
+    top: 18px;
+    left: var(--margem);
+    width: calc(100% - 2 * var(--margem));
+    height: calc(100% - 18px);
+    max-width: none;
+    color: var(--c-cacau);
+  }
+  .mural-digital__texto {
+    font-family: var(--f-display);
+    font-size: 31px;
+    letter-spacing: 9px;
+  }
+  .mural-digital__texto--p {
+    font-size: 23px;
+    letter-spacing: 7px;
+  }
+  .mural-digital__mono {
+    fill: currentColor;
+  }
+  .mural-digital__original {
+    position: absolute;
+    right: clamp(20px, 4vw, 64px);
+    bottom: clamp(24px, 6vh, 64px);
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    margin: 0;
+    rotate: 5deg;
+  }
+  .mural-digital__polaroid {
+    width: clamp(130px, 13vw, 200px);
+    padding: 8px 8px 26px;
+    background: #fffaf2;
+    border-radius: 4px;
+    box-shadow: 0 18px 40px -20px rgb(43 33 28 / 0.6);
+  }
+  .mural-digital__polaroid img {
+    aspect-ratio: 1;
+    object-fit: cover;
+    width: 100%;
+  }
+  .mural-digital__original figcaption {
+    color: var(--c-telha);
+  }
+
+  @media (max-width: 899px) {
+    .mural-digital__cabeca {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mural-digital__legenda {
+      text-align: left;
+    }
+    .mural-digital__svg {
+      left: 0;
+      width: auto;
+      aspect-ratio: 3597 / 1984;
+    }
+    .mural-digital__original {
+      bottom: 18px;
+    }
+  }
+  :global(.sem-movimento) .mural-digital__palco {
+    height: auto;
+  }
+</style>
+
+<script>
+  import { gsap, reduzido } from '../../scripts/nucleo';
+  import { desenharMarca } from '../../scripts/desenho';
+
+  const secao = document.querySelector<HTMLElement>('.mural-digital');
+  if (secao && !reduzido) {
+    const palco = secao.querySelector<HTMLElement>('.mural-digital__palco')!;
+    const svg = secao.querySelector<SVGSVGElement>('.mural-digital__svg')!;
+    const grupo = (g: string) => Array.from(svg.querySelectorAll<SVGPathElement>(`path[data-grupo="${g}"], g[data-grupo="${g}"] path`));
+    const pontosDe = (g: string) => Array.from(svg.querySelectorAll<SVGCircleElement>(`circle[data-grupo="${g}"]`));
+    const textos = svg.querySelectorAll<SVGElement>('.mural-digital__textos text, .mural-digital__textos use');
+    const bolinhas = svg.querySelectorAll<SVGCircleElement>('.mural-digital__bolinhas circle');
+    const wm = svg.querySelector<SVGGElement>('.mural-digital__wordmark')!;
+    const original = secao.querySelector<HTMLElement>('.mural-digital__original')!;
+    const todos = svg.querySelectorAll<SVGPathElement>('.mural-digital__lados path, .mural-digital__centro path');
+
+    gsap.set(todos, { drawSVG: '0% 0%' });
+    gsap.set([...svg.querySelectorAll('.mural-digital__pontos circle'), ...bolinhas], { scale: 0, transformOrigin: '50% 50%' });
+    gsap.set(textos, { opacity: 0, y: 14 });
+    gsap.set(original, { scale: 0, rotation: -18 });
+
+    const tl = gsap.timeline({ defaults: { ease: 'none' } });
+    const desenhar = (paths: Element[], dur: number, stagger: number, pos: string | number) => {
+      if (paths.length) tl.to(paths, { drawSVG: '0% 100%', duration: dur, stagger }, pos);
+    };
+    desenhar(grupo('borda'), 0.6, 0.004, 0);
+    desenhar(grupo('listras'), 0.5, 0.008, 0.1);
+    desenhar(grupo('reguas'), 0.6, 0.1, 0.3);
+    desenhar(grupo('pontilhado'), 0.7, 0.1, 0.55);
+    tl.to(bolinhas, { scale: 1, duration: 0.25, stagger: 0.012, ease: 'back.out(3)' }, 0.75);
+    desenhar(grupo('arco'), 0.8, 0.1, 0.9);
+    desenhar(grupo('onda'), 0.8, 0.05, 1.15);
+    desenhar([...grupo('xicara'), ...grupo('prateleira'), ...grupo('suporte')], 0.45, 0.02, 1.4);
+    desenhar(grupo('escada'), 0.35, 0.012, 1.6);
+    desenhar(grupo('ramo'), 0.4, 0.012, 1.85);
+    tl.to(pontosDe('ramo'), { scale: 1, duration: 0.25, stagger: 0.03, ease: 'back.out(3)' }, 2.25);
+    desenhar(grupo('ceu'), 0.5, 0.05, 2.1);
+    desenhar(grupo('mobilia'), 0.6, 0.03, 2.3);
+    desenhar(grupo('listras-base'), 0.5, 0.008, 2.4);
+    tl.to(textos, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08, ease: 'power2.out' }, 2.55);
+    tl.add(desenharMarca(wm as unknown as SVGSVGElement, { duracao: 0.9, ease: 'none' }), 2.6);
+    tl.to(original, { scale: 1, rotation: 5, duration: 0.4, ease: 'back.out(2)' }, 3.4);
+    tl.to({}, { duration: 0.35 });
+
+    const telaPequena = window.matchMedia('(max-width: 899px)').matches;
+    if (telaPequena) {
+      // no celular o mural é mais largo que a tela: ele "anda" enquanto se desenha
+      tl.fromTo(svg, { x: 0 }, { x: () => -(svg.getBoundingClientRect().width - window.innerWidth), duration: tl.duration(), ease: 'none' }, 0);
+    }
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: secao,
+        start: 'top top',
+        end: () => `+=${window.innerHeight * (telaPequena ? 2.6 : 2.3)}`,
+        scrub: 1,
+        pin: palco,
+        invalidateOnRefresh: true,
+      },
+    }).add(tl);
+
+    // depois de pronto: a onda "balança" como creme quando o cursor passa
+    grupo('onda').forEach((onda) => {
+      onda.style.pointerEvents = 'stroke';
+      onda.addEventListener('mouseenter', () => {
+        gsap.fromTo(onda, { scaleX: 1.45 }, { scaleX: 1, duration: 1.4, ease: 'elastic.out(1, 0.22)', transformOrigin: '50% 50%' });
+      });
+    });
+  }
+</script>

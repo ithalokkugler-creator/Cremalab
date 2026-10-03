@@ -1,0 +1,169 @@
+---
+// "Gelato não é sorvete": comparação qualitativa em barras desenhadas com Rough.js (no build).
+// Sem números de propósito — valores reais dependem da receita e precisam ser validados com a chef.
+import rough from 'roughjs';
+import { CORES } from '../../data/site';
+
+const gen = rough.generator();
+const L = 600;
+const linhas = [
+  { rotulo: 'Ar na massa', gelato: 0.34, sorvete: 0.88, nota: 'menos ar, mais denso' },
+  { rotulo: 'Frio na hora de servir', gelato: 0.52, sorvete: 0.9, nota: 'menos gelado, mais sabor' },
+  { rotulo: 'Gordura', gelato: 0.44, sorvete: 0.76, nota: 'mais leve no fim' },
+].map((l, i) => {
+  const barra = (valor: number, y: number, cor: string, estilo: 'hachure' | 'cross-hatch', semente: number) =>
+    gen
+      .toPaths(
+        gen.rectangle(6, y, (L - 12) * valor, 30, {
+          roughness: 1.3,
+          bowing: 1.2,
+          stroke: CORES.cacau,
+          strokeWidth: 1.6,
+          fill: cor,
+          fillStyle: estilo,
+          hachureGap: 7,
+          fillWeight: 2.2,
+          seed: semente,
+        }),
+      )
+      .map((p) => ({ d: p.d, stroke: p.stroke, largura: p.strokeWidth }));
+  return {
+    ...l,
+    gelato: barra(l.gelato, 8, CORES.ambar, 'hachure', 40 + i),
+    sorvete: barra(l.sorvete, 50, '#8a7d73', 'cross-hatch', 80 + i),
+  };
+});
+---
+
+<section class="comparacao secao" data-mundo="fior" aria-labelledby="comparacao-titulo">
+  <div class="casca comparacao__grade">
+    <div class="comparacao__texto">
+      <p class="t-eyebrow comparacao__eyebrow" data-anim="subir">Caderno de anotações</p>
+      <h2 id="comparacao-titulo" class="t-h2" data-anim="titulo">Gelato não é sorvete.</h2>
+      <p class="t-corpo" data-anim="subir">
+        Primos, sim. Iguais, não. O gelato italiano leva menos ar, é servido menos gelado e costuma ter menos gordura que
+        o sorvete industrial — por isso o sabor aparece primeiro.
+      </p>
+      <ul class="comparacao__legenda" role="list">
+        <li><span class="comparacao__amostra comparacao__amostra--gelato" aria-hidden="true"></span>Gelato</li>
+        <li><span class="comparacao__amostra comparacao__amostra--sorvete" aria-hidden="true"></span>Sorvete industrial</li>
+      </ul>
+    </div>
+
+    <div class="comparacao__papel">
+      {
+        linhas.map((l) => (
+          <figure class="comparacao__linha">
+            <figcaption class="comparacao__rotulo">
+              <span class="t-rotulo">{l.rotulo}</span>
+              <span class="t-anotacao comparacao__nota">{l.nota}</span>
+            </figcaption>
+            <svg viewBox={`0 0 ${L} 90`} class="comparacao__svg" role="img" aria-label={`${l.rotulo}: gelato tem menos que o sorvete industrial`}>
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                {l.gelato.map((p) => (
+                  <path d={p.d} stroke={p.stroke} stroke-width={p.largura} />
+                ))}
+                {l.sorvete.map((p) => (
+                  <path d={p.d} stroke={p.stroke} stroke-width={p.largura} />
+                ))}
+              </g>
+            </svg>
+          </figure>
+        ))
+      }
+      <p class="t-legenda comparacao__rodape">Comparação ilustrativa, sem escala.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .comparacao__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+  }
+  .comparacao__texto {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+  }
+  .comparacao__eyebrow {
+    color: var(--c-telha);
+  }
+  .comparacao__legenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    font-size: 0.95rem;
+  }
+  .comparacao__legenda li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .comparacao__amostra {
+    width: 26px;
+    height: 14px;
+    border: 1.5px solid var(--c-cacau);
+    border-radius: 3px;
+  }
+  .comparacao__amostra--gelato {
+    background: repeating-linear-gradient(-45deg, var(--c-ambar) 0 2px, transparent 2px 5px);
+  }
+  .comparacao__amostra--sorvete {
+    background:
+      repeating-linear-gradient(-45deg, #8a7d73 0 1.5px, transparent 1.5px 5px),
+      repeating-linear-gradient(45deg, #8a7d73 0 1.5px, transparent 1.5px 5px);
+  }
+  /* folha de caderno pautada */
+  .comparacao__papel {
+    position: relative;
+    display: grid;
+    gap: 18px;
+    padding: clamp(24px, 3vw, 40px) clamp(20px, 3vw, 40px) 22px clamp(36px, 4vw, 56px);
+    border-radius: 6px 22px 22px 6px;
+    background:
+      linear-gradient(to right, transparent calc(clamp(36px, 4vw, 56px) - 14px), rgb(178 106 91 / 0.45) 0 calc(clamp(36px, 4vw, 56px) - 12.5px), transparent 0),
+      repeating-linear-gradient(to bottom, transparent 0 31px, rgb(43 33 28 / 0.09) 31px 32px),
+      #fffaf2;
+    box-shadow: 0 30px 60px -40px rgb(43 33 28 / 0.6);
+    rotate: 0.6deg;
+  }
+  .comparacao__linha {
+    display: grid;
+    gap: 2px;
+  }
+  .comparacao__rotulo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 14px;
+  }
+  .comparacao__nota {
+    color: var(--c-telha);
+    font-size: 1.2rem;
+  }
+  .comparacao__svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .comparacao__rodape {
+    opacity: 0.6;
+    text-align: right;
+  }
+  @media (max-width: 899px) {
+    .comparacao__grade {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { desenharAoRolar } from '../../scripts/desenho';
+  document.querySelectorAll<SVGSVGElement>('.comparacao__svg').forEach((svg, i) =>
+    desenharAoRolar(svg, { stagger: 0.25, atraso: i * 0.15, inicio: 'top 88%' }),
+  );
+</script>

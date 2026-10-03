@@ -1,0 +1,36 @@
+---
+// Ícones em traço contínuo, no mesmo desenho do mural (linha preta uniforme, pontas redondas).
+// São desenhados com DrawSVG (desenharTracos/desenharAoRolar), como o resto da marca.
+import { ICONES, type NomeIcone } from './icones';
+
+interface Props {
+  nome: NomeIcone;
+  class?: string;
+  traco?: number;
+  desenho?: boolean;
+}
+
+const { nome, class: classe, traco = 2.6, desenho = false } = Astro.props;
+const icone = ICONES[nome];
+---
+
+<svg
+  class:list={['icone', `icone--${nome}`, classe]}
+  viewBox="0 0 120 120"
+  aria-hidden="true"
+  focusable="false"
+  data-desenhavel={desenho ? '' : undefined}>
+  <g fill="none" stroke="currentColor" stroke-width={traco} stroke-linecap="round" stroke-linejoin="round">
+    {icone.paths.map((d) => <path d={d} />)}
+  </g>
+  {icone.pontos?.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} fill="currentColor" />)}
+</svg>
+
+<style>
+  .icone {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+</style>

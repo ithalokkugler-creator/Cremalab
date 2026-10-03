@@ -1,0 +1,30 @@
+---
+// Elementos isolados do mural, por nome — usados como doodles e stickers.
+import Tracos from './Tracos.astro';
+import type { NomeDoodle } from './doodles';
+
+interface Props {
+  nome: NomeDoodle;
+  class?: string;
+  tracoPx?: number;
+  desenho?: boolean;
+  espelhar?: boolean;
+}
+
+const MAPA: Record<NomeDoodle, { grupos: string[]; lado: 'esq' | 'dir' }> = {
+  xicara: { grupos: ['xicara'], lado: 'esq' },
+  ramo: { grupos: ['ramo'], lado: 'esq' },
+  sol: { grupos: ['ceu'], lado: 'dir' },
+  nuvem: { grupos: ['ceu'], lado: 'esq' },
+  onda: { grupos: ['onda'], lado: 'esq' },
+  arco: { grupos: ['arco'], lado: 'esq' },
+  mesa: { grupos: ['mobilia'], lado: 'esq' },
+  escada: { grupos: ['escada'], lado: 'esq' },
+  prateleira: { grupos: ['xicara', 'prateleira'], lado: 'esq' },
+};
+
+const { nome, class: classe, tracoPx = 2, desenho = false, espelhar = false } = Astro.props;
+const m = MAPA[nome];
+---
+
+<Tracos grupos={m.grupos} lado={m.lado} class:list={['doodle', `doodle--${nome}`, classe]} tracoPx={tracoPx} desenho={desenho} espelhar={espelhar} />

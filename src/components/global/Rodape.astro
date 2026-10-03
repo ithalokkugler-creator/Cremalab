@@ -1,0 +1,406 @@
+---
+import Marca from '../marca/Marca.astro';
+import Selo from '../marca/Selo.astro';
+import Doodle from '../marca/Doodle.astro';
+import { SITE, NAV, linkWhatsApp } from '../../data/site';
+import { unidadesAtivas } from '../../data/unidades';
+
+const ano = new Date().getFullYear();
+const blobs = [
+  'M50 4c12-1 22 6 27 15 11 2 19 12 18 23 6 8 5 20-3 26 1 12-9 22-21 22-6 6-17 8-25 3-11 4-23-1-27-12C8 77 2 66 6 55 0 46 3 33 13 28c1-13 14-22 27-19 3-3 6-5 10-5Z',
+  'M48 3c26 0 47 20 47 46S74 97 48 97 3 76 3 50 22 3 48 3Z',
+  'M52 2c10 8 20 2 28 10s2 18 10 28-2 20 6 30-12 14-14 22-14 2-24 6-16-6-26-4-14-10-20-16 2-16-4-26 6-18 4-28 14-8 20-14 12 0 20-8Z',
+];
+const stickers = [
+  { doodle: 'xicara', cor: 'var(--c-ambar)', blob: 0, x: 3, y: 3, rot: -10 },
+  { doodle: 'nuvem', cor: 'var(--c-fior)', blob: 2, x: 47, y: 1.5, rot: -14 },
+  { doodle: 'ramo', cor: 'var(--c-pistache-creme)', blob: 2, x: 86, y: 6, rot: 12 },
+  { doodle: 'sol', cor: 'var(--c-rosa)', blob: 1, x: 88, y: 15, rot: -6 },
+  { doodle: 'onda', cor: 'var(--c-terracota)', blob: 0, x: 50, y: 50, rot: 8 },
+  { doodle: 'mono', cor: 'var(--c-ambar)', blob: 1, x: 68, y: 52, rot: 10 },
+] as const;
+---
+
+<footer class="rodape" data-mundo="cacau" data-nav="escuro">
+  <div class="rodape__stickers" aria-hidden="true">
+    {
+      stickers.map((s) => (
+        <span
+          class="sticker"
+          style={`--x:${s.x}%;--y:${s.y}%;--rot:${s.rot}deg;--cor:${s.cor}`}
+          data-sticker>
+          <svg class="sticker__forma" viewBox="0 0 100 100">
+            <path d={blobs[s.blob]} />
+          </svg>
+          <span class="sticker__arte">
+            {s.doodle === 'mono' ? (
+              <svg viewBox="0 0 1359 2554" class="sticker__mono">
+                <use href="#simbolo-monograma" />
+              </svg>
+            ) : (
+              <Doodle nome={s.doodle} tracoPx={2.2} />
+            )}
+          </span>
+        </span>
+      ))
+    }
+  </div>
+
+  <div class="rodape__topo casca">
+    <p class="t-eyebrow rodape__eyebrow">Gelato + Café + Experiências</p>
+    <h2 class="t-h2 rodape__chamada" data-anim="titulo">
+      Vem tomar um gelato <span class="obliqua">com a gente.</span>
+    </h2>
+  </div>
+
+  <div class="rodape__grade casca">
+    <div class="rodape__col">
+      <h3 class="t-rotulo rodape__titulo">Unidades</h3>
+      <ul role="list" class="rodape__lista">
+        {
+          unidadesAtivas().map((u) => (
+            <li class="rodape__unidade" data-status={JSON.stringify(u.horarios)}>
+              <a href={`/unidades/${u.slug}`} class="rodape__unidade-nome t-h3" data-cursor="ir">
+                {u.nomeCurto}
+              </a>
+              <span class="rodape__endereco">
+                {u.endereco}
+                {u.complemento ? ` · ${u.complemento}` : ''} — {u.bairro}
+              </span>
+              <span class="rodape__status">
+                <i aria-hidden="true" />
+                <span data-status-texto>Ver horários</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="rodape__col">
+      <h3 class="t-rotulo rodape__titulo">Fale com a gente</h3>
+      <ul role="list" class="rodape__lista rodape__lista--links">
+        <li><a href={linkWhatsApp()} target="_blank" rel="noopener" data-rabisco="sublinhado" data-rabisco-gatilho="hover" data-rabisco-cor="#f1a500">WhatsApp {SITE.whatsappExibicao}</a></li>
+        <li><a href={SITE.instagram} target="_blank" rel="noopener" data-rabisco="sublinhado" data-rabisco-gatilho="hover" data-rabisco-cor="#f1a500">Instagram {SITE.instagramUsuario}</a></li>
+        <li><a href="/eventos-e-encomendas" data-rabisco="sublinhado" data-rabisco-gatilho="hover" data-rabisco-cor="#f1a500">Eventos & encomendas</a></li>
+      </ul>
+    </div>
+    <div class="rodape__col">
+      <h3 class="t-rotulo rodape__titulo">Navegue</h3>
+      <ul role="list" class="rodape__lista rodape__lista--links">
+        <li><a href="/" data-rabisco="sublinhado" data-rabisco-gatilho="hover" data-rabisco-cor="#f1a500">Início</a></li>
+        {
+          NAV.map((n) => (
+            <li>
+              <a href={n.href} data-rabisco="sublinhado" data-rabisco-gatilho="hover" data-rabisco-cor="#f1a500">
+                {n.rotulo}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="rodape__col rodape__col--selo">
+      <Selo id="selo-rodape" />
+    </div>
+  </div>
+
+  <div class="rodape__marca casca">
+    <Marca tipo="wordmark" id="rodape-wordmark" desenho titulo="Crema Lab" />
+  </div>
+
+  <div class="rodape__base casca">
+    <span>© {ano} Crema Lab · Felicidade atemporal desde {SITE.fundacao}</span>
+    <div class="creditos">
+      <button class="creditos__botao t-rotulo" type="button" aria-expanded="false" aria-controls="creditos-caixa">
+        Créditos
+      </button>
+      <div class="creditos__caixa" id="creditos-caixa" hidden>
+        <dl>
+          <div><dt class="t-rotulo">Chef gelatiere</dt><dd>{SITE.chef}</dd></div>
+          <div><dt class="t-rotulo">Interiores</dt><dd>Uza Design e Arquitetura</dd></div>
+          <div><dt class="t-rotulo">Fachada de micélio</dt><dd>Furf Design Studio + Mush</dd></div>
+          <div><dt class="t-rotulo">Fotos</dt><dd>Crema Lab (@cremalabgelato)</dd></div>
+          <div><dt class="t-rotulo">Tipografia</dt><dd>Blair ITC · Jost</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    position: relative;
+    padding: var(--respiro) 0 28px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .rodape__topo {
+    display: grid;
+    gap: 18px;
+    max-width: 1100px;
+    margin-bottom: clamp(56px, 8vw, 104px);
+  }
+  .rodape__eyebrow {
+    color: var(--c-ambar);
+  }
+  .rodape__chamada {
+    max-width: 14ch;
+    font-size: clamp(2.4rem, 6vw, 6rem);
+  }
+  .rodape__grade {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 0.8fr auto;
+    gap: 40px;
+    padding-top: 32px;
+    border-top: 1px solid color-mix(in srgb, var(--c-fior) 22%, transparent);
+  }
+  .rodape__titulo {
+    margin-bottom: 18px;
+    color: color-mix(in srgb, var(--c-fior) 62%, transparent);
+  }
+  .rodape__lista {
+    display: grid;
+    gap: 20px;
+  }
+  .rodape__lista--links {
+    gap: 10px;
+  }
+  .rodape__lista--links a {
+    position: relative;
+    display: inline-block;
+    font-size: 1.05rem;
+  }
+  .rodape__unidade {
+    display: grid;
+    gap: 4px;
+  }
+  .rodape__unidade-nome {
+    width: fit-content;
+  }
+  .rodape__endereco {
+    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--c-fior) 72%, transparent);
+  }
+  .rodape__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--c-fior) 80%, transparent);
+  }
+  .rodape__status i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.45;
+  }
+  .esta-aberto .rodape__status i {
+    background: var(--c-ambar);
+    opacity: 1;
+    box-shadow: 0 0 0 4px rgb(241 165 0 / 0.22);
+  }
+  .rodape__col--selo {
+    display: flex;
+    justify-content: flex-end;
+    --selo-fundo: var(--c-ambar);
+    --selo-tinta: var(--c-cacau);
+  }
+  .rodape__marca {
+    margin-top: clamp(64px, 9vw, 128px);
+    color: var(--c-fior);
+  }
+  .rodape__base {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 28px;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--c-fior) 68%, transparent);
+  }
+  .creditos {
+    position: relative;
+  }
+  .creditos__botao {
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--c-fior) 35%, transparent);
+    font-size: 0.66rem;
+  }
+  .creditos__caixa {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 12px);
+    width: min(360px, 86vw);
+    padding: 20px 22px;
+    border-radius: 18px;
+    background: var(--c-fior);
+    color: var(--c-cacau);
+    transform-origin: 100% 100%;
+  }
+  .creditos__caixa dl {
+    display: grid;
+    gap: 12px;
+  }
+  .creditos__caixa dt {
+    font-size: 0.6rem;
+    opacity: 0.6;
+  }
+  .creditos__caixa dd {
+    margin: 2px 0 0;
+    font-size: 0.95rem;
+  }
+
+  .rodape__stickers {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .sticker {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: clamp(70px, 8vw, 118px);
+    aspect-ratio: 1;
+    rotate: var(--rot);
+    display: grid;
+    place-items: center;
+    pointer-events: auto;
+  }
+  .sticker__forma {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: var(--cor);
+    stroke: var(--c-fior);
+    stroke-width: 3;
+    paint-order: stroke;
+    filter: drop-shadow(0 6px 0 rgb(0 0 0 / 0.25));
+  }
+  .sticker__arte {
+    position: relative;
+    width: 58%;
+    color: var(--c-cacau);
+  }
+  .sticker__mono {
+    width: 46%;
+    margin: auto;
+    fill: var(--c-cacau);
+  }
+
+  @media (max-width: 899px) {
+    .rodape__grade {
+      grid-template-columns: 1fr 1fr;
+    }
+    .rodape__col:first-child {
+      grid-column: 1 / -1;
+    }
+    .rodape__col--selo {
+      justify-content: flex-start;
+    }
+    .rodape__base {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .sticker {
+      opacity: 0.85;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido, ponteiroFino } from '../../scripts/nucleo';
+  import { desenharMarca, esconderMarca } from '../../scripts/desenho';
+
+  const rodape = document.querySelector<HTMLElement>('.rodape');
+  if (rodape) {
+    // wordmark gigante se desenha ao entrar
+    const marca = rodape.querySelector<SVGSVGElement>('.rodape__marca svg');
+    if (marca) {
+      esconderMarca(marca);
+      ScrollTrigger.create({
+        trigger: marca,
+        start: 'top 92%',
+        once: true,
+        onEnter: () => desenharMarca(marca, { duracao: 2.1 }),
+      });
+    }
+
+    // stickers: pulam ao entrar e fogem de movimentos rápidos do cursor
+    const stickers = Array.from(rodape.querySelectorAll<HTMLElement>('[data-sticker]'));
+    const giro = new Map<HTMLElement, number>();
+    stickers.forEach((s) => {
+      const r = parseFloat(getComputedStyle(s).getPropertyValue('--rot')) || 0;
+      giro.set(s, r);
+      s.style.rotate = 'none';
+      gsap.set(s, { rotation: r });
+    });
+    if (!reduzido) {
+      gsap.set(stickers, { scale: 0 });
+      ScrollTrigger.create({
+        trigger: rodape,
+        start: 'top 70%',
+        once: true,
+        onEnter: () => gsap.to(stickers, { scale: 1, duration: 0.9, ease: 'back.out(2.2)', stagger: 0.08 }),
+      });
+
+      if (ponteiroFino) {
+        let ultimo = { x: 0, y: 0, t: performance.now() };
+        rodape.addEventListener('pointermove', (e) => {
+          const agora = performance.now();
+          const dt = Math.max(agora - ultimo.t, 1);
+          const vx = (e.clientX - ultimo.x) / dt;
+          const vy = (e.clientY - ultimo.y) / dt;
+          ultimo = { x: e.clientX, y: e.clientY, t: agora };
+          const vel = Math.hypot(vx, vy);
+          if (vel < 0.6) return;
+          stickers.forEach((s) => {
+            const r = s.getBoundingClientRect();
+            const cx = r.left + r.width / 2;
+            const cy = r.top + r.height / 2;
+            const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+            if (dist > 170) return;
+            const forca = Math.min(vel, 4) * (1 - dist / 170) * 70;
+            gsap.to(s, {
+              x: vx * forca * 0.9,
+              y: vy * forca * 0.9,
+              rotation: (giro.get(s) ?? 0) + vx * 18,
+              duration: 0.35,
+              ease: 'power3.out',
+              overwrite: true,
+              onComplete: () => {
+                gsap.to(s, { x: 0, y: 0, rotation: giro.get(s) ?? 0, duration: 1.6, ease: 'elastic.out(1, 0.35)' });
+              },
+            });
+          });
+        });
+      } else {
+        stickers.forEach((s) =>
+          s.addEventListener('click', () =>
+            gsap.fromTo(s, { y: 0 }, { y: -30, duration: 0.25, yoyo: true, repeat: 1, ease: 'power2.out' }),
+          ),
+        );
+      }
+    }
+
+    // créditos pop-out
+    const botao = rodape.querySelector<HTMLButtonElement>('.creditos__botao');
+    const caixa = rodape.querySelector<HTMLElement>('.creditos__caixa');
+    if (botao && caixa) {
+      botao.addEventListener('click', () => {
+        const abrir = caixa.hidden;
+        botao.setAttribute('aria-expanded', String(abrir));
+        if (abrir) {
+          caixa.hidden = false;
+          gsap.fromTo(caixa, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.8)' });
+          gsap.from(caixa.querySelectorAll('dl > div'), { y: 10, opacity: 0, stagger: 0.05, duration: 0.4, delay: 0.1 });
+        } else {
+          gsap.to(caixa, { scale: 0.6, opacity: 0, duration: 0.25, onComplete: () => (caixa.hidden = true) });
+        }
+      });
+    }
+  }
+</script>

@@ -1,0 +1,326 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroPagina from '../components/ui/HeroPagina.astro';
+import FichaSabor from '../components/sabores/FichaSabor.astro';
+import Bola from '../components/sabores/Bola.astro';
+import Doodle from '../components/marca/Doodle.astro';
+import Seta from '../components/ui/Seta.astro';
+import { SABORES, sabor } from '../data/sabores';
+import { CARDAPIO } from '../data/cardapio';
+
+const filtros = [
+  { id: 'todos', rotulo: 'Todos' },
+  { id: 'gelato', rotulo: 'Gelatos' },
+  { id: 'sorbet', rotulo: 'Sorbets' },
+  { id: 'casa', rotulo: 'Da casa' },
+  { id: 'sazonal', rotulo: 'Sazonais' },
+  { id: 'vegano', rotulo: 'Veganos' },
+];
+const flutuantes = [sabor('mango-lab'), sabor('pistacchio'), sabor('uva-terci')];
+---
+
+<Base
+  titulo="Sabores"
+  mundo="ambar"
+  descricao="O arquivo de sabores da Crema Lab: gelatos e sorbets autorais, clássicos italianos e criações da estação, além de cafés, affogato, doces e paninis no pão de queijo.">
+  <HeroPagina
+    mundo="ambar"
+    eyebrow="O arquivo do laboratório"
+    linhas={['A vitrine', 'muda com', 'as estações']}
+    obliqua={2}
+    texto="Clássicos italianos, receitas autorais e combinações que só um laboratório testaria. Este é o nosso caderno de sabores — o que está na vitrine hoje, você descobre na loja (e no Instagram).">
+    <div class="sabores-hero__bolas" aria-hidden="true">
+      {
+        flutuantes.map((s, i) => (
+          <span class="sabores-hero__bola" style={`--i:${i}`} data-flutua>
+            <Bola sabor={s} id={`hero-sab-${s.id}`} />
+          </span>
+        ))
+      }
+    </div>
+  </HeroPagina>
+
+  <section class="arquivo secao" data-mundo="fior" aria-labelledby="arquivo-titulo">
+    <div class="casca arquivo__cabeca">
+      <h2 id="arquivo-titulo" class="t-h2" data-anim="titulo">Caderno de sabores</h2>
+      <div class="arquivo__filtros" role="group" aria-label="Filtrar sabores">
+        {
+          filtros.map((f, i) => (
+            <button type="button" class="arquivo__filtro" data-filtro={f.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+              {f.rotulo}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div class="casca arquivo__grade" data-grade>
+      {SABORES.map((s) => <FichaSabor sabor={s} />)}
+    </div>
+    <p class="casca t-legenda arquivo__aviso">
+      Sabores sazonais e edições especiais entram e saem da vitrine. Ingredientes podem variar — tem alguma restrição ou
+      alergia? Fale com a equipe antes de pedir.
+    </p>
+  </section>
+
+  <section class="faixa-estacao" data-mundo="terracota" data-nav="escuro" aria-labelledby="estacao-titulo">
+    <div class="casca faixa-estacao__grade">
+      <span class="faixa-estacao__doodle" aria-hidden="true"><Doodle nome="sol" tracoPx={2.4} /></span>
+      <div>
+        <p class="t-eyebrow faixa-estacao__eyebrow">Para levar à mesa</p>
+        <h2 id="estacao-titulo" class="t-h2" data-anim="titulo">Sobremesas da estação, sob encomenda.</h2>
+      </div>
+      <a class="botao faixa-estacao__botao" href="/eventos-e-encomendas#encomendas" data-rabisco="caixa" data-rabisco-cor="#f5efe6" data-ferver data-magnetico>
+        Ver encomendas <Seta />
+      </a>
+    </div>
+  </section>
+
+  <section id="cafes" class="cardapio secao" data-mundo="fior" aria-labelledby="cardapio-titulo">
+    <div class="casca cardapio__cabeca">
+      <span class="cardapio__xicara" aria-hidden="true"><Doodle nome="xicara" tracoPx={2.4} desenho /></span>
+      <h2 id="cardapio-titulo" class="t-h2" data-anim="titulo">Café, doces e salgados</h2>
+      <p class="t-corpo cardapio__intro" data-anim="subir">
+        O gelato puxa a fila, mas a casa também é café: espresso, affogato, lattes de inverno e paninis no pão de queijo
+        artesanal.
+      </p>
+    </div>
+    <div class="casca cardapio__grade">
+      {
+        CARDAPIO.map((secao) => (
+          <div class="cardapio__coluna" data-anim="subir">
+            <h3 class="t-h3 cardapio__titulo">{secao.titulo}</h3>
+            <ul class="cardapio__lista" role="list">
+              {secao.itens.map((item) => (
+                <li class="cardapio__item">
+                  <span class="cardapio__nome">
+                    {item.nome}
+                    {item.nota && <span class="pilula cardapio__nota">{item.nota}</span>}
+                  </span>
+                  <span class="cardapio__desc">{item.descricao}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+    <p class="casca t-legenda arquivo__aviso">Preços e disponibilidade na loja — o cardápio de cafés e lanches muda com a estação.</p>
+  </section>
+</Base>
+
+<style>
+  .sabores-hero__bolas {
+    position: absolute;
+    right: clamp(16px, 4vw, 72px);
+    bottom: clamp(30px, 6vh, 70px);
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    width: min(40vw, 560px);
+  }
+  .sabores-hero__bola {
+    flex: 1;
+    rotate: calc((var(--i) - 1) * 8deg);
+    translate: 0 calc((var(--i) - 1) * -18px);
+  }
+  .sabores-hero__bola:nth-child(2) {
+    translate: 0 -46px;
+  }
+
+  .arquivo__cabeca {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+  .arquivo__filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .arquivo__filtro {
+    padding: 11px 16px 10px;
+    border-radius: 999px;
+    border: 1.5px solid color-mix(in srgb, var(--c-cacau) 22%, transparent);
+    font-family: var(--f-display);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition:
+      background 0.3s,
+      color 0.3s,
+      border-color 0.3s;
+  }
+  .arquivo__filtro:hover {
+    border-color: var(--c-cacau);
+  }
+  .arquivo__filtro[aria-pressed='true'] {
+    background: var(--c-cacau);
+    border-color: var(--c-cacau);
+    color: var(--c-fior);
+  }
+  .arquivo__grade {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+  }
+  .arquivo__grade :global(.ficha[hidden]) {
+    display: none;
+  }
+  .arquivo__aviso {
+    margin-top: 36px;
+    opacity: 0.7;
+    max-width: 70ch;
+  }
+
+  .faixa-estacao {
+    padding-block: clamp(72px, 9vw, 120px);
+  }
+  .faixa-estacao__grade {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: clamp(20px, 3vw, 48px);
+  }
+  .faixa-estacao__doodle {
+    width: clamp(60px, 7vw, 100px);
+  }
+  .faixa-estacao__eyebrow {
+    color: var(--c-ambar);
+    margin-bottom: 14px;
+  }
+  .faixa-estacao__botao {
+    color: var(--c-fior);
+  }
+  .faixa-estacao__botao:hover {
+    background: var(--c-fior);
+    color: var(--c-cacau);
+  }
+
+  .cardapio__cabeca {
+    position: relative;
+    display: grid;
+    gap: 18px;
+    max-width: 760px;
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .cardapio__xicara {
+    width: 74px;
+  }
+  .cardapio__intro {
+    max-width: 52ch;
+  }
+  .cardapio__grade {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 3vw, 48px);
+  }
+  .cardapio__titulo {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+    border-bottom: 1.5px solid var(--c-cacau);
+  }
+  .cardapio__lista {
+    display: grid;
+    gap: 16px;
+  }
+  .cardapio__item {
+    display: grid;
+    gap: 4px;
+  }
+  .cardapio__nome {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 1.05rem;
+  }
+  .cardapio__nota {
+    --pilula-bg: var(--c-pistache-creme);
+    font-size: 0.52rem;
+  }
+  .cardapio__desc {
+    font-size: 0.95rem;
+    color: var(--suave);
+  }
+
+  @media (max-width: 899px) {
+    .sabores-hero__bolas {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .faixa-estacao__grade {
+      grid-template-columns: 1fr;
+    }
+    .cardapio__grade {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido } from '../scripts/nucleo';
+  import { Flip } from 'gsap/Flip';
+  gsap.registerPlugin(Flip);
+
+  // filtro do caderno de sabores com GSAP Flip
+  const grade = document.querySelector<HTMLElement>('[data-grade]');
+  const botoes = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filtro]'));
+  if (grade) {
+    const fichas = Array.from(grade.querySelectorAll<HTMLElement>('.ficha'));
+    botoes.forEach((b) =>
+      b.addEventListener('click', () => {
+        const f = b.dataset.filtro!;
+        botoes.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+        const estado = Flip.getState(fichas);
+        fichas.forEach((el) => {
+          el.hidden = f !== 'todos' && !el.dataset.filtros!.split(' ').includes(f);
+        });
+        Flip.from(estado, {
+          duration: reduzido ? 0 : 0.7,
+          ease: 'creme',
+          scale: true,
+          absolute: true,
+          onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'creme' }),
+          onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.85, duration: 0.35 }),
+        });
+        ScrollTrigger.refresh();
+      }),
+    );
+
+    if (!reduzido) {
+      fichas.forEach((el, i) => {
+        gsap.from(el, {
+          y: 50,
+          opacity: 0,
+          rotation: (i % 2 ? 1 : -1) * 2,
+          duration: 0.9,
+          ease: 'creme',
+          scrollTrigger: { trigger: el, start: 'top 92%', once: true },
+        });
+      });
+    }
+
+    // abrir direto numa ficha (/sabores#pistacchio) destaca o cartão
+    const alvo = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+    if (alvo?.classList.contains('ficha')) {
+      setTimeout(() => {
+        alvo.scrollIntoView({ block: 'center' });
+        gsap.fromTo(alvo, { boxShadow: '0 0 0 0 rgba(241,165,0,0.9)' }, { boxShadow: '0 0 0 14px rgba(241,165,0,0)', duration: 1.4, repeat: 1 });
+      }, 900);
+    }
+  }
+
+  // bolas do topo flutuam devagar
+  if (!reduzido) {
+    document.querySelectorAll<HTMLElement>('[data-flutua]').forEach((el, i) => {
+      gsap.to(el, { y: '-=12', duration: 2.4 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: i * 0.3 });
+    });
+  }
+</script>

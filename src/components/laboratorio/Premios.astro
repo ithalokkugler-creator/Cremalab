@@ -1,0 +1,150 @@
+---
+// Prêmios: medalhas que "carimbam" a página ao entrar, com selo Rough desenhado em volta.
+import Icone from '../marca/Icone.astro';
+import { PREMIOS } from '../../data/site';
+---
+
+<section class="premios secao" data-mundo="rosa" aria-labelledby="premios-titulo">
+  <div class="casca">
+    <div class="premios__cabeca">
+      <p class="t-eyebrow premios__eyebrow" data-anim="subir">Reconhecimento</p>
+      <h2 id="premios-titulo" class="t-h2" data-anim="titulo">Premiada logo no primeiro ano.</h2>
+    </div>
+    <ul class="premios__lista" role="list">
+      {
+        PREMIOS.map((p, i) => (
+          <li class="premio" style={`--giro:${[-4, 3, -2][i % 3]}deg`}>
+            <span class="premio__medalha">
+              <Icone nome="medalha" />
+            </span>
+            <span class="premio__ano">{p.ano}</span>
+            <span class="premio__nome t-rotulo">{p.titulo}</span>
+            <span class="premio__categoria">{p.categoria}</span>
+            <span
+              class:list={['premio__resultado', 'pilula', { 'premio__resultado--ouro': p.resultado === 'Vencedora' }]}
+              data-rabisco="circulo"
+              data-rabisco-cor="#2b211c"
+              data-rabisco-atraso={0.5 + i * 0.2}>
+              {p.resultado}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="premios__imprensa t-corpo" data-anim="subir">
+      Na imprensa: designboom, Gazeta do Povo / Bom Gourmet, Haus, Topview, CBN Curitiba, Bem Paraná e outros veículos de
+      Curitiba.
+    </p>
+  </div>
+</section>
+
+<style>
+  .premios__cabeca {
+    display: grid;
+    gap: 16px;
+    margin-bottom: clamp(40px, 5vw, 72px);
+  }
+  .premios__eyebrow {
+    color: var(--c-telha);
+  }
+  .premios__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 3vw, 44px);
+  }
+  .premio {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 10px;
+    padding: 30px 22px 34px;
+    border-radius: var(--raio);
+    background: var(--c-fior);
+    text-align: center;
+    rotate: var(--giro);
+    box-shadow: 0 24px 50px -36px rgb(43 33 28 / 0.6);
+  }
+  .premio__medalha {
+    width: 92px;
+    color: var(--c-terracota);
+  }
+  .premio__ano {
+    font-family: var(--f-display);
+    font-size: clamp(2.6rem, 4vw, 3.6rem);
+    line-height: 1;
+  }
+  .premio__nome {
+    font-size: 0.62rem;
+    opacity: 0.7;
+  }
+  .premio__categoria {
+    font-family: var(--f-display);
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    min-height: 2.6em;
+  }
+  .premio__resultado {
+    --pilula-bg: var(--c-pistache-creme);
+    position: relative;
+    margin-top: 4px;
+  }
+  .premio__resultado--ouro {
+    --pilula-bg: var(--c-ambar);
+  }
+  .premios__imprensa {
+    margin-top: clamp(36px, 4vw, 56px);
+    max-width: 70ch;
+  }
+  @media (max-width: 899px) {
+    .premios__lista {
+      grid-template-columns: 1fr;
+    }
+    .premio {
+      max-width: 420px;
+      width: 100%;
+      justify-self: center;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, reduzido } from '../../scripts/nucleo';
+  import { desenharTracos, esconderTracos } from '../../scripts/desenho';
+  import { ScrollTrigger } from '../../scripts/nucleo';
+
+  const lista = document.querySelector<HTMLElement>('.premios__lista');
+  if (lista) {
+    const premios = Array.from(lista.querySelectorAll<HTMLElement>('.premio'));
+    premios.forEach((p) => {
+      const giro = parseFloat(getComputedStyle(p).getPropertyValue('--giro')) || 0;
+      p.style.rotate = 'none';
+      gsap.set(p, { rotation: giro });
+      p.dataset.giro = String(giro);
+    });
+    const medalhas = premios.map((p) => p.querySelector<SVGSVGElement>('.premio__medalha svg')!);
+    medalhas.forEach((m) => esconderTracos(m));
+    ScrollTrigger.create({
+      trigger: lista,
+      start: 'top 78%',
+      once: true,
+      onEnter: () => {
+        if (reduzido) {
+          medalhas.forEach((m) => desenharTracos(m));
+          return;
+        }
+        // carimbo: cai grande e torto, assenta com tranco
+        premios.forEach((p, i) => {
+          const giro = Number(p.dataset.giro);
+          gsap.fromTo(
+            p,
+            { scale: 1.5, opacity: 0, rotation: giro - 14 },
+            { scale: 1, opacity: 1, rotation: giro, duration: 0.55, ease: 'back.out(2.2)', delay: i * 0.22 },
+          );
+          desenharTracos(medalhas[i], { atraso: 0.3 + i * 0.22, stagger: 0.08 });
+        });
+        gsap.fromTo(lista, { y: 0 }, { y: 5, duration: 0.06, repeat: 5, yoyo: true, delay: 0.42, ease: 'none', clearProps: 'y' });
+      },
+    });
+  }
+</script>

@@ -1,0 +1,75 @@
+---
+// Monograma CL ou wordmark "crema lab" vetorizados a partir dos PNGs da marca.
+// Com `desenho`, cada parte recebe uma máscara feita do "esqueleto" da letra:
+// animar o esqueleto com DrawSVG revela a forma original exata, como se fosse desenhada.
+import monograma from '../../assets/marca/monograma.json';
+import wordmark from '../../assets/marca/wordmark.json';
+
+interface Props {
+  tipo: 'monograma' | 'wordmark';
+  id: string;
+  class?: string;
+  titulo?: string;
+  desenho?: boolean;
+  decorativo?: boolean;
+}
+
+const { tipo, id, class: classe, titulo = 'Crema Lab', desenho = false, decorativo = false } = Astro.props;
+const dados = tipo === 'monograma' ? monograma : wordmark;
+const [x, y, w, h] = dados.viewBox;
+---
+
+<svg
+  class:list={['marca', `marca--${tipo}`, classe]}
+  viewBox={`${x} ${y} ${w} ${h}`}
+  data-marca={tipo}
+  data-desenho={desenho ? '' : undefined}
+  data-desenhavel={desenho ? '' : undefined}
+  role={decorativo ? undefined : 'img'}
+  aria-hidden={decorativo ? 'true' : undefined}
+  aria-labelledby={decorativo ? undefined : `${id}-t`}
+  focusable="false"
+>
+  {!decorativo && <title id={`${id}-t`}>{titulo}</title>}
+  {
+    desenho && (
+      <defs>
+        {dados.partes.map((p, i) => (
+          <mask id={`${id}-m${i}`} maskUnits="userSpaceOnUse" x={x} y={y} width={w} height={h}>
+            {p.esqueletos.map((e) => (
+              <path
+                class="marca__esqueleto"
+                d={e.d}
+                stroke="#fff"
+                stroke-width={e.sw}
+                fill="none"
+                stroke-linecap="butt"
+                stroke-linejoin="round"
+              />
+            ))}
+          </mask>
+        ))}
+      </defs>
+    )
+  }
+  {
+    dados.partes.map((p, i) => (
+      <path
+        class="marca__parte"
+        d={p.d}
+        fill="currentColor"
+        fill-rule="evenodd"
+        mask={desenho ? `url(#${id}-m${i})` : undefined}
+      />
+    ))
+  }
+</svg>
+
+<style>
+  .marca {
+    display: block;
+    width: 100%;
+    height: auto;
+    color: inherit;
+  }
+</style>

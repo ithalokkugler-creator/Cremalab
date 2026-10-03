@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import Manifesto from '../components/home/Manifesto.astro';
+import Vitrine from '../components/home/Vitrine.astro';
+import Espatula from '../components/home/Espatula.astro';
+import LabTeaser from '../components/home/LabTeaser.astro';
+import MuralDigital from '../components/home/MuralDigital.astro';
+import Fachada from '../components/home/Fachada.astro';
+import Leque from '../components/home/Leque.astro';
+import UnidadesSecao from '../components/unidades/UnidadesSecao.astro';
+import Marquee from '../components/home/Marquee.astro';
+import { SITE } from '../data/site';
+import { UNIDADES } from '../data/unidades';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Crema Lab',
+  slogan: 'Felicidade atemporal',
+  founder: { '@type': 'Person', name: SITE.chef, jobTitle: 'Chef gelatiere' },
+  foundingDate: String(SITE.fundacao),
+  sameAs: [SITE.instagram],
+  department: UNIDADES.filter((u) => u.ativa).map((u) => ({
+    '@type': 'IceCreamShop',
+    name: u.nome,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: `${u.endereco}${u.complemento ? `, ${u.complemento}` : ''}`,
+      addressLocality: 'Curitiba',
+      addressRegion: 'PR',
+      postalCode: u.cep,
+      addressCountry: 'BR',
+    },
+    servesCuisine: 'Gelato',
+  })),
+};
+---
+
+<Base schema={schema}>
+  <Hero />
+  <Manifesto />
+  <Vitrine />
+  <Espatula />
+  <LabTeaser />
+  <MuralDigital />
+  <Fachada />
+  <Leque />
+  <UnidadesSecao />
+  <Marquee />
+</Base>

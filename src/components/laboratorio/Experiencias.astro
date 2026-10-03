@@ -1,0 +1,310 @@
+---
+// Experiências: exposições, festivais, edições especiais e collabs numa galeria arrastável
+// (rolagem nativa + arraste com inércia no mouse; os cartões entortam com a velocidade).
+import Doodle from '../marca/Doodle.astro';
+import Icone from '../marca/Icone.astro';
+import Seta from '../ui/Seta.astro';
+import type { NomeDoodle } from '../marca/doodles';
+import type { NomeIcone } from '../marca/icones';
+import type { Mundo } from '../../data/site';
+import { SITE } from '../../data/site';
+
+type Experiencia = {
+  titulo: string;
+  quando: string;
+  texto: string;
+  mundo: Mundo;
+  desenho: { doodle?: NomeDoodle; icone?: NomeIcone };
+  nota?: string;
+};
+
+const EXPERIENCIAS: Experiencia[] = [
+  {
+    titulo: 'A Arte do Gelato',
+    quando: 'Exposição · Piazza do Batel',
+    texto:
+      'Inaugurada no Dia do Sorvete (23/09), ocupou as paredes da Piazza com fotos, mapas de ingredientes, adesivos e textos sobre como um gelato nasce.',
+    mundo: 'pistache-creme',
+    desenho: { doodle: 'arco' },
+    nota: 'gelato também se aprende',
+  },
+  {
+    titulo: 'Festival San Giovanni',
+    quando: 'Festival · junho',
+    texto:
+      'Um São João italiano, em homenagem ao padroeiro de Florença: gelato de pipoca doce com caramelo salgado, arroz-doce português com gelato de canela e panini de pão de queijo com raclette de Witmarsum.',
+    mundo: 'ambar',
+    desenho: { icone: 'balao' },
+  },
+  {
+    titulo: 'Dia do Sorvete',
+    quando: 'Edição limitada · 23/09',
+    texto:
+      'Chocolate com azeite e flor de sal, baunilha com bacon crocante e Doppio di Latte com farofa de batata frita e chocolate. Duram pouco — de propósito.',
+    mundo: 'rosa',
+    desenho: { icone: 'taca' },
+    nota: 'quem provou, provou',
+  },
+  {
+    titulo: 'Natal em bowls',
+    quando: 'Encomenda · dezembro',
+    texto:
+      'Sobremesas de Natal sob encomenda, servidas em bowls metalizados criados com a Vanessa Taques Casa. Depois da festa, a peça fica na sua mesa.',
+    mundo: 'terracota',
+    desenho: { icone: 'bowl' },
+  },
+  {
+    titulo: 'Collabs',
+    quando: 'Parcerias',
+    texto:
+      'Drinks com sorbet com a Île de France, cafés da Lucca, o limoncello da Casa Limoncello no Limonello e até moda com a Revival, unidas pela cor pistache.',
+    mundo: 'fior',
+    desenho: { doodle: 'xicara' },
+    nota: 'pistache combina com tudo',
+  },
+];
+---
+
+<section class="experiencias secao" id="experiencias" data-mundo="cacau" data-nav="escuro" aria-labelledby="experiencias-titulo">
+  <div class="casca experiencias__cabeca">
+    <div>
+      <p class="t-eyebrow experiencias__eyebrow" data-anim="subir">Gelato + café + experiências</p>
+      <h2 id="experiencias-titulo" class="t-h2" data-anim="titulo">O laboratório também é palco.</h2>
+    </div>
+    <p class="t-corpo experiencias__intro" data-anim="subir">
+      Exposições, festivais, edições que somem da vitrine e parcerias com quem pensa parecido. As próximas aparecem
+      primeiro no Instagram.
+    </p>
+  </div>
+
+  <div
+    class="experiencias__trilho"
+    tabindex="0"
+    role="region"
+    aria-label="Experiências da Crema Lab — arraste ou role para o lado"
+    data-cursor="arraste">
+    <ul class="experiencias__lista" role="list">
+      {
+        EXPERIENCIAS.map((x, i) => (
+          <li class="experiencia" data-mundo={x.mundo} style={`--giro:${i % 2 ? 1.6 : -1.4}deg`}>
+            <div class="experiencia__desenho" aria-hidden="true">
+              {x.desenho.doodle && <Doodle nome={x.desenho.doodle} tracoPx={2.2} />}
+              {x.desenho.icone && <Icone nome={x.desenho.icone} />}
+            </div>
+            <p class="experiencia__quando t-rotulo">{x.quando}</p>
+            <h3 class="experiencia__titulo t-h3">{x.titulo}</h3>
+            <p class="experiencia__texto">{x.texto}</p>
+            {x.nota && (
+              <p class="experiencia__nota t-anotacao" aria-hidden="true">
+                {x.nota}
+              </p>
+            )}
+          </li>
+        ))
+      }
+      <li class="experiencia experiencia--proxima" data-mundo="ambar">
+        <p class="experiencia__quando t-rotulo">Em breve</p>
+        <h3 class="experiencia__titulo t-h3">A próxima experiência</h3>
+        <p class="experiencia__texto">Lançamentos, festivais e edições limitadas saem primeiro no Instagram.</p>
+        <a class="botao experiencia__botao" href={SITE.instagram} target="_blank" rel="noopener" data-magnetico>
+          {SITE.instagramUsuario} <Seta direcao="diagonal" />
+        </a>
+      </li>
+    </ul>
+  </div>
+  <p class="casca experiencias__dica t-anotacao" aria-hidden="true">
+    <svg viewBox="0 0 90 30" fill="none" class="experiencias__dica-seta">
+      <path d="M4 15H82M72 6l10 9-10 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    arraste para o lado
+  </p>
+</section>
+
+<style>
+  .experiencias {
+    overflow: hidden;
+  }
+  .experiencias__cabeca {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    align-items: end;
+    gap: 24px 48px;
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .experiencias__eyebrow {
+    color: var(--c-ambar);
+    margin-bottom: 16px;
+  }
+  .experiencias__intro {
+    max-width: 44ch;
+    color: color-mix(in srgb, var(--c-fior) 80%, transparent);
+  }
+  .experiencias__trilho {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    cursor: grab;
+    padding-block: 24px 30px;
+  }
+  .experiencias__trilho::-webkit-scrollbar {
+    display: none;
+  }
+  .experiencias__trilho:active {
+    cursor: grabbing;
+  }
+  .experiencias__trilho:focus-visible {
+    outline: 3px solid var(--c-ambar);
+    outline-offset: -3px;
+  }
+  .experiencias__lista {
+    display: flex;
+    gap: clamp(16px, 2vw, 28px);
+    width: max-content;
+    padding-inline: var(--margem);
+  }
+  .experiencia {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    width: clamp(270px, 28vw, 380px);
+    min-height: clamp(400px, 34vw, 480px);
+    padding: 26px 26px 30px;
+    border-radius: var(--raio);
+    background: var(--bg);
+    color: var(--ink);
+    rotate: var(--giro);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .experiencia__desenho {
+    width: 96px;
+    height: 96px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 10px;
+  }
+  .experiencia__desenho :global(svg) {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .experiencia__quando {
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+  .experiencia__titulo {
+    font-size: clamp(1.3rem, 2vw, 1.75rem);
+  }
+  .experiencia__texto {
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+  .experiencia__nota {
+    margin-top: auto;
+    font-size: 1.3rem;
+    color: var(--acento);
+    rotate: -3deg;
+  }
+  .experiencia[data-mundo='fior'] .experiencia__nota,
+  .experiencia[data-mundo='ambar'] .experiencia__nota {
+    color: var(--c-telha);
+  }
+  .experiencia--proxima {
+    align-content: end;
+  }
+  .experiencia__botao {
+    justify-self: start;
+    margin-top: 8px;
+  }
+  .experiencias__dica {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--c-pistache-creme);
+    font-size: 1.3rem;
+  }
+  .experiencias__dica-seta {
+    width: 60px;
+  }
+  @media (max-width: 899px) {
+    .experiencias__cabeca {
+      grid-template-columns: 1fr;
+    }
+    .experiencia {
+      width: 80vw;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido, ponteiroFino } from '../../scripts/nucleo';
+  import { desenharTracos, esconderTracos } from '../../scripts/desenho';
+  import { Draggable } from 'gsap/Draggable';
+  import { InertiaPlugin } from 'gsap/InertiaPlugin';
+  gsap.registerPlugin(Draggable, InertiaPlugin);
+
+  const secao = document.querySelector<HTMLElement>('.experiencias');
+  if (secao) {
+    const trilho = secao.querySelector<HTMLElement>('.experiencias__trilho')!;
+    const cartoes = Array.from(secao.querySelectorAll<HTMLElement>('.experiencia'));
+    const desenhos = Array.from(secao.querySelectorAll<SVGSVGElement>('.experiencia__desenho svg'));
+
+    // a inclinação de base passa a ser do GSAP (ele absorve o "rotate" do CSS ao animar)
+    cartoes.forEach((c) => {
+      const giro = parseFloat(getComputedStyle(c).getPropertyValue('--giro')) || 0;
+      c.style.rotate = 'none';
+      gsap.set(c, { rotation: giro });
+    });
+
+    // desenhos entram quando a galeria aparece
+    desenhos.forEach((svg) => esconderTracos(svg));
+    ScrollTrigger.create({
+      trigger: trilho,
+      start: 'top 80%',
+      once: true,
+      onEnter: () => desenhos.forEach((svg, i) => desenharTracos(svg, { atraso: i * 0.15, stagger: 0.03 })),
+    });
+
+    if (!reduzido) {
+      gsap.from(cartoes, {
+        x: 160,
+        opacity: 0,
+        duration: 1.1,
+        ease: 'creme',
+        stagger: 0.08,
+        scrollTrigger: { trigger: trilho, start: 'top 85%', once: true },
+      });
+
+      // cartões entortam com a velocidade da galeria
+      const entortar = gsap.quickTo(cartoes, 'skewX', { duration: 0.5, ease: 'power3' });
+      let ultimo = trilho.scrollLeft;
+      let parado = 0;
+      trilho.addEventListener(
+        'scroll',
+        () => {
+          const delta = trilho.scrollLeft - ultimo;
+          ultimo = trilho.scrollLeft;
+          entortar(gsap.utils.clamp(-7, 7, -delta * 0.35));
+          window.clearTimeout(parado);
+          parado = window.setTimeout(() => entortar(0), 90);
+        },
+        { passive: true },
+      );
+    }
+
+    // no mouse, arrastar a galeria com inércia (no toque, a rolagem nativa já faz isso)
+    if (ponteiroFino) {
+      Draggable.create(trilho, {
+        type: 'scrollLeft',
+        inertia: !reduzido,
+        allowNativeTouchScrolling: true,
+        dragClickables: false,
+        cursor: 'grab',
+        activeCursor: 'grabbing',
+        onPress() {
+          gsap.killTweensOf(trilho);
+        },
+      });
+    }
+  }
+</script>

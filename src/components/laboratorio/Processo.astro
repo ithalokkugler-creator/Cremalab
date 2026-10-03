@@ -1,0 +1,307 @@
+---
+// "Anatomia de um gelato": os 6 passos como páginas de caderno. No desktop a seção fica presa e os
+// passos correm na horizontal, ligados pelo pontilhado do mural; cada ícone se desenha ao chegar.
+import Icone from '../marca/Icone.astro';
+import type { NomeIcone } from '../marca/icones';
+
+const PASSOS: { titulo: string; icone: NomeIcone; texto: string; nota: string }[] = [
+  {
+    titulo: 'Curadoria',
+    icone: 'limao',
+    texto:
+      'Ingredientes de verdade: fruta da estação, cafés especiais da Lucca, o limoncello da Casa Limoncello, doce de leite mineiro. A receita começa na escolha.',
+    nota: 'fruta boa, receita boa',
+  },
+  {
+    titulo: 'Pastas da casa',
+    icone: 'pote',
+    texto: 'As pastas de pistache e de avelã são feitas aqui, do zero. É delas que nascem o Pistacchio e o Nocciolotto.',
+    nota: 'feitas aqui!',
+  },
+  {
+    titulo: 'Balanceamento',
+    icone: 'balanca',
+    texto:
+      'Cada sabor tem a sua conta: açúcares, sólidos, gordura e água em equilíbrio, para chegar à textura certa sem esconder o sabor.',
+    nota: 'matemática + paladar',
+  },
+  {
+    titulo: 'Maturação',
+    icone: 'relogio',
+    texto: 'A base descansa no frio antes de ir para a máquina. É o tempo de os ingredientes se entenderem.',
+    nota: 'paciência é ingrediente',
+  },
+  {
+    titulo: 'Batimento',
+    icone: 'batedor',
+    texto: 'A máquina bate e incorpora pouco ar. Por isso o gelato é denso, sedoso e intenso.',
+    nota: 'menos ar, mais sabor',
+  },
+  {
+    titulo: 'Vitrine & espátula',
+    icone: 'espatula',
+    texto:
+      'Na vitrine, o gelato é trabalhado e servido com espátula, numa temperatura menos gelada que a de um sorvete comum — para derreter devagar na boca.',
+    nota: 'espátula, sempre',
+  },
+];
+---
+
+<section class="processo" data-mundo="fior" aria-labelledby="processo-titulo">
+  <div class="processo__fixo">
+    <div class="casca processo__cabeca">
+      <p class="t-eyebrow processo__eyebrow" data-anim="subir">Do zero à vitrine</p>
+      <h2 id="processo-titulo" class="t-h2" data-anim="titulo">Anatomia de um gelato</h2>
+      <p class="t-corpo processo__intro" data-anim="subir">
+        Seis passos, todos feitos no laboratório — à vista, atrás da parede de vidro do Batel.
+      </p>
+    </div>
+
+    <div class="processo__janela">
+      <div class="processo__trilho">
+        <span class="processo__pontilhado" aria-hidden="true"></span>
+        <ol class="processo__lista" role="list">
+        {
+          PASSOS.map((p, i) => (
+            <li class="passo" style={`--i:${i}`}>
+              <span class="passo__conta" aria-hidden="true" />
+              <div class="passo__topo">
+                <span class="passo__numero" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span class="passo__icone">
+                  <Icone nome={p.icone} desenho />
+                </span>
+              </div>
+              <h3 class="t-h3 passo__titulo">
+                <span class="sr-only">Passo {i + 1}: </span>
+                {p.titulo}
+              </h3>
+              <p class="passo__texto">{p.texto}</p>
+              <p class="passo__nota t-anotacao" aria-hidden="true">
+                <svg viewBox="0 0 60 30" class="passo__seta" fill="none">
+                  <path d="M56 4C44 18 28 24 6 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  <path d="M14 17 5 24l10 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                {p.nota}
+              </p>
+            </li>
+          ))
+        }
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .processo {
+    position: relative;
+    overflow: hidden;
+  }
+  .processo__fixo {
+    display: grid;
+    align-content: center;
+    gap: clamp(28px, 4vh, 56px);
+    min-height: 100svh;
+    padding-block: calc(var(--nav-h) + 24px) clamp(32px, 6vh, 64px);
+  }
+  .processo__cabeca {
+    display: grid;
+    gap: 14px;
+  }
+  .processo__eyebrow {
+    color: var(--c-telha);
+  }
+  .processo__intro {
+    max-width: 48ch;
+  }
+  .processo__janela {
+    position: relative;
+  }
+  .processo__trilho {
+    position: relative;
+    width: max-content;
+    padding-inline: var(--margem);
+    padding-top: 18px;
+  }
+  .processo__lista {
+    display: flex;
+    gap: clamp(20px, 3vw, 48px);
+  }
+  .processo__pontilhado {
+    position: absolute;
+    left: var(--margem);
+    right: var(--margem);
+    top: 18px;
+    height: 3px;
+    background: radial-gradient(circle, var(--c-cacau) 1.3px, transparent 1.6px) 0 50% / 12px 3px repeat-x;
+    transform-origin: 0 50%;
+  }
+  .passo {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    width: clamp(280px, 27vw, 400px);
+    padding-top: 36px;
+  }
+  .passo__conta {
+    position: absolute;
+    top: -6px;
+    left: 0;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--c-terracota);
+    box-shadow: 0 0 0 4px var(--c-fior);
+  }
+  .passo__topo {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1.5px solid color-mix(in srgb, var(--c-cacau) 20%, transparent);
+  }
+  .passo__numero {
+    font-family: var(--f-display);
+    font-size: clamp(3.6rem, 6vw, 6rem);
+    line-height: 0.8;
+    color: var(--c-terracota);
+  }
+  .passo__icone {
+    width: clamp(78px, 7vw, 108px);
+    color: var(--c-cacau);
+  }
+  .passo__titulo {
+    font-size: clamp(1.2rem, 1.6vw, 1.5rem);
+  }
+  .passo__texto {
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 36ch;
+  }
+  .passo__nota {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--c-telha);
+    font-size: 1.35rem;
+    rotate: -2deg;
+  }
+  .passo__seta {
+    width: 44px;
+    flex: none;
+  }
+
+  @media (max-width: 899px) {
+    .processo__fixo {
+      min-height: auto;
+      padding-block: var(--respiro);
+    }
+    .processo__trilho {
+      width: auto;
+      padding-left: calc(var(--margem) + 26px);
+      padding-top: 0;
+    }
+    .processo__lista {
+      flex-direction: column;
+      gap: 44px;
+    }
+    .processo__pontilhado {
+      left: calc(var(--margem) + 6px);
+      right: auto;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      height: auto;
+      background: radial-gradient(circle, var(--c-cacau) 1.3px, transparent 1.6px) 50% 0 / 3px 12px repeat-y;
+      transform-origin: 50% 0;
+    }
+    .passo {
+      width: auto;
+      padding-top: 0;
+    }
+    .passo__conta {
+      top: 10px;
+      left: -27px;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido } from '../../scripts/nucleo';
+  import { desenharTracos, esconderTracos, desenharAoRolar } from '../../scripts/desenho';
+
+  const secao = document.querySelector<HTMLElement>('.processo');
+  if (secao) {
+    const fixo = secao.querySelector<HTMLElement>('.processo__fixo')!;
+    const trilho = secao.querySelector<HTMLElement>('.processo__trilho')!;
+    const pontilhado = secao.querySelector<HTMLElement>('.processo__pontilhado')!;
+    const passos = Array.from(secao.querySelectorAll<HTMLElement>('.passo'));
+    const icones = passos.map((p) => p.querySelector<SVGSVGElement>('.icone')!);
+
+    if (reduzido) {
+      icones.forEach((svg) => desenharTracos(svg));
+    } else {
+      const mm = gsap.matchMedia();
+
+      // desktop: seção presa, trilho corre na horizontal
+      mm.add('(min-width: 900px)', () => {
+        icones.forEach((svg) => esconderTracos(svg));
+        const distancia = () => Math.max(0, trilho.scrollWidth - window.innerWidth);
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: secao,
+            pin: fixo,
+            start: 'top top',
+            end: () => `+=${distancia() + window.innerHeight * 0.35}`,
+            scrub: 0.8,
+            invalidateOnRefresh: true,
+          },
+        });
+        tl.to(trilho, { x: () => -distancia(), ease: 'none', duration: 1 }, 0).fromTo(
+          pontilhado,
+          { scaleX: 0 },
+          { scaleX: 1, ease: 'none', duration: 1 },
+          0,
+        );
+        const animTrilho = tl.getChildren()[0] as gsap.core.Tween;
+        passos.forEach((p, i) => {
+          gsap.from(p.querySelector('.passo__conta'), {
+            scale: 0,
+            duration: 0.6,
+            ease: 'elastic.out(1, 0.45)',
+            scrollTrigger: { trigger: p, containerAnimation: animTrilho, start: 'left 88%', toggleActions: 'play none none reverse' },
+          });
+          ScrollTrigger.create({
+            trigger: p,
+            containerAnimation: animTrilho,
+            start: 'left 78%',
+            once: true,
+            onEnter: () => desenharTracos(icones[i], { stagger: 0.06 }),
+          });
+          gsap.from(p.querySelector('.passo__nota'), {
+            opacity: 0,
+            x: -14,
+            duration: 0.8,
+            ease: 'creme',
+            scrollTrigger: { trigger: p, containerAnimation: animTrilho, start: 'left 62%', toggleActions: 'play none none reverse' },
+          });
+        });
+        return () => icones.forEach((svg) => gsap.set(svg.querySelectorAll('path'), { drawSVG: '0% 100%' }));
+      });
+
+      // mobile: lista vertical, o pontilhado desce junto
+      mm.add('(max-width: 899px)', () => {
+        gsap.fromTo(
+          pontilhado,
+          { scaleY: 0 },
+          { scaleY: 1, ease: 'none', scrollTrigger: { trigger: trilho, start: 'top 75%', end: 'bottom 70%', scrub: true } },
+        );
+        icones.forEach((svg) => desenharAoRolar(svg, { stagger: 0.06 }));
+      });
+    }
+  }
+</script>

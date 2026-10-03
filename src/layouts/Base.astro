@@ -1,0 +1,139 @@
+---
+import '@fontsource-variable/jost';
+import '@fontsource-variable/jost/wght-italic.css';
+import '@fontsource-variable/caveat';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import Espatulada from '../components/global/Espatulada.astro';
+import Cursor from '../components/global/Cursor.astro';
+import Navbar from '../components/nav/Navbar.astro';
+import Rodape from '../components/global/Rodape.astro';
+import Sprite from '../components/marca/Sprite.astro';
+import { SITE, type Mundo } from '../data/site';
+
+interface Props {
+  titulo?: string;
+  descricao?: string;
+  mundo?: Mundo;
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  titulo,
+  descricao = SITE.descricao,
+  mundo = 'fior',
+  schema,
+} = Astro.props;
+
+const tituloFinal = titulo ? `${titulo} | Crema Lab` : 'Crema Lab | Gelato artesanal italiano em Curitiba';
+const canonica = new URL(Astro.url.pathname, Astro.site);
+const imagemOg = new URL('/og-crema-lab.png', Astro.site);
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{tituloFinal}</title>
+    <meta name="description" content={descricao} />
+    <link rel="canonical" href={canonica} />
+    <meta name="theme-color" content="#b26a5b" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/blair-itc-medium.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Crema Lab" />
+    <meta property="og:title" content={tituloFinal} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={imagemOg} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+
+    <script is:inline>
+      // Estado inicial da transição — roda antes da primeira pintura para a página nascer coberta.
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        var cores = {
+          terracota: ['#b26a5b', '#f5efe6'],
+          ambar: ['#f1a500', '#2b211c'],
+          'pistache-creme': ['#dad3a7', '#2b211c'],
+          rosa: ['#e4bfae', '#2b211c'],
+          cacau: ['#2b211c', '#f5efe6'],
+          telha: ['#8e4f42', '#f5efe6'],
+        };
+        try {
+          var t = sessionStorage.getItem('crema:transicao');
+          if (t && cores[t]) {
+            d.classList.add('coberto');
+            d.style.setProperty('--cor-transicao', cores[t][0]);
+            d.style.setProperty('--cor-mono-transicao', cores[t][1]);
+          } else if (!sessionStorage.getItem('crema:visitou')) {
+            d.classList.add('carregando');
+          }
+        } catch (e) {}
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('sem-movimento');
+      })();
+    </script>
+  </head>
+  <body data-mundo={mundo}>
+    <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+    <Sprite />
+    <Espatulada />
+    <Cursor />
+    <Navbar />
+    <main id="conteudo" tabindex="-1">
+      <slot />
+    </main>
+    <Rodape />
+    <div class="grao" aria-hidden="true"></div>
+
+    <script>
+      import '../scripts/global';
+      import { ScrollTrigger } from '../scripts/nucleo';
+      // depois que todas as seções criaram seus gatilhos: ordem de cima para baixo e recálculo
+      requestAnimationFrame(() => {
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --cor-transicao: #b26a5b;
+  }
+  .coberto .espatulada {
+    color: var(--cor-transicao);
+  }
+  .coberto .espatulada__mono {
+    color: var(--cor-mono-transicao);
+  }
+  main:focus {
+    outline: none;
+  }
+  .rabisco {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .tem-rabisco {
+    position: relative;
+    display: inline-block;
+  }
+  .rabisco--marca-texto {
+    z-index: -1;
+  }
+  .tem-rabisco:has(.rabisco--marca-texto) {
+    isolation: isolate;
+  }
+</style>

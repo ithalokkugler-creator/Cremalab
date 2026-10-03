@@ -1,0 +1,121 @@
+---
+// "Escolha sua vitrine" — mapa desenhado + cartões com status ao vivo.
+import MapaDesenhado from './MapaDesenhado.astro';
+import CardUnidade from './CardUnidade.astro';
+import { unidadesAtivas } from '../../data/unidades';
+
+interface Props {
+  titulo?: string;
+  eyebrow?: string;
+  id?: string;
+}
+const { titulo = 'Escolha sua vitrine', eyebrow = 'Três casas em Curitiba', id = 'unidades' } = Astro.props;
+---
+
+<section class="unidades secao" data-mundo="fior" aria-labelledby={`${id}-titulo`} id={id}>
+  <div class="casca unidades__cabeca">
+    <p class="t-eyebrow unidades__eyebrow" data-anim="subir">{eyebrow}</p>
+    <h2 id={`${id}-titulo`} class="t-h2" data-anim="titulo">{titulo}</h2>
+  </div>
+  <div class="casca unidades__grade">
+    <div class="unidades__mapa">
+      <MapaDesenhado id={`${id}-mapa`} />
+      <p class="t-legenda unidades__aviso">Mapa ilustrativo — use “Como chegar” para a rota.</p>
+    </div>
+    <div class="unidades__cards">
+      {unidadesAtivas().map((u) => <CardUnidade unidade={u} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .unidades__cabeca {
+    display: grid;
+    gap: 16px;
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .unidades__eyebrow {
+    color: var(--c-telha);
+  }
+  .unidades__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: start;
+  }
+  .unidades__mapa {
+    position: sticky;
+    top: calc(var(--nav-h) + 40px);
+    padding: clamp(12px, 2vw, 24px);
+    border-radius: 26px;
+    background: color-mix(in srgb, var(--c-pistache-creme) 45%, var(--c-fior));
+  }
+  .unidades__aviso {
+    margin-top: 8px;
+    opacity: 0.6;
+    text-align: right;
+  }
+  .unidades__cards {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+  }
+  @media (max-width: 899px) {
+    .unidades__grade {
+      grid-template-columns: 1fr;
+    }
+    .unidades__mapa {
+      position: relative;
+      top: auto;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido } from '../../scripts/nucleo';
+
+  document.querySelectorAll<HTMLElement>('.unidades').forEach((secao) => {
+    const mapa = secao.querySelector<SVGSVGElement>('[data-mapa]');
+    if (!mapa) return;
+    const ruas = mapa.querySelectorAll<SVGPathElement>('.mapa__ruas path, .mapa__parque path, .mapa__quadras path');
+    const pinos = mapa.querySelectorAll<SVGGElement>('.mapa__pino');
+    const rotulos = mapa.querySelectorAll<SVGTextElement>('.mapa__rotulo, .mapa__bairro');
+    const circulos = mapa.querySelectorAll<SVGPathElement>('.mapa__circulo path');
+    gsap.set(circulos, { drawSVG: '0% 0%' });
+
+    if (!reduzido) {
+      gsap.set(ruas, { drawSVG: '0% 0%' });
+      gsap.set(pinos, { y: -60, opacity: 0 });
+      gsap.set(rotulos, { opacity: 0 });
+      ScrollTrigger.create({
+        trigger: mapa,
+        start: 'top 78%',
+        once: true,
+        onEnter: () => {
+          const tl = gsap.timeline();
+          tl.to(ruas, { drawSVG: '0% 100%', duration: 1.1, ease: 'espatula', stagger: 0.006 })
+            .to(rotulos, { opacity: 1, duration: 0.6, stagger: 0.05 }, 0.7)
+            .to(pinos, { y: 0, opacity: 1, duration: 1.1, ease: 'elastic.out(1, 0.45)', stagger: 0.14 }, 0.9);
+        },
+      });
+    }
+
+    // passar sobre um cartão destaca o pino correspondente
+    secao.querySelectorAll<HTMLElement>('.card-unidade').forEach((card) => {
+      const slug = card.dataset.unidade;
+      const grupo = mapa.querySelector<SVGGElement>(`.mapa__unidade[data-unidade="${slug}"]`);
+      if (!grupo) return;
+      const circulo = grupo.querySelectorAll('.mapa__circulo path');
+      const pino = grupo.querySelector('.mapa__pino');
+      const entrar = () => {
+        gsap.to(circulo, { drawSVG: '0% 100%', duration: 0.7, ease: 'espatula', stagger: 0.12 });
+        if (!reduzido) gsap.fromTo(pino, { y: 0 }, { y: -14, duration: 0.3, yoyo: true, repeat: 1, ease: 'power2.out' });
+      };
+      const sair = () => gsap.to(circulo, { drawSVG: '100% 100%', duration: 0.4, ease: 'power2.in' });
+      card.addEventListener('mouseenter', entrar);
+      card.addEventListener('mouseleave', sair);
+      card.addEventListener('focusin', entrar);
+      card.addEventListener('focusout', sair);
+    });
+  });
+</script>

@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Crema Lab — tokens de design
+   Paleta, tipografia, espaçamentos e curvas definidos na preparação (seção 5).
+   ========================================================================== */
+
+/* O "+" do arquivo Blair ITC desenha um "1" pequeno: este recorte mínimo da Jost
+   fornece só o sinal de mais (U+002B) para os textos em Blair. */
+@font-face {
+  font-family: "Blair Mais";
+  src: url("/fonts/jost-mais.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+002B;
+}
+
+@font-face {
+  font-family: "Blair ITC";
+  src: url("/fonts/blair-itc-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* paleta */
+  --c-terracota: #b26a5b;
+  --c-telha: #8e4f42;
+  --c-ambar: #f1a500;
+  --c-pistache-creme: #dad3a7;
+  --c-fior: #f5efe6;
+  --c-cacau: #2b211c;
+  --c-rosa: #e4bfae;
+  --c-pistache: #a3a86b;
+  --c-kraft: #e6dbc4;
+
+  /* papéis (cada seção/mundo redefine) */
+  --bg: var(--c-fior);
+  --ink: var(--c-cacau);
+  --acento: var(--c-terracota);
+  --suave: color-mix(in srgb, var(--ink) 62%, var(--bg));
+  --linha: color-mix(in srgb, var(--ink) 18%, transparent);
+
+  /* tipografia */
+  --f-display: "Blair Mais", "Blair ITC", "Copperplate", "Copperplate Gothic Light", "Optima", sans-serif;
+  --f-texto: "Jost Variable", "Jost", "Futura", "Century Gothic", system-ui, sans-serif;
+  --f-anotacao: "Caveat Variable", "Caveat", "Segoe Print", cursive;
+
+  /* curvas */
+  --ease-creme: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-espatula: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-padrao: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* espaço */
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 40px;
+  --s5: 64px;
+  --s6: 104px;
+  --s7: 168px;
+  --margem: clamp(16px, 2.4vw, 36px);
+  --respiro: clamp(96px, 12vw, 176px);
+  --raio: 24px;
+  --raio-p: 14px;
+  --nav-h: 84px;
+  --max: 1440px;
+
+  /* traço */
+  --traco: 2px;
+}
+
+@media (max-width: 599px) {
+  :root {
+    --raio: 16px;
+    --nav-h: 68px;
+  }
+}
+
+/* mundos de cor (seção 5.1) */
+[data-mundo="fior"] { --bg: var(--c-fior); --ink: var(--c-cacau); --acento: var(--c-terracota); }
+[data-mundo="ambar"] { --bg: var(--c-ambar); --ink: var(--c-cacau); --acento: var(--c-terracota); }
+[data-mundo="pistache-creme"] { --bg: var(--c-pistache-creme); --ink: var(--c-cacau); --acento: var(--c-telha); }
+[data-mundo="terracota"] { --bg: var(--c-terracota); --ink: var(--c-fior); --acento: var(--c-ambar); }
+[data-mundo="telha"] { --bg: var(--c-telha); --ink: var(--c-fior); --acento: var(--c-ambar); }
+[data-mundo="rosa"] { --bg: var(--c-rosa); --ink: var(--c-cacau); --acento: var(--c-terracota); }
+[data-mundo="cacau"] { --bg: var(--c-cacau); --ink: var(--c-fior); --acento: var(--c-ambar); }
+
+[data-mundo] {
+  background-color: var(--bg);
+  color: var(--ink);
+}

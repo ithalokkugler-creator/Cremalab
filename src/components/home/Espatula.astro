@@ -1,0 +1,208 @@
+---
+// "Agora é com você: passe a espátula." — o momento 3D da Home (Three.js, carregado sob demanda).
+import { Image } from 'astro:assets';
+import { sabor } from '../../data/sabores';
+import cubas from '../../assets/fotos/vitrine-cubas.jpg';
+
+const opcoes = [
+  { s: sabor('pistacchio'), graos: 0.22 },
+  { s: sabor('mango-lab'), graos: 0.0 },
+  { s: sabor('fior-di-latte'), graos: 0.0 },
+  { s: sabor('nocciolotto'), graos: 0.14 },
+  { s: sabor('chocolate-azeite-flor-de-sal'), graos: 0.07 },
+].map(({ s, graos }) => ({ id: s.id, nome: s.nome, cor: s.cor, detalhe: s.detalhe, graos }));
+---
+
+<section class="espatula secao" data-mundo="fior" aria-labelledby="espatula-titulo">
+  <div class="casca espatula__grade">
+    <div class="espatula__texto">
+      <p class="t-eyebrow espatula__eyebrow" data-anim="subir">Gelato não é bola</p>
+      <h2 id="espatula-titulo" class="t-h2" data-anim="titulo">Agora é com você: passe a espátula.</h2>
+      <p class="t-corpo espatula__intro" data-anim="subir">
+        Na tradição italiana, o gelato é trabalhado na espátula — cremoso, denso, vivo. Passe o cursor (ou o dedo) pela cuba
+        para sentir a textura, e troque o sabor quando quiser.
+      </p>
+      <div class="espatula__sabores" role="radiogroup" aria-label="Sabor da cuba" data-anim="subir">
+        {
+          opcoes.map((o, i) => (
+            <button
+              type="button"
+              class="espatula__sabor"
+              role="radio"
+              aria-checked={i === 0 ? 'true' : 'false'}
+              data-sabor={JSON.stringify({ cor: o.cor, detalhe: o.detalhe, graos: o.graos })}
+              style={`--cor:${o.cor}`}>
+              <i aria-hidden="true" />
+              {o.nome}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div class="espatula__palco" data-cursor="espatular">
+      <canvas class="espatula__canvas" aria-hidden="true"></canvas>
+      <Image src={cubas} alt="Cubas de gelato na vitrine da Crema Lab" class="espatula__reserva" widths={[400, 640]} sizes="(max-width: 899px) 92vw, 50vw" />
+      <button class="espatula__ativar t-rotulo" type="button" hidden>Toque para espatular</button>
+      <button class="espatula__pronto t-rotulo" type="button" hidden>Pronto</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .espatula__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(28px, 4vw, 72px);
+    align-items: center;
+  }
+  .espatula__texto {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+  }
+  .espatula__eyebrow {
+    color: var(--c-telha);
+  }
+  .espatula__intro {
+    max-width: 40ch;
+  }
+  .espatula__sabores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .espatula__sabor {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px 9px 10px;
+    border-radius: 999px;
+    border: 1.5px solid color-mix(in srgb, var(--c-cacau) 22%, transparent);
+    font-family: var(--f-display);
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition:
+      background 0.3s,
+      border-color 0.3s,
+      color 0.3s;
+  }
+  .espatula__sabor i {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--cor);
+    box-shadow: inset 0 0 0 1.5px rgb(43 33 28 / 0.35);
+  }
+  .espatula__sabor[aria-checked='true'] {
+    background: var(--c-cacau);
+    border-color: var(--c-cacau);
+    color: var(--c-fior);
+  }
+  .espatula__palco {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 28px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c-pistache-creme) 70%, var(--c-fior)), transparent 70%),
+      var(--c-fior);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c-cacau) 10%, transparent);
+  }
+  .espatula__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+  .espatula__reserva {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .espatula.com-3d .espatula__reserva {
+    display: none;
+  }
+  .espatula__ativar,
+  .espatula__pronto {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    translate: -50% 0;
+    padding: 14px 20px 13px;
+    border-radius: 999px;
+    background: var(--c-cacau);
+    color: var(--c-fior);
+    font-size: 0.66rem;
+    box-shadow: 0 10px 24px -12px rgb(43 33 28 / 0.7);
+  }
+  @media (max-width: 899px) {
+    .espatula__grade {
+      grid-template-columns: 1fr;
+    }
+    .espatula__palco {
+      aspect-ratio: 1 / 1;
+    }
+  }
+</style>
+
+<script>
+  import { reduzido, ponteiroFino } from '../../scripts/nucleo';
+  import type { CorSabor } from '../../scripts/three/espatula';
+  import { suporta3d } from '../../scripts/three/suporte';
+
+  const secao = document.querySelector<HTMLElement>('.espatula');
+  if (secao && !reduzido && suporta3d()) {
+    const palco = secao.querySelector<HTMLElement>('.espatula__palco')!;
+    const canvas = secao.querySelector<HTMLCanvasElement>('.espatula__canvas')!;
+    const botoes = Array.from(secao.querySelectorAll<HTMLButtonElement>('.espatula__sabor'));
+    const ativar = secao.querySelector<HTMLButtonElement>('.espatula__ativar')!;
+    const pronto = secao.querySelector<HTMLButtonElement>('.espatula__pronto')!;
+    let cena: { trocarSabor: (s: CorSabor) => void; ativar: (v: boolean) => void } | null = null;
+
+    const carregar = async () => {
+      const { iniciarEspatula } = await import('../../scripts/three/espatula');
+      const inicial = JSON.parse(botoes[0].dataset.sabor!) as CorSabor;
+      cena = iniciarEspatula({ canvas, palco, sabor: inicial, reduzido });
+      secao.classList.add('com-3d');
+      if (!ponteiroFino) {
+        // no toque, a cena só captura o dedo depois de ativada (não prende a rolagem)
+        cena.ativar(false);
+        ativar.hidden = false;
+      }
+    };
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          io.disconnect();
+          carregar();
+        }
+      },
+      { rootMargin: '600px 0px' },
+    );
+    io.observe(palco);
+
+    botoes.forEach((b) =>
+      b.addEventListener('click', () => {
+        botoes.forEach((o) => o.setAttribute('aria-checked', String(o === b)));
+        cena?.trocarSabor(JSON.parse(b.dataset.sabor!) as CorSabor);
+      }),
+    );
+    ativar.addEventListener('click', () => {
+      cena?.ativar(true);
+      canvas.style.touchAction = 'none';
+      ativar.hidden = true;
+      pronto.hidden = false;
+    });
+    pronto.addEventListener('click', () => {
+      cena?.ativar(false);
+      canvas.style.touchAction = 'pan-y';
+      pronto.hidden = true;
+      ativar.hidden = false;
+    });
+  }
+</script>

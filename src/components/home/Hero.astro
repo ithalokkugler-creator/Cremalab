@@ -1,0 +1,492 @@
+---
+// Topo da landing (referência: truus.co): card arredondado com margem, título gigante embaixo,
+// elipse desenhada à mão, doodles e bolha do cursor. A "vitrine" em arco mostra as fotos da casa
+// como um rolo de filme — pronta para receber o vídeo da marca quando ele existir.
+import { Image } from 'astro:assets';
+import Doodle from '../marca/Doodle.astro';
+import Selo from '../marca/Selo.astro';
+import interior from '../../assets/fotos/interior-mural.jpg';
+import copo from '../../assets/fotos/copo-manga-coco.jpg';
+import extracao from '../../assets/fotos/laboratorio-extracao.jpg';
+import chef from '../../assets/fotos/chef-harlen.jpg';
+import melancia from '../../assets/fotos/sorbet-melancia.jpg';
+import fachada from '../../assets/fotos/fachada-batel.jpg';
+
+const fotos = [
+  { src: interior, alt: 'Salão da Crema Lab no Batel, com o mural de traço e a coluna "Tradição, inovação e sabor"', pos: '62% 40%' },
+  { src: copo, alt: 'Copo compostável da Crema Lab com duas bolas de gelato, manga e coco', pos: '50% 38%' },
+  { src: extracao, alt: 'Gelato cremoso saindo da máquina direto para a cuba, no laboratório', pos: '55% 50%' },
+  { src: chef, alt: 'A chef gelatiere Harlen Brandão sorrindo com um copo de sorbet', pos: '45% 30%' },
+  { src: melancia, alt: 'Sorbet de melancia no copo compostável', pos: '50% 55%' },
+  { src: fachada, alt: 'Fachada terracota de micélio da Crema Lab, com toldos amarelos', pos: '50% 50%' },
+];
+---
+
+<section class="hero" data-nav="escuro" aria-labelledby="hero-titulo">
+  <div class="hero__card" data-mundo="terracota">
+    <svg class="hero__waffle" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="waffle-hero" width="58" height="58" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <path d="M0 0H58M0 0V58" stroke="#f5efe6" stroke-opacity="0.11" stroke-width="3"></path>
+          <path d="M0 3.5H58M3.5 0V58" stroke="#5b2a20" stroke-opacity="0.32" stroke-width="2.4"></path>
+        </pattern>
+        <radialGradient id="waffle-luz" cx="50%" cy="35%" r="75%">
+          <stop offset="0" stop-color="#f5efe6" stop-opacity="0.12"></stop>
+          <stop offset="1" stop-color="#2b211c" stop-opacity="0.22"></stop>
+        </radialGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#waffle-hero)"></rect>
+      <rect width="100%" height="100%" fill="url(#waffle-luz)"></rect>
+    </svg>
+
+    <div class="hero__topo">
+      <p class="t-eyebrow hero__eyebrow" data-hero-entra>Curitiba · desde 2024</p>
+      <p class="t-lead hero__sub" data-hero-entra>Gelato italiano de autor, feito do zero todos os dias no nosso laboratório.</p>
+      <div class="hero__controles" data-hero-entra>
+        <button class="hero__botao" type="button" aria-label="Pausar fotos" data-pausar>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pausa" d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path><path class="i-play" d="M7 5l12 7-12 7Z" fill="currentColor"></path></svg>
+        </button>
+        <span class="hero__contador t-rotulo"><span data-atual>01</span> / {String(fotos.length).padStart(2, '0')}</span>
+      </div>
+    </div>
+
+    <div class="hero__vitrine">
+      <div class="hero__toldo" aria-hidden="true">
+        <svg viewBox="0 0 200 26" preserveAspectRatio="none" focusable="false">
+          <path d="M6 0H194L200 18H0Z" fill="#f1a500"></path>
+          <path d="M0 18H200L196 26H4Z" fill="#c98900"></path>
+        </svg>
+      </div>
+      <div class="hero__arco arco" data-cursor="próxima" data-lcp>
+        {
+          fotos.map((f, i) => (
+            <Image
+              src={f.src}
+              alt={f.alt}
+              class="hero__foto"
+              style={`object-position:${f.pos}`}
+              widths={[480, 720, 960]}
+              sizes="(max-width: 899px) 72vw, 34vw"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : 'auto'}
+              data-ativa={i === 0 ? '' : undefined}
+            />
+          ))
+        }
+        <div class="hero__degrade" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <span class="hero__doodle hero__doodle--sol" aria-hidden="true"><Doodle nome="sol" tracoPx={2.4} desenho /></span>
+    <span class="hero__doodle hero__doodle--ramo" aria-hidden="true"><Doodle nome="ramo" tracoPx={2.2} desenho /></span>
+
+    <h1 id="hero-titulo" class="hero__titulo">
+      <span class="sr-only">Crema Lab, gelateria artesanal em Curitiba: </span>
+      <span class="hero__linha t-h1" aria-hidden="true">Felicidade</span>
+      <span class="hero__linha t-h1" aria-hidden="true">
+        <span
+          class="obliqua hero__atemporal"
+          data-rabisco="elipse"
+          data-rabisco-cor="#f1a500"
+          data-rabisco-gatilho="manual">Atemporal</span>
+      </span>
+      <span class="sr-only">Felicidade atemporal</span>
+    </h1>
+
+    <p class="hero__assinatura t-rotulo" data-hero-entra>Gelato + Café + Experiências</p>
+    <a class="hero__rolar t-rotulo" href="#manifesto" data-hero-entra>
+      <span>Role para provar</span>
+      <svg viewBox="0 0 24 44" aria-hidden="true" focusable="false">
+        <path d="M12 2c-6 6 6 10 0 16s6 10 0 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        <path d="M5 34l7 8 7-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+    <div class="hero__selo" data-hero-entra><Selo id="selo-hero" /></div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding: 12px;
+    background: var(--c-fior);
+  }
+  .hero__card {
+    position: relative;
+    height: calc(100svh - 24px);
+    min-height: 640px;
+    border-radius: var(--raio);
+    overflow: hidden;
+    isolation: isolate;
+    transform-origin: 50% 0%;
+  }
+  .hero__waffle {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .hero__topo {
+    position: absolute;
+    left: clamp(24px, 3vw, 48px);
+    top: clamp(120px, 15vh, 150px);
+    max-width: 30ch;
+    display: grid;
+    gap: 14px;
+  }
+  .hero__eyebrow {
+    color: var(--c-ambar);
+  }
+  .hero__sub {
+    font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+  }
+
+  .hero__vitrine {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    top: clamp(104px, 13vh, 124px);
+    width: min(32vw, 430px);
+  }
+  .hero__toldo {
+    position: relative;
+    z-index: 2;
+    width: 112%;
+    margin: 0 -6% -10px;
+    filter: drop-shadow(0 6px 0 rgb(43 33 28 / 0.18));
+    transform-origin: 50% 0%;
+  }
+  .hero__toldo svg {
+    width: 100%;
+    height: 26px;
+  }
+  .hero__arco {
+    position: relative;
+    height: calc(100svh - 24px - clamp(104px, 13vh, 124px) - clamp(190px, 27vh, 290px));
+    min-height: 330px;
+    border-radius: 999px 999px 18px 18px;
+    background: var(--c-telha);
+    box-shadow: inset 0 0 0 1px rgb(245 239 230 / 0.2);
+  }
+  .hero__foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+  }
+  .hero__foto[data-ativa] {
+    opacity: 1;
+  }
+  .hero__degrade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 45%, rgb(43 33 28 / 0.55));
+    pointer-events: none;
+  }
+  .hero__controles {
+    display: flex;
+    margin-top: 6px;
+    align-items: center;
+    gap: 12px;
+    color: var(--c-fior);
+  }
+  .hero__botao {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1.5px solid rgb(245 239 230 / 0.35);
+    background: rgb(245 239 230 / 0.08);
+    backdrop-filter: blur(8px);
+    transition:
+      background 0.25s,
+      border-color 0.25s;
+  }
+  .hero__botao:hover {
+    background: rgb(245 239 230 / 0.2);
+    border-color: rgb(245 239 230 / 0.7);
+  }
+  .hero__botao svg {
+    width: 15px;
+    height: 15px;
+  }
+  .hero__botao .i-play {
+    display: none;
+  }
+  .hero__botao.pausado .i-play {
+    display: block;
+  }
+  .hero__botao.pausado .i-pausa {
+    display: none;
+  }
+  .hero__contador {
+    font-size: 0.66rem;
+    opacity: 0.8;
+  }
+
+  .hero__titulo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(70px, 10vh, 108px);
+    display: grid;
+    justify-items: center;
+    color: var(--c-fior);
+    pointer-events: none;
+  }
+  .hero__linha {
+    display: block;
+    font-size: clamp(3.1rem, 10.4vw, 11.5rem);
+    line-height: 0.86;
+    text-shadow: 0 2px 30px rgb(43 33 28 / 0.25);
+  }
+  .hero__atemporal {
+    pointer-events: auto;
+  }
+
+  .hero__doodle {
+    position: absolute;
+    color: var(--c-fior);
+    pointer-events: none;
+  }
+  .hero__doodle--sol {
+    width: clamp(70px, 7vw, 110px);
+    right: clamp(70px, 14vw, 230px);
+    top: clamp(150px, 26vh, 260px);
+  }
+  .hero__doodle--ramo {
+    width: clamp(64px, 6vw, 96px);
+    left: clamp(40px, 11vw, 190px);
+    bottom: clamp(150px, 26vh, 260px);
+    rotate: -18deg;
+  }
+
+  .hero__assinatura {
+    position: absolute;
+    left: clamp(24px, 3vw, 48px);
+    bottom: 30px;
+    color: var(--c-fior);
+    font-size: 0.7rem;
+  }
+  .hero__rolar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: fit-content;
+    bottom: 22px;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    color: var(--c-fior);
+    font-size: 0.62rem;
+    opacity: 0.9;
+  }
+  .hero__rolar svg {
+    width: 14px;
+    height: 26px;
+  }
+  .hero__selo {
+    position: absolute;
+    right: clamp(20px, 2.6vw, 44px);
+    bottom: clamp(20px, 3vh, 36px);
+    --selo-fundo: var(--c-fior);
+    --selo-tinta: var(--c-cacau);
+  }
+
+  @media (max-width: 899px) {
+    .hero {
+      padding: 8px;
+    }
+    .hero__card {
+      height: calc(100svh - 16px);
+      min-height: 600px;
+    }
+    .hero__topo {
+      top: auto;
+      bottom: 92px;
+      left: 20px;
+      right: 20px;
+      max-width: none;
+      gap: 8px;
+    }
+    .hero__eyebrow {
+      display: none;
+    }
+    .hero__sub {
+      font-size: 1rem;
+      max-width: 26ch;
+    }
+    .hero__vitrine {
+      top: 84px;
+      width: 66vw;
+    }
+    .hero__arco {
+      height: 44svh;
+      min-height: 280px;
+    }
+    .hero__titulo {
+      bottom: 168px;
+    }
+    .hero__linha {
+      font-size: clamp(2.6rem, 13.4vw, 5rem);
+    }
+    .hero__doodle--sol {
+      right: 14px;
+      top: 92px;
+      width: 58px;
+    }
+    .hero__doodle--ramo {
+      display: none;
+    }
+    .hero__rolar {
+      display: none;
+    }
+    .hero__selo {
+      right: 14px;
+      bottom: 22px;
+    }
+    .hero__selo :global(.selo) {
+      width: 78px;
+    }
+    .hero__assinatura {
+      bottom: 30px;
+      left: 20px;
+      max-width: 22ch;
+      font-size: 0.62rem;
+    }
+  }
+  @media (max-height: 700px) and (min-width: 900px) {
+    .hero__linha {
+      font-size: clamp(3rem, 8.6vw, 9rem);
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, SplitText, reduzido, aoEntrar } from '../../scripts/nucleo';
+  import { desenharTracos, esconderTracos } from '../../scripts/desenho';
+
+  const hero = document.querySelector<HTMLElement>('.hero');
+  if (hero) {
+    const card = hero.querySelector<HTMLElement>('.hero__card')!;
+    const arco = hero.querySelector<HTMLElement>('.hero__arco')!;
+    const fotos = Array.from(arco.querySelectorAll<HTMLImageElement>('.hero__foto'));
+    const contador = hero.querySelector<HTMLElement>('[data-atual]')!;
+    const botao = hero.querySelector<HTMLButtonElement>('[data-pausar]')!;
+    const linhas = hero.querySelectorAll<HTMLElement>('.hero__linha');
+    const atemporal = hero.querySelector<HTMLElement>('.hero__atemporal')!;
+    const doodles = Array.from(hero.querySelectorAll<SVGSVGElement>('.hero__doodle svg'));
+    const entra = hero.querySelectorAll<HTMLElement>('[data-hero-entra]');
+    const toldo = hero.querySelector<HTMLElement>('.hero__toldo')!;
+
+    // ----------------------------------------------- rolo de fotos no arco
+    let atual = 0;
+    let pausado = reduzido;
+    let timer = 0;
+    const INTERVALO = 3400;
+
+    const mostrar = (i: number) => {
+      const anterior = fotos[atual];
+      atual = (i + fotos.length) % fotos.length;
+      const nova = fotos[atual];
+      contador.textContent = String(atual + 1).padStart(2, '0');
+      if (nova.loading === 'lazy') nova.loading = 'eager';
+      gsap.killTweensOf(nova);
+      nova.style.zIndex = '1';
+      anterior.style.zIndex = '0';
+      if (reduzido) {
+        gsap.set(nova, { opacity: 1 });
+        gsap.set(anterior, { opacity: 0 });
+        return;
+      }
+      // "espatulada" diagonal revelando a próxima foto
+      gsap.fromTo(
+        nova,
+        { opacity: 1, scale: 1.14, clipPath: 'polygon(0% 0%, 0% 0%, -40% 100%, -40% 100%)' },
+        {
+          clipPath: 'polygon(0% 0%, 140% 0%, 100% 100%, -40% 100%)',
+          scale: 1,
+          duration: 1.15,
+          ease: 'creme',
+          onComplete: () => {
+            gsap.set(anterior, { opacity: 0 });
+            nova.style.clipPath = '';
+          },
+        },
+      );
+    };
+    const agendar = () => {
+      window.clearTimeout(timer);
+      if (!pausado) timer = window.setTimeout(() => {
+        mostrar(atual + 1);
+        agendar();
+      }, INTERVALO);
+    };
+    arco.addEventListener('click', () => {
+      mostrar(atual + 1);
+      agendar();
+    });
+    botao.addEventListener('click', () => {
+      pausado = !pausado;
+      botao.classList.toggle('pausado', pausado);
+      botao.setAttribute('aria-label', pausado ? 'Tocar fotos' : 'Pausar fotos');
+      agendar();
+    });
+    if (reduzido) {
+      botao.classList.add('pausado');
+      botao.setAttribute('aria-label', 'Tocar fotos');
+    }
+    // pausa quando o hero sai da tela
+    ScrollTrigger.create({
+      trigger: card,
+      start: 'top top',
+      end: 'bottom top',
+      onLeave: () => window.clearTimeout(timer),
+      onEnterBack: () => agendar(),
+    });
+
+    // ------------------------------------------------------------ entrada
+    doodles.forEach((d) => esconderTracos(d));
+    let split: SplitText | null = null;
+    if (!reduzido) {
+      split = SplitText.create(linhas, { type: 'chars', mask: 'lines' });
+      gsap.set(split.chars, { yPercent: 115, rotation: () => gsap.utils.random(-9, 9) });
+      gsap.set(entra, { opacity: 0, y: 16 });
+      gsap.set(arco, { clipPath: 'inset(100% 0% 0% 0% round 999px 999px 18px 18px)' });
+      gsap.set(fotos[0], { scale: 1.18 });
+      gsap.set(toldo, { scaleY: 0 });
+    }
+
+    aoEntrar(() => {
+      if (reduzido) {
+        doodles.forEach((d) => desenharTracos(d));
+        document.dispatchEvent(new CustomEvent('crema:rabiscar', { detail: atemporal }));
+        agendar();
+        return;
+      }
+      const tl = gsap.timeline({ onComplete: agendar });
+      tl.to(arco, { clipPath: 'inset(0% 0% 0% 0% round 999px 999px 18px 18px)', duration: 1.25, ease: 'creme' }, 0)
+        .to(fotos[0], { scale: 1, duration: 1.8, ease: 'creme' }, 0)
+        .to(toldo, { scaleY: 1, duration: 0.7, ease: 'back.out(2)' }, 0.55)
+        .to(split!.chars, { yPercent: 0, rotation: 0, duration: 0.95, ease: 'creme', stagger: 0.028 }, 0.15)
+        .add(() => document.dispatchEvent(new CustomEvent('crema:rabiscar', { detail: atemporal })), 0.9)
+        .add(desenharTracos(doodles[0], { stagger: 0.08 }), 1.0)
+        .add(desenharTracos(doodles[1], { stagger: 0.03 }), 1.2)
+        .to(entra, { opacity: 1, y: 0, duration: 0.9, ease: 'creme', stagger: 0.07 }, 0.7);
+
+      // ao rolar: a vitrine se afasta
+      gsap
+        .timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } })
+        .to(card, { scale: 0.93, borderRadius: 44, ease: 'none' }, 0)
+        .to(hero.querySelector('.hero__titulo'), { yPercent: -60, ease: 'none' }, 0)
+        .to(hero.querySelector('.hero__vitrine'), { yPercent: -10, ease: 'none' }, 0);
+    });
+  }
+</script>

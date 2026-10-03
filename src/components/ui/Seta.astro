@@ -1,0 +1,20 @@
+---
+// Seta em traço (as setas não existem na Blair ITC).
+interface Props {
+  class?: string;
+  direcao?: 'direita' | 'baixo' | 'diagonal' | 'esquerda';
+}
+const { class: classe, direcao = 'direita' } = Astro.props;
+const giro = { direita: 0, baixo: 90, diagonal: -45, esquerda: 180 }[direcao];
+---
+
+<svg
+  class:list={['botao__seta', classe]}
+  viewBox="0 0 28 12"
+  fill="none"
+  aria-hidden="true"
+  focusable="false"
+  style={giro ? `rotate:${giro}deg` : undefined}>
+  <path d="M1 6.4c6.6-.9 15.2-.8 24.4-.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+  <path d="M20.2 1.6l5.4 4.6-5.6 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>

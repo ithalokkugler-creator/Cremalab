@@ -1,0 +1,154 @@
+---
+// Loader da primeira visita + transição entre páginas ("espatulada").
+// Um único traço gigante em S, como o gesto da espátula que espalha o gelato,
+// cobre a tela enquanto o monograma se desenha; depois o traço se desfaz e revela a página.
+import Marca from '../marca/Marca.astro';
+
+// serpentina que varre a tela: viradas fora da área visível (x < 0 e x > 1000)
+const pts: [number, number][] = [
+  [-280, 30], [260, 120], [720, 10], [1280, 110],
+  [720, 330], [260, 240], [-280, 360],
+  [260, 560], [720, 470], [1280, 600],
+  [720, 820], [260, 730], [-280, 850],
+  [260, 1060], [720, 960], [1280, 1100],
+];
+const r = (n: number) => Math.round(n * 10) / 10;
+let d = `M${pts[0][0]} ${pts[0][1]}`;
+for (let i = 0; i < pts.length - 1; i++) {
+  const p0 = pts[Math.max(i - 1, 0)];
+  const p1 = pts[i];
+  const p2 = pts[i + 1];
+  const p3 = pts[Math.min(i + 2, pts.length - 1)];
+  const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+  const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+  d += `C${r(c1[0])} ${r(c1[1])} ${r(c2[0])} ${r(c2[1])} ${p2[0]} ${p2[1]}`;
+}
+---
+
+<div class="espatulada" aria-hidden="true">
+  <div class="espatulada__solido"></div>
+  <svg class="espatulada__svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" focusable="false">
+    <path
+      class="espatulada__traco"
+      d={d}
+      fill="none"
+      stroke="currentColor"
+      stroke-width="340"
+      stroke-linecap="round"
+      stroke-linejoin="round"></path>
+  </svg>
+  <div class="espatulada__mono">
+    <Marca tipo="monograma" id="esp-mono" desenho decorativo />
+  </div>
+</div>
+
+<div class="loader" aria-hidden="true">
+  <div class="loader__mono">
+    <Marca tipo="monograma" id="loader-mono" desenho decorativo />
+  </div>
+  <svg class="loader__onda" viewBox="0 0 240 28" focusable="false">
+    <path
+      d="M4 14 C 16 2, 28 2, 40 14 S 64 26, 76 14 S 100 2, 112 14 S 136 26, 148 14 S 172 2, 184 14 S 208 26, 220 14 S 232 8, 236 10"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.4"
+      stroke-linecap="round"></path>
+  </svg>
+  <p class="loader__rotulo t-rotulo">Preparando a vitrine</p>
+</div>
+<p class="sr-only" aria-live="polite" id="aviso-carregamento"></p>
+
+<style>
+  .espatulada {
+    position: fixed;
+    inset: 0;
+    z-index: 9500;
+    pointer-events: none;
+    visibility: hidden;
+    color: var(--cor-transicao, var(--c-terracota));
+  }
+  .espatulada.ativa,
+  :global(.coberto) .espatulada {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .espatulada__solido {
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+  }
+  :global(.coberto) .espatulada__solido {
+    opacity: 1;
+  }
+  .espatulada__svg {
+    position: absolute;
+    inset: -3%;
+    width: 106%;
+    height: 106%;
+    max-width: none;
+  }
+  .espatulada__traco {
+    visibility: hidden;
+  }
+  .espatulada__mono {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: clamp(52px, 6vw, 84px);
+    height: fit-content;
+    color: var(--cor-mono-transicao, var(--c-fior));
+    opacity: 0;
+  }
+  :global(.coberto) .espatulada__mono {
+    opacity: 1;
+  }
+  :global(.coberto) .espatulada__mono :global(svg) {
+    visibility: visible;
+  }
+
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9400;
+    display: none;
+    place-items: center;
+    align-content: center;
+    gap: 22px;
+    background: var(--c-fior);
+    color: var(--c-cacau);
+  }
+  :global(.carregando) .loader {
+    display: grid;
+  }
+  .loader__mono {
+    width: clamp(64px, 8vw, 104px);
+  }
+  .loader__onda {
+    width: 132px;
+    height: auto;
+    color: var(--c-terracota);
+  }
+  .loader__rotulo {
+    opacity: 0.7;
+    font-size: 0.68rem;
+  }
+
+  /* rede de segurança: se o JS falhar, nada fica coberto */
+  :global(.coberto) .espatulada {
+    animation: descobrir 0s 3s forwards;
+  }
+  :global(.carregando) .loader {
+    animation: descobrir 0s 6s forwards;
+  }
+  @keyframes descobrir {
+    to {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/transicao';
+</script>

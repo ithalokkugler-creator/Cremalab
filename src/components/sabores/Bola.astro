@@ -1,0 +1,216 @@
+---
+// Ilustração de um sabor: bola trabalhada na espátula dentro do copo compostável da Crema Lab.
+// Geometria gerada no build a partir do id do sabor (sempre igual para o mesmo sabor).
+import type { Sabor } from '../../data/sabores';
+import { aleatorio, hash, curvaSuave } from '../../scripts/util';
+
+interface Props {
+  sabor: Sabor;
+  id: string;
+  class?: string;
+  copo?: boolean;
+}
+
+const { sabor, id, class: classe, copo = true } = Astro.props;
+const rnd = aleatorio(hash(sabor.id));
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+// contorno da bola: arco irregular com "ondas" de espátula + base escondida pelo copo
+const N = 10;
+const contorno: [number, number][] = [];
+for (let i = 0; i <= N; i++) {
+  const t = i / N;
+  const ang = Math.PI * (1.09 - 1.18 * t);
+  const onda = 1 + (rnd() - 0.5) * 0.11 + (i % 2 ? 0.03 : -0.018);
+  contorno.push([100 + Math.cos(ang) * 75 * onda, 118 - Math.sin(ang) * 66 * onda]);
+}
+contorno.push([171, 150], [100, 156], [29, 150]);
+const forma = curvaSuave(contorno, true);
+
+// marcas da espátula: arcos parciais concêntricos
+const marcas: string[] = [];
+for (const [escala, a0, a1] of [
+  [0.8, 0.86, 0.2],
+  [0.58, 0.8, 0.28],
+  [0.36, 0.74, 0.34],
+] as const) {
+  const cx = 100 + (rnd() - 0.5) * 10;
+  const pts: [number, number][] = [];
+  for (let k = 0; k <= 6; k++) {
+    const ang = Math.PI * (a0 - (a0 - a1) * (k / 6)) + (rnd() - 0.5) * 0.08;
+    pts.push([cx + Math.cos(ang) * 75 * escala, 122 - Math.sin(ang) * 66 * escala + (rnd() - 0.5) * 2]);
+  }
+  marcas.push(curvaSuave(pts));
+}
+const brilho = (() => {
+  const pts: [number, number][] = [];
+  for (let k = 0; k <= 4; k++) {
+    const ang = Math.PI * (0.86 - 0.16 * (k / 4));
+    pts.push([100 + Math.cos(ang) * 64, 118 - Math.sin(ang) * 56]);
+  }
+  return curvaSuave(pts);
+})();
+
+// ponto aleatório dentro da bola
+function pontoDentro(): [number, number] {
+  for (let tentativa = 0; tentativa < 60; tentativa++) {
+    const x = 34 + rnd() * 132;
+    const y = 58 + rnd() * 84;
+    if ((x - 100) ** 2 / 70 ** 2 + (y - 120) ** 2 / 62 ** 2 < 0.82) return [x, y];
+  }
+  return [100, 110];
+}
+
+type Peca = { tipo: 'path' | 'circle' | 'ellipse'; attrs: Record<string, string | number> };
+const pecas: Peca[] = [];
+switch (sabor.inclusao) {
+  case 'farofa':
+    for (let i = 0; i < 18; i++) {
+      const [x, y] = pontoDentro();
+      const r = 1.8 + rnd() * 2.2;
+      const a = rnd() * Math.PI * 2;
+      const tri = [0, 1, 2]
+        .map((k) => {
+          const aa = a + (k * Math.PI * 2) / 3 + (rnd() - 0.5) * 0.6;
+          return `${r1(x + Math.cos(aa) * r)} ${r1(y + Math.sin(aa) * r)}`;
+        })
+        .join('L');
+      pecas.push({ tipo: 'path', attrs: { d: `M${tri}Z`, fill: sabor.detalhe } });
+    }
+    break;
+  case 'pedacos':
+    for (let i = 0; i < 8; i++) {
+      const [x, y] = pontoDentro();
+      const r = 3.6 + rnd() * 3.2;
+      const pts: [number, number][] = [0, 1, 2, 3, 4].map((k) => {
+        const aa = (k * Math.PI * 2) / 5 + rnd() * 0.5;
+        const rr = r * (0.75 + rnd() * 0.4);
+        return [x + Math.cos(aa) * rr, y + Math.sin(aa) * rr];
+      });
+      pecas.push({
+        tipo: 'path',
+        attrs: { d: curvaSuave(pts, true), fill: sabor.detalhe, stroke: 'var(--c-cacau)', 'stroke-width': 0.9 },
+      });
+    }
+    break;
+  case 'calda': {
+    const y0 = 92 + rnd() * 14;
+    const pts: [number, number][] = [
+      [32, y0 + 14],
+      [62, y0 - 10],
+      [96, y0 + 16],
+      [128, y0 - 8],
+      [170, y0 + 6],
+    ];
+    pecas.push({
+      tipo: 'path',
+      attrs: { d: curvaSuave(pts), fill: 'none', stroke: sabor.detalhe, 'stroke-width': 7, 'stroke-linecap': 'round' },
+    });
+    const pts2: [number, number][] = [
+      [48, y0 + 34],
+      [84, y0 + 22],
+      [118, y0 + 38],
+      [152, y0 + 26],
+    ];
+    pecas.push({
+      tipo: 'path',
+      attrs: {
+        d: curvaSuave(pts2),
+        fill: 'none',
+        stroke: sabor.detalhe,
+        'stroke-width': 3.4,
+        'stroke-linecap': 'round',
+        opacity: 0.85,
+      },
+    });
+    break;
+  }
+  case 'raspas':
+    for (let i = 0; i < 12; i++) {
+      const [x, y] = pontoDentro();
+      const c = 4 + rnd() * 4;
+      const a = rnd() * Math.PI;
+      pecas.push({
+        tipo: 'path',
+        attrs: {
+          d: `M${r1(x - Math.cos(a) * c)} ${r1(y - Math.sin(a) * c)}Q${r1(x + 3)} ${r1(y - 4)} ${r1(x + Math.cos(a) * c)} ${r1(y + Math.sin(a) * c)}`,
+          fill: 'none',
+          stroke: sabor.detalhe,
+          'stroke-width': 2.2,
+          'stroke-linecap': 'round',
+        },
+      });
+    }
+    break;
+  case 'pontos':
+    for (let i = 0; i < 34; i++) {
+      const [x, y] = pontoDentro();
+      pecas.push({ tipo: 'circle', attrs: { cx: r1(x), cy: r1(y), r: r1(0.8 + rnd() * 0.9), fill: sabor.detalhe } });
+    }
+    break;
+  case 'sementes':
+    for (let i = 0; i < 13; i++) {
+      const [x, y] = pontoDentro();
+      pecas.push({
+        tipo: 'ellipse',
+        attrs: {
+          cx: r1(x),
+          cy: r1(y),
+          rx: 2.4,
+          ry: 1.5,
+          fill: sabor.detalhe,
+          transform: `rotate(${Math.round(rnd() * 180)} ${r1(x)} ${r1(y)})`,
+        },
+      });
+    }
+    break;
+}
+const clip = `${id}-clip`;
+---
+
+<svg class:list={['bola', classe]} viewBox="0 0 200 220" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id={clip}><path d={forma}></path></clipPath>
+  </defs>
+  <g class="bola__gelato">
+    <path d={forma} fill={sabor.cor}></path>
+    <g clip-path={`url(#${clip})`}>
+      {
+        pecas.map((p) =>
+          p.tipo === 'path' ? <path {...p.attrs} /> : p.tipo === 'circle' ? <circle {...p.attrs} /> : <ellipse {...p.attrs} />,
+        )
+      }
+      {
+        marcas.map((m) => (
+          <path d={m} fill="none" stroke="var(--c-cacau)" stroke-opacity="0.32" stroke-width="2.2" stroke-linecap="round" />
+        ))
+      }
+      <path d={brilho} fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round"></path>
+    </g>
+    <path d={forma} fill="none" stroke="var(--c-cacau)" stroke-width="2.4" stroke-linejoin="round"></path>
+  </g>
+  {
+    copo && (
+      <g class="bola__copo">
+        <path
+          d="M28 134 L45 203 Q47 211 56 211 L144 211 Q153 211 155 203 L172 134 Z"
+          fill="var(--c-kraft)"
+          stroke="var(--c-cacau)"
+          stroke-width="2.4"
+          stroke-linejoin="round"
+        />
+        <path d="M33 150 L167 150" stroke="var(--c-cacau)" stroke-opacity="0.2" stroke-width="1.6" />
+        <use href="#simbolo-wordmark" x="66" y="166" width="68" height="14" fill="var(--c-cacau)" />
+        <path d="M74 189 L126 189" stroke="var(--c-cacau)" stroke-opacity="0.35" stroke-width="1.2" />
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .bola {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

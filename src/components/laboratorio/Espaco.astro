@@ -1,0 +1,288 @@
+---
+// "O lugar onde o gelato é o protagonista" (texto oficial da Crema Lab) + a foto do salão do Batel
+// com pontos clicáveis: cada ponto e o item da lista se acendem juntos (rabisco Rough no ponto).
+import { Image } from 'astro:assets';
+import interior from '../../assets/fotos/interior-mural.jpg';
+
+// posições em % da foto (1336 × 1380 visíveis)
+const PONTOS = [
+  {
+    x: 17.2,
+    y: 50,
+    titulo: 'Tradição · Inovação · E sabor',
+    texto: 'O manifesto da casa, pintado na coluna logo na entrada.',
+  },
+  {
+    x: 67,
+    y: 8,
+    titulo: 'Forro em abóbada',
+    texto: 'Arcos e abóbadas em terracota que lembram as cúpulas das capelas e palácios italianos.',
+  },
+  {
+    x: 75.6,
+    y: 45,
+    titulo: 'O mural de traço',
+    texto: 'Arco, xícara, ramo, réguas e pontilhados — o mesmo desenho que se desenha neste site.',
+  },
+  {
+    x: 41.9,
+    y: 86,
+    titulo: 'Piso de cacos',
+    texto: 'Paginação exclusiva com pequenas peças cerâmicas em rosa, areia, preto e branco.',
+  },
+  {
+    x: 74.9,
+    y: 82,
+    titulo: 'A mesinha mostarda',
+    texto: 'Cadeiras pretas de casca, mesas redondas e um ponto de amarelo — a cor dos toldos da fachada.',
+  },
+];
+---
+
+<section class="espaco secao" data-mundo="fior" aria-labelledby="espaco-titulo" id="espaco">
+  <div class="casca espaco__cabeca">
+    <h2 id="espaco-titulo" class="t-h2 espaco__titulo" data-anim="titulo">
+      O lugar onde o gelato é o <span class="espaco__destaque">protagonista</span>
+    </h2>
+    <p class="t-lead espaco__lead" data-anim="subir">
+      Aqui, cada sabor nasce no nosso Lab, a partir de ingredientes de verdade e receitas próprias, feitas sem pressa e
+      com atenção aos detalhes.
+    </p>
+  </div>
+
+  <div class="casca espaco__grade">
+    <div class="espaco__foto">
+      <div class="espaco__arco arco" data-anim="imagem">
+        <Image
+          src={interior}
+          alt="O salão da Crema Lab Batel: coluna com o manifesto Tradição, Inovação e Sabor, mural de traço com o logotipo, forro curvo terracota, cadeiras pretas e piso de cacos cerâmicos"
+          widths={[480, 760, 1100]}
+          sizes="(max-width: 899px) 92vw, 46vw"
+        />
+      </div>
+      {
+        PONTOS.map((p, i) => (
+          <button
+            type="button"
+            class="espaco__ponto"
+            style={`left:${p.x}%;top:${p.y}%`}
+            data-ponto={i}
+            aria-describedby={`espaco-item-${i}`}
+            aria-label={`${i + 1}. ${p.titulo}`}>
+            <span class="espaco__circulo" data-rabisco="circulo" data-rabisco-gatilho="manual" data-rabisco-cor="#f1a500">
+              {i + 1}
+            </span>
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="espaco__texto">
+      <ol class="espaco__lista" role="list">
+        {
+          PONTOS.map((p, i) => (
+            <li class="espaco__item" id={`espaco-item-${i}`} data-item={i} data-anim="subir">
+              <span class="espaco__num" aria-hidden="true">
+                {i + 1}
+              </span>
+              <div>
+                <h3 class="espaco__item-titulo">{p.titulo}</h3>
+                <p class="espaco__item-texto">{p.texto}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="t-corpo espaco__extra" data-anim="subir">
+        As paredes têm pintura espatulada, no mesmo gesto de quem monta a vitrine. E, no fundo da loja, o laboratório
+        fica à vista, atrás de uma parede de vidro com estrutura metálica em curvas.
+      </p>
+      <p class="t-legenda espaco__credito">
+        Interiores: Uza Design e Arquitetura · Prêmio Bom Gourmet 2024, categoria HAUS Ambientação
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .espaco__cabeca {
+    display: grid;
+    gap: 18px;
+    justify-items: center;
+    text-align: center;
+    margin-bottom: clamp(36px, 5vw, 72px);
+  }
+  .espaco__titulo {
+    max-width: 16ch;
+  }
+  .espaco__destaque {
+    color: var(--c-terracota);
+  }
+  .espaco__lead {
+    max-width: 46ch;
+  }
+  .espaco__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    gap: clamp(28px, 5vw, 80px);
+    align-items: center;
+  }
+  .espaco__foto {
+    position: relative;
+  }
+  .espaco__arco {
+    aspect-ratio: 1336 / 1380;
+  }
+  .espaco__arco :global(img) {
+    object-position: 50% 0;
+  }
+  .espaco__ponto {
+    position: absolute;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    z-index: 2;
+  }
+  .espaco__circulo {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--c-fior);
+    color: var(--c-cacau);
+    font-family: var(--f-display);
+    font-size: 0.8rem;
+    box-shadow: 0 6px 16px -6px rgb(43 33 28 / 0.6);
+    transition:
+      background 0.3s,
+      color 0.3s,
+      scale 0.4s var(--ease-creme);
+  }
+  .espaco__ponto::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 2px solid var(--c-fior);
+    animation: pulso 2.4s var(--ease-creme) infinite;
+    animation-delay: calc(var(--d, 0) * 1s);
+  }
+  @keyframes pulso {
+    0% {
+      scale: 0.7;
+      opacity: 0.9;
+    }
+    80%,
+    100% {
+      scale: 1.7;
+      opacity: 0;
+    }
+  }
+  .espaco__ponto.ativo .espaco__circulo {
+    background: var(--c-ambar);
+    scale: 1.15;
+  }
+  .espaco__texto {
+    display: grid;
+    gap: 26px;
+  }
+  .espaco__lista {
+    display: grid;
+    gap: 6px;
+  }
+  .espaco__item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    cursor: default;
+    transition: background 0.35s;
+  }
+  .espaco__item.ativo {
+    background: color-mix(in srgb, var(--c-ambar) 22%, transparent);
+  }
+  .espaco__num {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-cacau);
+    font-family: var(--f-display);
+    font-size: 0.8rem;
+  }
+  .espaco__item-titulo {
+    font-family: var(--f-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .espaco__item-texto {
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: var(--suave);
+  }
+  .espaco__credito {
+    opacity: 0.7;
+  }
+  @media (max-width: 899px) {
+    .espaco__grade {
+      grid-template-columns: 1fr;
+    }
+    .espaco__ponto {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .espaco__ponto::before {
+      animation: none;
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  import { rabiscar, apagarRabisco } from '../../scripts/rabisco';
+
+  const secao = document.querySelector<HTMLElement>('.espaco');
+  if (secao) {
+    const pontos = Array.from(secao.querySelectorAll<HTMLButtonElement>('[data-ponto]'));
+    const itens = Array.from(secao.querySelectorAll<HTMLElement>('[data-item]'));
+    let fixo: number | null = null;
+
+    const acender = (i: number | null) => {
+      pontos.forEach((p, j) => {
+        const ativo = i === j;
+        p.classList.toggle('ativo', ativo);
+        p.setAttribute('aria-pressed', String(ativo));
+        const circulo = p.querySelector<HTMLElement>('[data-rabisco]')!;
+        if (ativo) rabiscar(circulo);
+        else apagarRabisco(circulo);
+      });
+      itens.forEach((it, j) => it.classList.toggle('ativo', i === j));
+    };
+
+    pontos.forEach((p, i) => {
+      p.style.setProperty('--d', String(i * 0.35));
+      p.addEventListener('mouseenter', () => acender(i));
+      p.addEventListener('mouseleave', () => acender(fixo));
+      p.addEventListener('focus', () => acender(i));
+      p.addEventListener('blur', () => acender(fixo));
+      p.addEventListener('click', () => {
+        fixo = fixo === i ? null : i;
+        acender(fixo);
+      });
+    });
+    itens.forEach((it, i) => {
+      it.addEventListener('mouseenter', () => acender(i));
+      it.addEventListener('mouseleave', () => acender(fixo));
+    });
+  }
+</script>

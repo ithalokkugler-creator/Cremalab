@@ -1,0 +1,342 @@
+---
+// "A vitrine muda com as estações" — cartões de sabor arremessáveis (referência: motion cards da truus).
+import Bola from '../sabores/Bola.astro';
+import Doodle from '../marca/Doodle.astro';
+import Seta from '../ui/Seta.astro';
+import { sabor, ROTULO_TAG } from '../../data/sabores';
+
+const cards = [
+  { s: sabor('nocciolotto'), x: 3, y: 22, rot: -8 },
+  { s: sabor('pistacchio'), x: 27, y: 0, rot: 5 },
+  { s: sabor('mango-lab'), x: 51, y: 28, rot: -3 },
+  { s: sabor('cuca-de-doce-de-leite'), x: 75, y: 4, rot: 8 },
+];
+const etiquetas = [
+  { texto: 'feito do zero, todo dia', cor: 'var(--c-fior)', x: 1, y: 6, rot: -6 },
+  { texto: 'pasta de pistache da casa', cor: 'var(--c-rosa)', x: 30, y: 90, rot: 4 },
+  { texto: 'técnica italiana, sotaque curitibano', cor: 'var(--c-pistache-creme)', x: 50, y: 8, rot: -3 },
+  { texto: 'manga com pesto? confia.', cor: 'var(--c-cacau)', tinta: 'var(--c-fior)', x: 77, y: 92, rot: 7 },
+];
+const blob =
+  'M170 30c120-40 300-30 430 10s300 10 390 80 40 190 0 270-120 120-260 130-330 30-480 10S60 470 30 380s20-220 140-350Z';
+---
+
+<section class="vitrine secao" data-mundo="ambar" aria-labelledby="vitrine-titulo">
+  <div class="casca vitrine__cabeca">
+    <div>
+      <p class="t-eyebrow vitrine__eyebrow" data-anim="subir">O arquivo do laboratório</p>
+      <h2 id="vitrine-titulo" class="t-h2 vitrine__titulo">
+        <span data-anim="titulo">A vitrine muda</span>
+        <span class="vitrine__estacoes">com as <span data-rabisco="sublinhado" data-rabisco-cor="#2b211c" data-rabisco-atraso="0.5">estações</span></span>
+      </h2>
+    </div>
+    <p class="t-corpo vitrine__intro" data-anim="subir">
+      Clássicos, receitas autorais e combinações que a gente só testa porque é laboratório. Cada unidade tem a sua
+      vitrine — e ela nunca fica igual por muito tempo.
+    </p>
+    <span class="vitrine__sol" aria-hidden="true">
+      <svg viewBox="0 0 100 100" class="vitrine__sol-forma"><path d="M48 3c26 0 47 20 47 46S74 97 48 97 3 76 3 50 22 3 48 3Z"></path></svg>
+      <span class="vitrine__sol-arte"><Doodle nome="sol" tracoPx={2.4} /></span>
+    </span>
+  </div>
+
+  <div class="vitrine__area">
+    <svg class="vitrine__blob" viewBox="0 0 1060 560" preserveAspectRatio="none" aria-hidden="true">
+      <path d={blob} fill="var(--c-pistache-creme)"></path>
+    </svg>
+    <ul role="list" class="vitrine__cards">
+      {
+        cards.map(({ s, x, y, rot }) => (
+          <li class="card-sabor" style={`--x:${x}%;--y:${y}%;--rot:${rot}deg`} data-arremessavel data-rot={rot}>
+            <a href={`/sabores#${s.id}`} class="card-sabor__link" data-cursor="provar">
+              <span class="card-sabor__bola">
+                <Bola sabor={s} id={`vitrine-${s.id}`} />
+              </span>
+              <span class="card-sabor__textos">
+                <span class="t-rotulo card-sabor__cat">
+                  {s.categoria}
+                  {s.temporada ? ` · ${s.temporada}` : s.classico ? ' · clássico' : ''}
+                </span>
+                <span class="t-h3 card-sabor__nome">{s.nome}</span>
+                <span class="card-sabor__desc">{s.descricao}</span>
+                {s.tags?.length ? (
+                  <span class="card-sabor__tags">
+                    {s.tags.map((t) => (
+                      <span class="pilula">{ROTULO_TAG[t]}</span>
+                    ))}
+                  </span>
+                ) : null}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    {
+      etiquetas.map((e) => (
+        <span
+          class="pilula vitrine__etiqueta"
+          style={`--x:${e.x}%;--y:${e.y}%;--rot:${e.rot}deg;--pilula-bg:${e.cor};${e.tinta ? `--pilula-tinta:${e.tinta}` : ''}`}
+          data-arremessavel
+          data-rot={e.rot}
+          aria-hidden="true">
+          {e.texto}
+        </span>
+      ))
+    }
+  </div>
+
+  <div class="casca vitrine__rodape">
+    <p class="t-legenda vitrine__dica">A disponibilidade varia por unidade e por estação.</p>
+    <a class="botao" href="/sabores" data-rabisco="caixa" data-rabisco-cor="#2b211c" data-ferver data-magnetico>
+      Ver todos os sabores <Seta />
+    </a>
+  </div>
+</section>
+
+<style>
+  .vitrine {
+    overflow: hidden;
+  }
+  .vitrine__cabeca {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    align-items: end;
+    gap: 40px;
+  }
+  .vitrine__eyebrow {
+    margin-bottom: 18px;
+  }
+  .vitrine__titulo {
+    display: grid;
+    justify-items: start;
+    gap: 0.06em;
+  }
+  .vitrine__estacoes {
+    margin-left: 0.6em;
+  }
+  .vitrine__intro {
+    max-width: 38ch;
+    padding-bottom: 8px;
+  }
+  .vitrine__sol {
+    position: absolute;
+    right: 2%;
+    top: -64px;
+    width: clamp(84px, 9vw, 130px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    rotate: 10deg;
+  }
+  .vitrine__sol-forma {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: var(--c-rosa);
+    stroke: var(--c-fior);
+    stroke-width: 3;
+    paint-order: stroke;
+    filter: drop-shadow(0 5px 0 rgb(43 33 28 / 0.18));
+  }
+  .vitrine__sol-arte {
+    position: relative;
+    width: 52%;
+  }
+
+  .vitrine__area {
+    position: relative;
+    width: min(100% - 2 * var(--margem), 1320px);
+    height: clamp(600px, 48vw, 700px);
+    margin: clamp(48px, 6vw, 88px) auto 0;
+  }
+  .vitrine__blob {
+    position: absolute;
+    inset: 8% 2% 4%;
+    width: 96%;
+    height: 88%;
+  }
+  .vitrine__cards {
+    position: absolute;
+    inset: 0;
+  }
+  .card-sabor {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: clamp(220px, 21vw, 290px);
+    rotate: var(--rot);
+    z-index: 1;
+  }
+  .card-sabor:nth-child(odd) {
+    z-index: 2;
+  }
+  .card-sabor__link {
+    display: grid;
+    gap: 10px;
+    padding: 16px 18px 20px;
+    border-radius: 22px;
+    background: var(--c-fior);
+    color: var(--c-cacau);
+    box-shadow:
+      0 18px 40px -22px rgb(43 33 28 / 0.55),
+      0 2px 0 rgb(43 33 28 / 0.1);
+    transition:
+      transform 0.45s var(--ease-creme),
+      box-shadow 0.45s var(--ease-creme);
+  }
+  .card-sabor__link:hover {
+    transform: translateY(-8px) rotate(calc(var(--rot) * -1));
+    box-shadow:
+      0 30px 50px -24px rgb(43 33 28 / 0.6),
+      0 2px 0 rgb(43 33 28 / 0.1);
+  }
+  .card-sabor__bola {
+    display: block;
+    width: 76%;
+    margin: -4px auto 0;
+  }
+  .card-sabor__textos {
+    display: grid;
+    gap: 6px;
+  }
+  .card-sabor__cat {
+    font-size: 0.6rem;
+    opacity: 0.6;
+  }
+  .card-sabor__nome {
+    font-size: 1.2rem;
+  }
+  .card-sabor__desc {
+    font-size: 0.92rem;
+    line-height: 1.42;
+  }
+  .card-sabor__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .card-sabor__tags .pilula {
+    --pilula-bg: var(--c-pistache-creme);
+    font-size: 0.56rem;
+  }
+  .vitrine__etiqueta {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    z-index: 3;
+    rotate: var(--rot);
+    padding: 12px 20px 11px;
+    font-size: 0.7rem;
+    box-shadow: 0 6px 0 rgb(43 33 28 / 0.14);
+  }
+
+  .vitrine__rodape {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-top: clamp(40px, 5vw, 72px);
+  }
+  .vitrine__dica {
+    opacity: 0.75;
+  }
+
+  @media (max-width: 899px) {
+    .vitrine__cabeca {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .vitrine__sol {
+      top: -40px;
+      right: 0;
+    }
+    .vitrine__area {
+      width: 100%;
+      height: auto;
+      display: grid;
+      gap: 18px;
+    }
+    .vitrine__blob {
+      display: none;
+    }
+    .vitrine__cards {
+      position: relative;
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 36px var(--margem) 30px;
+      scrollbar-width: none;
+    }
+    .vitrine__cards::-webkit-scrollbar {
+      display: none;
+    }
+    .card-sabor {
+      position: relative;
+      left: auto;
+      top: auto;
+      flex: none;
+      width: 72vw;
+      scroll-snap-align: center;
+    }
+    .vitrine__etiqueta {
+      position: relative;
+      left: auto;
+      top: auto;
+      justify-self: start;
+      margin-left: var(--margem);
+    }
+    .vitrine__rodape {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ponteiroFino, reduzido } from '../../scripts/nucleo';
+
+  const area = document.querySelector<HTMLElement>('.vitrine__area');
+  if (area && ponteiroFino && !reduzido && window.matchMedia('(min-width: 900px)').matches) {
+    // arremesso: a velocidade do cursor ao sair do cartão o empurra; depois ele volta com mola
+    area.querySelectorAll<HTMLElement>('[data-arremessavel]').forEach((el) => {
+      // a inclinação de repouso passa para o GSAP, para o arremesso girar a partir dela
+      const base = Number(el.dataset.rot || 0);
+      el.style.rotate = 'none';
+      gsap.set(el, { rotation: base });
+      let ultimo = { x: 0, y: 0, t: 0 };
+      let vx = 0;
+      let vy = 0;
+      el.addEventListener('pointermove', (e) => {
+        const agora = performance.now();
+        const dt = Math.max(agora - ultimo.t, 8);
+        if (ultimo.t) {
+          vx = (e.clientX - ultimo.x) / dt;
+          vy = (e.clientY - ultimo.y) / dt;
+        }
+        ultimo = { x: e.clientX, y: e.clientY, t: agora };
+      });
+      el.addEventListener('pointerenter', () => (ultimo.t = 0));
+      el.addEventListener('pointerleave', () => {
+        const forca = Math.min(Math.hypot(vx, vy), 3.2);
+        if (forca < 0.25) return;
+        const k = 120;
+        gsap.killTweensOf(el);
+        gsap.to(el, {
+          x: vx * k,
+          y: vy * k,
+          rotation: base + gsap.utils.clamp(-28, 28, vx * 14),
+          duration: 0.42,
+          ease: 'power3.out',
+          onComplete: () => {
+            gsap.to(el, { x: 0, y: 0, rotation: base, duration: 1.7, ease: 'elastic.out(1, 0.32)' });
+          },
+        });
+      });
+    });
+  }
+</script>

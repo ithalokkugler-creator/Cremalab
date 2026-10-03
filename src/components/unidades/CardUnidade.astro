@@ -1,0 +1,170 @@
+---
+import { Image } from 'astro:assets';
+import Seta from '../ui/Seta.astro';
+import { type Unidade, descreverHorarios, diasFechados, linkMapa } from '../../data/unidades';
+
+interface Props {
+  unidade: Unidade;
+  foto?: boolean;
+  titulo?: 'h2' | 'h3';
+}
+const { unidade: u, foto = true, titulo = 'h3' } = Astro.props;
+const horarios = descreverHorarios(u.horarios);
+const fechados = diasFechados(u.horarios);
+const Titulo = titulo;
+---
+
+<article class="card-unidade" data-mundo={u.mundo} data-unidade={u.slug}>
+  <div class="card-unidade__corpo">
+    <p class="t-eyebrow card-unidade__apelido">{u.apelido}</p>
+    <Titulo class="t-h3 card-unidade__nome">
+      <a href={`/unidades/${u.slug}`} data-cursor="ir">{u.nomeCurto}</a>
+    </Titulo>
+    <address class="card-unidade__endereco">
+      {u.endereco}{u.complemento ? <><br />{u.complemento}</> : null}<br />
+      {u.bairro} · {u.cidade}
+    </address>
+    <dl class="card-unidade__horarios">
+      {
+        horarios.map((h) => (
+          <div>
+            <dt>{h.dias}</dt>
+            <dd>{h.horas}</dd>
+          </div>
+        ))
+      }
+      {
+        fechados.length > 0 && (
+          <div>
+            <dt>{fechados.join(', ')}</dt>
+            <dd>fechado</dd>
+          </div>
+        )
+      }
+    </dl>
+    <p class="card-unidade__status" data-status={JSON.stringify(u.horarios)}>
+      <i aria-hidden="true"></i>
+      <span data-status-texto>Confira os horários</span>
+    </p>
+    <div class="card-unidade__acoes">
+      <a class="card-unidade__link t-rotulo" href={linkMapa(u)} target="_blank" rel="noopener">
+        Como chegar <Seta direcao="diagonal" />
+      </a>
+      <a class="card-unidade__link t-rotulo" href={`/unidades/${u.slug}`}>
+        Ver a unidade <Seta />
+      </a>
+    </div>
+  </div>
+  {
+    foto && (
+      <div class="card-unidade__foto arco">
+        <Image src={u.foto} alt={`Loja ${u.nome}`} widths={[240, 360]} sizes="160px" />
+      </div>
+    )
+  }
+</article>
+
+<style>
+  .card-unidade {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    padding: clamp(20px, 2.2vw, 30px);
+    border-radius: 22px;
+    box-shadow: 0 20px 40px -30px rgb(43 33 28 / 0.6);
+  }
+  .card-unidade__corpo {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    min-width: 0;
+  }
+  .card-unidade__apelido {
+    font-size: 0.62rem;
+    opacity: 0.75;
+  }
+  .card-unidade__nome {
+    font-size: clamp(1.15rem, 1.6vw, 1.55rem);
+    overflow-wrap: anywhere;
+  }
+  .card-unidade__endereco {
+    font-style: normal;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  .card-unidade__horarios {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .card-unidade__horarios div {
+    display: flex;
+    gap: 10px;
+  }
+  .card-unidade__horarios dt {
+    min-width: 6.5em;
+    font-weight: 500;
+  }
+  .card-unidade__horarios dd {
+    margin: 0;
+  }
+  .card-unidade__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 7px 12px 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 10%, transparent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .card-unidade__status i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.45;
+  }
+  .card-unidade__status.esta-aberto i {
+    opacity: 1;
+    background: var(--c-ambar);
+    box-shadow: 0 0 0 4px rgb(241 165 0 / 0.3);
+  }
+  [data-mundo='ambar'] .card-unidade__status.esta-aberto i {
+    background: var(--c-cacau);
+    box-shadow: 0 0 0 4px rgb(43 33 28 / 0.18);
+  }
+  .card-unidade__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    margin-top: 4px;
+  }
+  .card-unidade__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 0.66rem;
+    border-bottom: 1.5px solid currentColor;
+  }
+  .card-unidade__link :global(.botao__seta) {
+    width: 20px;
+  }
+  .card-unidade__foto {
+    width: clamp(110px, 10vw, 150px);
+    aspect-ratio: 3 / 4;
+    align-self: start;
+  }
+  @media (max-width: 599px) {
+    .card-unidade {
+      grid-template-columns: 1fr;
+    }
+    .card-unidade__foto {
+      display: none;
+    }
+  }
+</style>

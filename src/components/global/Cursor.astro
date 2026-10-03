@@ -1,0 +1,136 @@
+---
+// Cursor da marca: colherzinha (padrão) + bolha de gelato com texto contextual
+// sobre elementos com data-cursor="texto". Só em dispositivos com mouse.
+---
+
+<div class="cursor" aria-hidden="true">
+  <span class="cursor__bolha">
+    <svg class="cursor__forma" viewBox="0 0 120 104" focusable="false">
+      <path
+        d="M60 5c14-2 29 6 34 18 13 2 21 14 18 27 7 9 5 24-6 30 0 12-12 21-24 18-7 7-20 8-28 2-12 5-26-1-30-12C11 86 4 74 9 62 2 52 5 37 16 31c1-15 17-25 31-21 4-3 8-5 13-5Z"
+        fill="currentColor"></path>
+    </svg>
+    <span class="cursor__texto"></span>
+  </span>
+</div>
+
+<style>
+  .cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9800;
+    pointer-events: none;
+    display: none;
+  }
+  :global(html.cursor-da-marca) .cursor {
+    display: block;
+  }
+  .cursor__bolha {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 92px;
+    height: 80px;
+    translate: -14% -96%;
+    color: var(--c-ambar);
+    transform: scale(0) rotate(-30deg);
+  }
+  .cursor__forma {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 0 rgb(43 33 28 / 0.18));
+  }
+  .cursor__texto {
+    position: relative;
+    font-family: var(--f-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--c-cacau);
+    white-space: nowrap;
+  }
+
+  :global(html.cursor-da-marca),
+  :global(html.cursor-da-marca body) {
+    cursor:
+      url('/cursor/colher.svg') 4 3,
+      auto;
+  }
+  :global(html.cursor-da-marca a),
+  :global(html.cursor-da-marca button),
+  :global(html.cursor-da-marca [role='button']),
+  :global(html.cursor-da-marca label),
+  :global(html.cursor-da-marca select),
+  :global(html.cursor-da-marca summary),
+  :global(html.cursor-da-marca [data-cursor]) {
+    cursor:
+      url('/cursor/colher-cheia.svg') 4 3,
+      pointer;
+  }
+  :global(html.cursor-da-marca input),
+  :global(html.cursor-da-marca textarea) {
+    cursor: text;
+  }
+</style>
+
+<script>
+  import { gsap, ponteiroFino, reduzido } from '../../scripts/nucleo';
+
+  const raiz = document.querySelector<HTMLElement>('.cursor');
+  if (raiz && ponteiroFino) {
+    document.documentElement.classList.add('cursor-da-marca');
+    const bolha = raiz.querySelector<HTMLElement>('.cursor__bolha')!;
+    const texto = raiz.querySelector<HTMLElement>('.cursor__texto')!;
+    const xTo = gsap.quickTo(raiz, 'x', { duration: reduzido ? 0.01 : 0.5, ease: 'power3' });
+    const yTo = gsap.quickTo(raiz, 'y', { duration: reduzido ? 0.01 : 0.5, ease: 'power3' });
+    let ativo: Element | null = null;
+
+    const mostrar = (rotulo: string) => {
+      texto.textContent = rotulo;
+      gsap.killTweensOf(bolha);
+      gsap.to(bolha, {
+        scale: 1,
+        rotation: 0,
+        duration: reduzido ? 0.01 : 1.5,
+        ease: 'elastic.out(1, 0.42)',
+      });
+    };
+    const esconder = () => {
+      gsap.killTweensOf(bolha);
+      gsap.to(bolha, { scale: 0, rotation: -30, duration: 0.28, ease: 'sine.inOut' });
+    };
+
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType !== 'mouse') return;
+        xTo(e.clientX);
+        yTo(e.clientY);
+      },
+      { passive: true },
+    );
+
+    document.addEventListener('pointerover', (e) => {
+      const alvo = (e.target as Element | null)?.closest?.('[data-cursor]') ?? null;
+      if (alvo === ativo) return;
+      ativo = alvo;
+      const rotulo = alvo?.getAttribute('data-cursor');
+      if (alvo && rotulo) mostrar(rotulo);
+      else esconder();
+    });
+    document.addEventListener('pointerleave', () => {
+      ativo = null;
+      esconder();
+    });
+    // permite que outros componentes troquem o texto (ex.: a cena 3D)
+    document.addEventListener('crema:cursor', ((e: CustomEvent<string | null>) => {
+      if (e.detail) mostrar(e.detail);
+      else esconder();
+    }) as EventListener);
+  }
+</script>

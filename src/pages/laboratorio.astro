@@ -1,0 +1,443 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import HeroPagina from '../components/ui/HeroPagina.astro';
+import Seta from '../components/ui/Seta.astro';
+import Doodle from '../components/marca/Doodle.astro';
+import Processo from '../components/laboratorio/Processo.astro';
+import GelatoSorvete from '../components/laboratorio/GelatoSorvete.astro';
+import Espaco from '../components/laboratorio/Espaco.astro';
+import FachadaMicelio from '../components/laboratorio/FachadaMicelio.astro';
+import Experiencias from '../components/laboratorio/Experiencias.astro';
+import Sustentabilidade from '../components/laboratorio/Sustentabilidade.astro';
+import Equipe from '../components/laboratorio/Equipe.astro';
+import Premios from '../components/laboratorio/Premios.astro';
+import extracao from '../assets/fotos/laboratorio-extracao.jpg';
+import chef from '../assets/fotos/chef-harlen.jpg';
+import { SITE } from '../data/site';
+
+const marcos = [
+  { quando: 'Itália', onde: 'San Marino', oque: 'Curso intensivo de gelato' },
+  { quando: 'Itália', onde: 'Brescia', oque: 'Formação em tempo integral, com mestres do gelato artesanal' },
+  { quando: '2024', onde: 'Batel', oque: 'Nasce a Crema Lab, com o laboratório à vista' },
+  { quando: 'Nov. 2025', onde: 'ParkShoppingBarigui', oque: 'A segunda casa, com um pistache exclusivo' },
+  { quando: 'Agora', onde: 'Shopping Mueller', oque: 'A casa mais nova, no Centro Cívico' },
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.chef,
+  jobTitle: 'Chef gelatiere e fundadora',
+  worksFor: { '@type': 'Organization', name: 'Crema Lab' },
+};
+---
+
+<Base
+  titulo="O Laboratório"
+  mundo="pistache-creme"
+  descricao="Do zero até a pasta de pistache: conheça a chef gelatiere Harlen Tessari Brandão, o método purista, o processo do gelato, a fachada de micélio e as experiências da Crema Lab."
+  schema={schema}>
+  <HeroPagina
+    mundo="pistache-creme"
+    eyebrow="O laboratório"
+    linhas={['Do zero.', 'Até a pasta', 'de pistache.']}
+    obliqua={2}
+    texto="Gelato italiano artesanal e purista, com toque local: receitas autorais e tudo feito do zero — à vista de quem passa pela parede de vidro do laboratório."
+    imagem={extracao}
+    alt="Gelato recém-batido saindo da máquina, guiado por uma espátula, no laboratório da Crema Lab"
+    doodle="ramo"
+  />
+
+  <!-- A tradição que inspira (texto oficial da Crema Lab) -->
+  <section class="tradicao secao" data-mundo="fior" aria-labelledby="tradicao-titulo">
+    <div class="casca tradicao__grade">
+      <div class="tradicao__texto">
+        <p class="t-eyebrow tradicao__eyebrow" data-anim="subir">Por que “Crema”</p>
+        <h2 id="tradicao-titulo" class="t-h1 tradicao__titulo" data-anim="subir">
+          A <span data-rabisco="marca-texto" data-rabisco-cor="#f1a500">tradição</span> que inspira.
+        </h2>
+        <p class="t-lead" data-anim="subir">
+          <strong>“Crema”</strong> vem do italiano e carrega uma conexão direta com as origens do gelato.
+        </p>
+        <p class="t-corpo tradicao__corpo" data-anim="subir">
+          Um nome que remete à cremosidade, à tradição italiana e à experiência que buscamos traduzir em cada receita.
+        </p>
+      </div>
+
+      <aside class="tradicao__verbete" aria-label="Verbete: crema e lab">
+        <span class="tradicao__furo" aria-hidden="true"></span>
+        <p class="t-rotulo tradicao__rotulo">Verbete</p>
+        <p class="tradicao__palavra" lang="it">crema</p>
+        <p class="t-anotacao tradicao__fonetica">/ˈkrɛ.ma/ · do italiano, subst. fem.</p>
+        <ol class="tradicao__defs">
+          <li>Creme; cremosidade.</li>
+          <li>Nas gelaterias italianas, um dos sabores mais clássicos: o gelato de creme.</li>
+        </ol>
+        <hr class="tradicao__divisor" />
+        <p class="tradicao__palavra tradicao__palavra--lab">lab</p>
+        <p class="t-anotacao tradicao__fonetica">de laboratório</p>
+        <ol class="tradicao__defs">
+          <li>Onde cada receita é testada até ficar certa.</li>
+        </ol>
+      </aside>
+    </div>
+  </section>
+
+  <!-- A chef -->
+  <section class="chef secao" data-mundo="pistache-creme" aria-labelledby="chef-titulo">
+    <div class="casca chef__grade">
+      <figure class="chef__retrato">
+        <div class="chef__arco arco" data-anim="imagem">
+          <Image
+            src={chef}
+            alt="A chef gelatiere Harlen Brandão, de dólmã branco, sorrindo com um copo de sorbet na mão"
+            widths={[400, 496]}
+            sizes="(max-width: 899px) 80vw, 34vw"
+          />
+        </div>
+        <figcaption class="chef__nota t-anotacao">
+          chef gelatiere
+          <svg viewBox="0 0 80 50" fill="none" aria-hidden="true">
+            <path d="M74 4C62 24 40 38 8 42" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path>
+            <path d="M18 32 6 42l13 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </figcaption>
+      </figure>
+
+      <div class="chef__texto">
+        <p class="t-eyebrow chef__eyebrow" data-anim="subir">A chef · fundadora</p>
+        <h2 id="chef-titulo" class="t-h2" data-anim="titulo">Harlen Tessari Brandão</h2>
+        <p class="t-lead" data-anim="subir">
+          Três formações em institutos italianos, com mestres do gelato artesanal, e passagens por cozinhas e
+          laboratórios de renome.
+        </p>
+        <p class="t-corpo chef__corpo" data-anim="subir">
+          Primeiro, um curso intensivo em San Marino; depois, a formação em tempo integral em Brescia. Em Curitiba, abriu a
+          Crema Lab em 2024 com um método purista: receitas autorais, ingredientes funcionais, compromisso com a
+          sustentabilidade e tudo feito do zero — <span data-rabisco="sublinhado" data-rabisco-cor="#b26a5b">inclusive as pastas de pistache e de avelã</span>.
+        </p>
+      </div>
+    </div>
+
+    <div class="casca chef__linha-tempo">
+      <svg class="chef__onda" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
+        <path
+          d="M0 20C50 6 100 6 150 20S250 34 300 20 400 6 450 20 550 34 600 20 700 6 750 20 850 34 900 20 1000 10 1000 10"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          vector-effect="non-scaling-stroke"></path>
+      </svg>
+      <ol class="chef__marcos" role="list">
+        {
+          marcos.map((m) => (
+            <li class="chef__marco">
+              <span class="chef__ponto" aria-hidden="true" />
+              <span class="chef__quando t-rotulo">{m.quando}</span>
+              <span class="chef__onde">{m.onde}</span>
+              <span class="chef__oque">{m.oque}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <Processo />
+  <GelatoSorvete />
+  <Espaco />
+  <FachadaMicelio />
+  <Sustentabilidade />
+  <Experiencias />
+  <Equipe />
+  <Premios />
+
+  <section class="lab-cta" data-mundo="terracota" data-nav="escuro" aria-labelledby="lab-cta-titulo">
+    <div class="casca lab-cta__grade">
+      <span class="lab-cta__doodle" aria-hidden="true"><Doodle nome="arco" tracoPx={2.4} desenho /></span>
+      <div class="lab-cta__texto">
+        <h2 id="lab-cta-titulo" class="t-h2" data-anim="titulo">Venha ver o laboratório de perto.</h2>
+        <p class="t-lead" data-anim="subir">O laboratório envidraçado fica no Batel. Passe para provar — e para espiar.</p>
+        <div class="lab-cta__botoes">
+          <a class="botao botao--cheio" href="/unidades/batel" data-magnetico>Ver a unidade Batel <Seta /></a>
+          <a class="botao" href="/unidades" data-magnetico>Todas as unidades <Seta /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ------------------------------------------------ tradição */
+  .tradicao__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(36px, 6vw, 96px);
+    align-items: center;
+  }
+  .tradicao__texto {
+    display: grid;
+    gap: 22px;
+  }
+  .tradicao__eyebrow {
+    color: var(--c-telha);
+  }
+  .tradicao__titulo {
+    font-size: clamp(2.6rem, 6.4vw, 6.6rem);
+    line-height: 0.95;
+  }
+  .tradicao__corpo {
+    max-width: 50ch;
+  }
+  .tradicao__verbete {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    padding: 34px clamp(24px, 3vw, 40px) 34px clamp(36px, 4vw, 52px);
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 29px, rgb(43 33 28 / 0.08) 29px 30px),
+      #fffaf2;
+    border-radius: 4px 20px 20px 4px;
+    box-shadow: 0 30px 60px -40px rgb(43 33 28 / 0.7);
+    rotate: -1.5deg;
+  }
+  .tradicao__furo {
+    position: absolute;
+    left: 14px;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background: radial-gradient(circle, var(--c-fior) 4px, transparent 4.5px) 50% 14px / 10px 34px repeat-y;
+  }
+  .tradicao__rotulo {
+    font-size: 0.6rem;
+    opacity: 0.6;
+  }
+  .tradicao__palavra {
+    font-family: var(--f-display);
+    font-size: clamp(3rem, 5vw, 4.6rem);
+    line-height: 1;
+    text-transform: lowercase;
+    color: var(--c-terracota);
+  }
+  .tradicao__palavra--lab {
+    color: var(--c-cacau);
+  }
+  .tradicao__fonetica {
+    font-size: 1.25rem;
+    color: var(--c-telha);
+  }
+  .tradicao__defs {
+    display: grid;
+    gap: 6px;
+    padding-left: 1.3em;
+    list-style: decimal;
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+  .tradicao__divisor {
+    margin: 14px 0 6px;
+    border: 0;
+    border-top: 1.5px dashed color-mix(in srgb, var(--c-cacau) 35%, transparent);
+  }
+
+  /* ------------------------------------------------ chef */
+  .chef__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(36px, 6vw, 96px);
+    align-items: center;
+  }
+  .chef__retrato {
+    position: relative;
+  }
+  .chef__arco {
+    aspect-ratio: 496 / 602;
+    max-height: 78svh;
+    margin-inline: auto;
+    box-shadow: 0 30px 60px -36px rgb(43 33 28 / 0.6);
+  }
+  .chef__nota {
+    position: absolute;
+    right: -6%;
+    bottom: 12%;
+    display: grid;
+    justify-items: end;
+    font-size: 1.6rem;
+    color: var(--c-telha);
+    rotate: -6deg;
+  }
+  .chef__nota svg {
+    width: 70px;
+    margin-right: 40px;
+  }
+  .chef__texto {
+    display: grid;
+    gap: 20px;
+  }
+  .chef__eyebrow {
+    color: var(--c-telha);
+  }
+  .chef__corpo {
+    max-width: 58ch;
+  }
+  .chef__linha-tempo {
+    position: relative;
+    margin-top: clamp(56px, 8vw, 120px);
+  }
+  .chef__onda {
+    position: absolute;
+    left: var(--margem);
+    right: var(--margem);
+    top: 0;
+    width: calc(100% - 2 * var(--margem));
+    height: 40px;
+    color: var(--c-cacau);
+  }
+  .chef__marcos {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 20px;
+    padding-top: 12px;
+  }
+  .chef__marco {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+  }
+  .chef__ponto {
+    width: 16px;
+    height: 16px;
+    margin-bottom: 18px;
+    border-radius: 50%;
+    background: var(--c-terracota);
+    box-shadow: 0 0 0 5px var(--c-pistache-creme);
+  }
+  .chef__quando {
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+  .chef__onde {
+    font-family: var(--f-display);
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+  .chef__oque {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--suave);
+  }
+
+  /* ------------------------------------------------ cta */
+  .lab-cta {
+    padding-block: clamp(80px, 10vw, 140px);
+  }
+  .lab-cta__grade {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: clamp(28px, 5vw, 80px);
+  }
+  .lab-cta__doodle {
+    width: clamp(90px, 12vw, 180px);
+  }
+  .lab-cta__texto {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+  }
+  .lab-cta__botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (max-width: 899px) {
+    .tradicao__grade,
+    .chef__grade {
+      grid-template-columns: 1fr;
+    }
+    .chef__retrato {
+      width: min(84%, 420px);
+      justify-self: center;
+    }
+    .chef__nota {
+      right: -10%;
+      font-size: 1.3rem;
+    }
+    .chef__onda {
+      display: none;
+    }
+    .chef__marcos {
+      grid-template-columns: 1fr;
+      gap: 26px;
+      padding-left: 34px;
+      border-left: 2px dotted var(--c-cacau);
+      margin-left: 8px;
+    }
+    .chef__marco {
+      position: relative;
+    }
+    .chef__ponto {
+      position: absolute;
+      left: -43px;
+      top: 2px;
+      margin: 0;
+    }
+    .lab-cta__grade {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, reduzido } from '../scripts/nucleo';
+
+  // linha do tempo da chef: a onda se desenha com a rolagem e os marcos acendem em sequência
+  const linha = document.querySelector<HTMLElement>('.chef__linha-tempo');
+  if (linha && !reduzido) {
+    const onda = linha.querySelector<SVGPathElement>('.chef__onda path');
+    const marcos = Array.from(linha.querySelectorAll<HTMLElement>('.chef__marco'));
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 900px)', () => {
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: linha, start: 'top 85%', end: 'bottom 55%', scrub: 0.6 },
+      });
+      if (onda) tl.fromTo(onda, { drawSVG: '0% 0%' }, { drawSVG: '0% 100%', ease: 'none', duration: 1 }, 0);
+      marcos.forEach((m, i) => {
+        const t = (i / (marcos.length - 1)) * 0.9;
+        tl.from(m.querySelector('.chef__ponto'), { scale: 0, duration: 0.08, ease: 'back.out(3)' }, t).from(
+          m.querySelectorAll('.chef__quando, .chef__onde, .chef__oque'),
+          { opacity: 0, y: 14, duration: 0.12, stagger: 0.02 },
+          t,
+        );
+      });
+    });
+    mm.add('(max-width: 899px)', () => {
+      marcos.forEach((m) =>
+        gsap.from(m, { opacity: 0, x: -16, duration: 0.8, ease: 'creme', scrollTrigger: { trigger: m, start: 'top 88%', once: true } }),
+      );
+    });
+  }
+
+  // o verbete cai inclinado na mesa
+  const verbete = document.querySelector<HTMLElement>('.tradicao__verbete');
+  if (verbete) {
+    verbete.style.rotate = 'none';
+    gsap.set(verbete, { rotation: -1.5 });
+    if (!reduzido) {
+      gsap.from(verbete, {
+        y: 80,
+        rotation: 8,
+        opacity: 0,
+        duration: 1.2,
+        ease: 'creme',
+        scrollTrigger: { trigger: verbete, start: 'top 85%', once: true },
+      });
+    }
+  }
+</script>

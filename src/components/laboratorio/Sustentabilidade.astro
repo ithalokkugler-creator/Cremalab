@@ -1,0 +1,90 @@
+---
+// "Do copo à fachada": três escolhas de sustentabilidade, com ícones que se desenham ao rolar.
+import Icone from '../marca/Icone.astro';
+import type { NomeIcone } from '../marca/icones';
+
+const ITENS: { icone: NomeIcone; titulo: string; texto: string }[] = [
+  {
+    icone: 'cogumelo',
+    titulo: 'Fachada de micélio',
+    texto: 'Painéis cultivados a partir de resíduos agrícolas, que isolam calor e som e voltam para a natureza.',
+  },
+  {
+    icone: 'copo',
+    titulo: 'Enxoval compostável',
+    texto: 'O enxoval de serviço é compostável — inclusive o copo com o logo que vai na sua mão.',
+  },
+  {
+    icone: 'bowl',
+    titulo: 'Peças que ficam',
+    texto: 'No Natal, a sobremesa vem num bowl metalizado criado com a Vanessa Taques Casa, que depois vira objeto da casa.',
+  },
+];
+---
+
+<section class="sustentavel secao" data-mundo="pistache-creme" aria-labelledby="sustentavel-titulo">
+  <div class="casca">
+    <div class="sustentavel__cabeca">
+      <p class="t-eyebrow sustentavel__eyebrow" data-anim="subir">Sustentabilidade como linguagem</p>
+      <h2 id="sustentavel-titulo" class="t-h2" data-anim="titulo">Do copo à fachada, pensado para voltar à terra.</h2>
+    </div>
+    <ul class="sustentavel__lista" role="list">
+      {
+        ITENS.map((it, i) => (
+          <li class="sustentavel__item" data-anim="subir" data-atraso={i * 0.12}>
+            <span class="sustentavel__icone">
+              <Icone nome={it.icone} desenho />
+            </span>
+            <h3 class="t-h3 sustentavel__titulo">{it.titulo}</h3>
+            <p class="sustentavel__texto">{it.texto}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sustentavel__cabeca {
+    display: grid;
+    gap: 16px;
+    max-width: 820px;
+    margin-bottom: clamp(40px, 5vw, 72px);
+  }
+  .sustentavel__eyebrow {
+    color: var(--c-telha);
+  }
+  .sustentavel__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(28px, 4vw, 64px);
+  }
+  .sustentavel__item {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    padding-top: 22px;
+    border-top: 1.5px solid var(--c-cacau);
+  }
+  .sustentavel__icone {
+    width: clamp(84px, 8vw, 116px);
+    color: var(--c-cacau);
+  }
+  .sustentavel__texto {
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 34ch;
+  }
+  @media (max-width: 899px) {
+    .sustentavel__lista {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { desenharAoRolar } from '../../scripts/desenho';
+  document.querySelectorAll<SVGSVGElement>('.sustentavel__icone svg').forEach((svg, i) =>
+    desenharAoRolar(svg, { atraso: i * 0.15, stagger: 0.07 }),
+  );
+</script>

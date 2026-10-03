@@ -1,0 +1,751 @@
+---
+// Navbar fixa em 3 zonas (referência: truus.co) — blob SABORES · wordmark · WhatsApp + MENU.
+import QRCode from 'qrcode';
+import Marca from '../marca/Marca.astro';
+import Bola from '../sabores/Bola.astro';
+import Tracos from '../marca/Tracos.astro';
+import { SITE, NAV, linkWhatsApp } from '../../data/site';
+import { saboresClassicos } from '../../data/sabores';
+import { unidadesAtivas, descreverHorarios } from '../../data/unidades';
+
+const wa = linkWhatsApp();
+const qr = await QRCode.toString(wa, {
+  type: 'svg',
+  margin: 0,
+  errorCorrectionLevel: 'M',
+  color: { dark: '#2b211cff', light: '#00000000' },
+});
+const classicos = saboresClassicos().slice(0, 3);
+const caminho = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const blob =
+  'M60 5c14-2 29 6 34 18 13 2 21 14 18 27 7 9 5 24-6 30 0 12-12 21-24 18-7 7-20 8-28 2-12 5-26-1-30-12C11 86 4 74 9 62 2 52 5 37 16 31c1-15 17-25 31-21 4-3 8-5 13-5Z';
+---
+
+<header class="nav" data-tema="claro">
+  <div class="nav__zona nav__zona--esq">
+    <div class="nav__gatilho" data-painel>
+      <button
+        class="nav__blob nav__blob--sabores"
+        type="button"
+        aria-expanded="false"
+        aria-controls="painel-sabores"
+        data-cursor="provar">
+        <svg class="nav__blob-forma" viewBox="0 0 120 104" aria-hidden="true" focusable="false"><path d={blob}></path></svg>
+        <span class="nav__blob-rotulo t-rotulo">Sabores</span>
+      </button>
+      <div class="painel painel--esq" id="painel-sabores" role="region" aria-label="Clássicos da casa">
+        <div class="painel__interno">
+          <p class="t-rotulo painel__titulo">Clássicos da casa</p>
+          <ul role="list" class="painel__lista">
+            {
+              classicos.map((s) => (
+                <li class="painel__item">
+                  <a class="painel__sabor" href={`/sabores#${s.id}`}>
+                    <span class="painel__bola">
+                      <Bola sabor={s} id={`nav-${s.id}`} />
+                    </span>
+                    <span class="painel__textos">
+                      <span class="painel__selo t-rotulo">{s.categoria}</span>
+                      <span class="painel__nome t-h3">{s.nome}</span>
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <a class="painel__botao t-rotulo" href="/sabores">Ver o arquivo de sabores</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="nav__marca" href="/" aria-label="Crema Lab — página inicial" data-cursor="início">
+    <span class="nav__marca-tremor"><Marca tipo="wordmark" id="nav-wordmark" decorativo /></span>
+  </a>
+
+  <div class="nav__zona nav__zona--dir">
+    <div class="nav__gatilho nav__gatilho--whats" data-painel>
+      <button
+        class="nav__blob nav__blob--whats"
+        type="button"
+        aria-expanded="false"
+        aria-controls="painel-whats"
+        aria-label="Falar pelo WhatsApp"
+        data-cursor="chamar">
+        <svg class="nav__blob-forma" viewBox="0 0 120 104" aria-hidden="true" focusable="false"><path d={blob}></path></svg>
+        <svg class="nav__whats-icone" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <path
+            d="M16 4.5c6.4 0 11.5 5.1 11.5 11.4 0 6.4-5.1 11.5-11.5 11.5-2 0-3.9-.5-5.6-1.5l-5.4 1.6 1.7-5.2a11.4 11.4 0 0 1-1.8-6.3C4.9 9.6 10 4.5 16 4.5Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linejoin="round"></path>
+          <path
+            d="M11.8 10.6c.4-.4 1.1-.4 1.4.1l1 2c.2.4.1.9-.2 1.2l-.6.6c.6 1.5 1.8 2.7 3.3 3.4l.6-.6c.3-.3.8-.4 1.2-.2l2 .9c.5.2.6.9.2 1.3l-.8.9c-.6.6-1.6.8-2.5.4-2.9-1.2-5.2-3.5-6.4-6.4-.4-.9-.2-1.9.4-2.5l.4-.4Z"
+            fill="currentColor"></path>
+        </svg>
+      </button>
+      <div class="painel painel--dir" id="painel-whats" role="region" aria-label="WhatsApp">
+        <div class="painel__interno painel__interno--whats">
+          <div class="painel__qr" set:html={qr} />
+          <p class="t-h3 painel__chamada">Chame a gente no WhatsApp</p>
+          <p class="painel__texto">Encomendas, eventos e dúvidas. Respondemos no horário das lojas.</p>
+          <a class="painel__link" href={wa} target="_blank" rel="noopener">
+            <span class="t-rotulo">Abrir conversa</span>
+            <svg class="painel__link-traco" viewBox="0 0 169 10" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M1 6.6C56.4 3 112.2 1.2 168 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path>
+              <path d="M32.1 8.6c36.1-1.7 72.4-2.5 108.6-2.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <button class="nav__menu" type="button" aria-expanded="false" aria-controls="menu" data-cursor="abrir">
+      <span class="nav__regua" aria-hidden="true">{Array.from({ length: 9 }, () => <i></i>)}</span>
+      <span class="nav__menu-texto t-rotulo" data-texto-fechar="Fechar">Menu</span>
+    </button>
+  </div>
+</header>
+
+<div class="nav-veu" aria-hidden="true"></div>
+
+<div class="menu" id="menu" data-mundo="terracota" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <div class="menu__mural" aria-hidden="true">
+    <Tracos grupos={['arco', 'onda', 'xicara', 'prateleira', 'ramo', 'escada', 'ceu']} lado="dir" tracoPx={1.6} desenho />
+  </div>
+  <nav class="menu__nav" aria-label="Principal">
+    <ol role="list" class="menu__lista">
+      <li>
+        <a class="menu__link" href="/" aria-current={caminho === '/' ? 'page' : undefined}>
+          <span class="menu__num t-rotulo">00</span><span class="menu__rotulo t-h1">Início</span>
+        </a>
+      </li>
+      {
+        NAV.map((item, i) => (
+          <li>
+            <a
+              class="menu__link"
+              href={item.href}
+              aria-current={caminho === item.href || caminho.startsWith(`${item.href}/`) ? 'page' : undefined}>
+              <span class="menu__num t-rotulo">{String(i + 1).padStart(2, '0')}</span>
+              <span class="menu__rotulo t-h1">{item.rotulo}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+  <div class="menu__rodape">
+    <ul role="list" class="menu__unidades">
+      {
+        unidadesAtivas().map((u) => (
+          <li class="menu__unidade" data-status={JSON.stringify(u.horarios)} data-status-curto>
+            <a href={`/unidades/${u.slug}`}>
+              <span class="t-rotulo">{u.nomeCurto}</span>
+              <span class="menu__status">
+                <i class="menu__ponto" aria-hidden="true" />
+                <span data-status-texto>{descreverHorarios(u.horarios)[0].dias}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="menu__redes">
+      <a href={SITE.instagram} target="_blank" rel="noopener" class="t-rotulo">Instagram {SITE.instagramUsuario}</a>
+      <a href={wa} target="_blank" rel="noopener" class="t-rotulo">WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<a class="whats-flutuante t-rotulo" href={wa} target="_blank" rel="noopener" aria-label="Falar pelo WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <path
+      d="M16 4.5c6.4 0 11.5 5.1 11.5 11.4 0 6.4-5.1 11.5-11.5 11.5-2 0-3.9-.5-5.6-1.5l-5.4 1.6 1.7-5.2a11.4 11.4 0 0 1-1.8-6.3C4.9 9.6 10 4.5 16 4.5Z"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.2"
+      stroke-linejoin="round"></path>
+  </svg>
+  <span>WhatsApp</span>
+</a>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 1000;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    padding: 18px calc(var(--margem) + 6px) 0;
+    pointer-events: none;
+    color: var(--c-cacau);
+    transition: color 0.5s var(--ease-padrao);
+  }
+  .nav[data-tema='escuro'] {
+    color: var(--c-fior);
+  }
+  .nav > * {
+    pointer-events: auto;
+  }
+  .nav__zona {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .nav__zona--dir {
+    justify-content: flex-end;
+  }
+  .nav__gatilho {
+    position: relative;
+  }
+
+  /* blobs (como o "work" da truus) */
+  .nav__blob {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 104px;
+    height: 88px;
+    color: var(--c-cacau);
+  }
+  .nav__blob-forma {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: var(--c-ambar);
+    filter: drop-shadow(0 3px 0 rgb(43 33 28 / 0.16));
+  }
+  .nav__blob--whats .nav__blob-forma {
+    fill: var(--c-fior);
+  }
+  .nav__blob-rotulo {
+    position: relative;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+  }
+  .nav__whats-icone {
+    position: relative;
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav__marca {
+    display: block;
+    width: clamp(118px, 12vw, 168px);
+    margin-top: 22px;
+  }
+  .nav__marca-tremor {
+    display: block;
+  }
+
+  .nav__menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+    margin-top: 16px;
+    padding: 0 20px 0 16px;
+    border-radius: 999px;
+    background: var(--c-cacau);
+    color: var(--c-fior);
+    box-shadow: 0 3px 0 rgb(43 33 28 / 0.16);
+  }
+  .nav__menu-texto {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+  }
+  .nav__regua {
+    display: inline-flex;
+    gap: 3px;
+    height: 16px;
+    align-items: stretch;
+  }
+  .nav__regua i {
+    width: 1.5px;
+    background: currentColor;
+    opacity: 0.35;
+  }
+  .nav__regua i.cheia {
+    opacity: 1;
+  }
+
+  /* painéis pop-out */
+  .painel {
+    position: absolute;
+    top: -10px;
+    z-index: 2;
+    width: 340px;
+    border-radius: 22px;
+    background: var(--c-fior);
+    color: var(--c-cacau);
+    box-shadow:
+      0 24px 60px -24px rgb(43 33 28 / 0.45),
+      0 2px 0 rgb(43 33 28 / 0.08);
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0);
+  }
+  .painel--esq {
+    left: -10px;
+    transform-origin: 56px 50px;
+  }
+  .painel--dir {
+    right: -10px;
+    transform-origin: calc(100% - 56px) 50px;
+  }
+  .painel__interno {
+    padding: 104px 24px 24px;
+    display: grid;
+    gap: 18px;
+  }
+  .painel__titulo {
+    opacity: 0.65;
+  }
+  .painel__lista {
+    display: grid;
+    gap: 6px;
+  }
+  .painel__sabor {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    align-items: center;
+    gap: 14px;
+    padding: 8px;
+    border-radius: 16px;
+    transition: background 0.3s var(--ease-padrao);
+  }
+  .painel__sabor:hover,
+  .painel__sabor:focus-visible {
+    background: color-mix(in srgb, var(--c-pistache-creme) 55%, transparent);
+  }
+  .painel__bola {
+    width: 72px;
+    display: block;
+  }
+  .painel__textos {
+    display: grid;
+    gap: 6px;
+  }
+  .painel__selo {
+    width: fit-content;
+    padding: 4px 10px 3px;
+    border-radius: 999px 999px 999px 2px;
+    background: var(--c-rosa);
+    font-size: 0.62rem;
+  }
+  .painel__nome {
+    font-size: 1.15rem;
+  }
+  .painel__botao {
+    display: block;
+    margin-top: 6px;
+    padding: 18px;
+    border-radius: 14px;
+    background: var(--c-cacau);
+    color: var(--c-fior);
+    text-align: center;
+    font-size: 0.72rem;
+  }
+  .painel__interno--whats {
+    justify-items: center;
+    text-align: center;
+  }
+  .painel__qr {
+    width: 168px;
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--c-pistache-creme);
+  }
+  .painel__qr :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  .painel__chamada {
+    max-width: 14ch;
+  }
+  .painel__texto {
+    font-size: 0.95rem;
+    line-height: 1.45;
+    max-width: 26ch;
+    color: color-mix(in srgb, var(--c-cacau) 75%, transparent);
+  }
+  .painel__link {
+    display: inline-grid;
+    gap: 2px;
+    justify-items: center;
+    padding: 6px 4px;
+  }
+  .painel__link-traco {
+    width: 140px;
+    height: 10px;
+    color: var(--c-terracota);
+  }
+
+  .nav-veu {
+    position: fixed;
+    inset: 0;
+    z-index: 990;
+    background: rgb(43 33 28 / 0.38);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* menu tela cheia */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 980;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    grid-template-rows: 1fr auto;
+    padding: calc(var(--nav-h) + 56px) calc(var(--margem) + 8px) 32px;
+    overflow: hidden;
+    clip-path: circle(0% at 100% 0%);
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu__mural {
+    position: absolute;
+    right: calc(var(--margem) + 2vw);
+    bottom: 12vh;
+    width: min(34vw, 460px);
+    color: var(--c-fior);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .menu__lista {
+    display: grid;
+    gap: clamp(4px, 1.2vh, 14px);
+    align-content: center;
+  }
+  .menu__link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 18px;
+    position: relative;
+  }
+  .menu__num {
+    opacity: 0.6;
+    min-width: 2.4em;
+  }
+  .menu__rotulo {
+    font-size: clamp(2.3rem, 6.6vw, 6.4rem);
+    display: inline-block;
+  }
+  .menu__link[aria-current='page'] .menu__rotulo {
+    color: var(--c-ambar);
+  }
+  .menu__rodape {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    padding-top: 24px;
+    border-top: 1px solid color-mix(in srgb, var(--c-fior) 30%, transparent);
+  }
+  .menu__unidades {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 36px;
+  }
+  .menu__unidade a {
+    display: grid;
+    gap: 6px;
+  }
+  .menu__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+  .menu__ponto {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .esta-aberto .menu__ponto {
+    background: var(--c-ambar);
+    opacity: 1;
+    box-shadow: 0 0 0 4px rgb(241 165 0 / 0.25);
+  }
+  .menu__redes {
+    display: flex;
+    gap: 24px;
+  }
+
+  .whats-flutuante {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 970;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 20px 0 16px;
+    border-radius: 999px;
+    background: var(--c-ambar);
+    color: var(--c-cacau);
+    box-shadow: 0 10px 30px -12px rgb(43 33 28 / 0.6);
+    font-size: 0.72rem;
+    transform: translateY(140%);
+    transition: transform 0.6s var(--ease-creme);
+  }
+  .whats-flutuante svg {
+    width: 22px;
+    height: 22px;
+  }
+  .whats-flutuante.visivel {
+    transform: none;
+  }
+
+  @media (max-width: 899px) {
+    .nav {
+      grid-template-columns: auto 1fr;
+      padding-top: 12px;
+      align-items: center;
+    }
+    .nav__zona--esq,
+    .nav__gatilho--whats {
+      display: none;
+    }
+    .nav__marca {
+      margin-top: 0;
+      width: 124px;
+    }
+    .nav__menu {
+      margin-top: 0;
+      height: 44px;
+    }
+    .menu {
+      grid-template-columns: 1fr;
+      padding-top: calc(var(--nav-h) + 32px);
+    }
+    .menu__mural {
+      width: 46vw;
+      right: 4vw;
+      bottom: 24vh;
+      opacity: 0.35;
+    }
+    .whats-flutuante {
+      display: inline-flex;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, SplitText, reduzido, ponteiroFino, pausarScroll } from '../../scripts/nucleo';
+  import { desenharTracos, esconderTracos } from '../../scripts/desenho';
+  import { ativarStatus } from '../../scripts/horarios';
+
+  const nav = document.querySelector<HTMLElement>('.nav')!;
+  const veu = document.querySelector<HTMLElement>('.nav-veu')!;
+  let menuAberto = false;
+
+  // ------------------------------------------------------------- painéis
+  type Controle = { abrir: () => void; fechar: () => void; aberto: () => boolean };
+  const controles: Controle[] = [];
+
+  nav.querySelectorAll<HTMLElement>('[data-painel]').forEach((gatilho) => {
+    const botao = gatilho.querySelector<HTMLButtonElement>('button')!;
+    const painel = gatilho.querySelector<HTMLElement>('.painel')!;
+    const forma = botao.querySelector<SVGElement>('.nav__blob-forma');
+    const itens = painel.querySelectorAll<HTMLElement>('.painel__interno > *');
+    let aberto = false;
+
+    gsap.set(itens, { y: 10, opacity: 0 });
+
+    const abrir = () => {
+      if (aberto) return;
+      controles.forEach((c) => c !== controle && c.fechar());
+      aberto = true;
+      botao.setAttribute('aria-expanded', 'true');
+      gsap.killTweensOf([painel, itens, forma, veu]);
+      gsap.set(painel, { visibility: 'visible' });
+      gsap.to(veu, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' });
+      if (forma && !reduzido) gsap.to(forma, { rotation: '+=360', transformOrigin: '50% 50%', duration: 0.7, ease: 'power3.inOut' });
+      gsap.fromTo(painel, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: reduzido ? 0.01 : 0.8, ease: 'expo.out' });
+      gsap.to(itens, { y: 0, opacity: 1, duration: 0.45, stagger: 0.06, delay: reduzido ? 0 : 0.18, ease: 'power3.out' });
+    };
+    const fechar = () => {
+      if (!aberto) return;
+      aberto = false;
+      botao.setAttribute('aria-expanded', 'false');
+      gsap.killTweensOf([painel, itens, forma, veu]);
+      if (!controles.some((c) => c !== controle && c.aberto())) gsap.to(veu, { autoAlpha: 0, duration: 0.3 });
+      if (forma) gsap.to(forma, { rotation: 0, duration: 0.5, ease: 'power2.out' });
+      gsap.to(itens, { y: 10, opacity: 0, duration: 0.15, ease: 'power2.in' });
+      gsap.to(painel, {
+        scale: 0,
+        opacity: 0,
+        duration: reduzido ? 0.01 : 0.3,
+        ease: 'expo.in',
+        delay: 0.05,
+        onComplete: () => gsap.set(painel, { visibility: 'hidden' }),
+      });
+    };
+    const controle: Controle = { abrir, fechar, aberto: () => aberto };
+    controles.push(controle);
+
+    botao.addEventListener('click', () => (aberto ? fechar() : abrir()));
+    if (ponteiroFino) {
+      gatilho.addEventListener('mouseenter', abrir);
+      gatilho.addEventListener('mouseleave', fechar);
+    }
+    gatilho.addEventListener('focusout', (e) => {
+      if (!gatilho.contains(e.relatedTarget as Node)) fechar();
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') controles.forEach((c) => c.fechar());
+  });
+  veu.addEventListener('click', () => controles.forEach((c) => c.fechar()));
+
+  // -------------------------------------------------- tremido do wordmark
+  const tremor = nav.querySelector<HTMLElement>('.nav__marca-tremor');
+  if (tremor && ponteiroFino && !reduzido) {
+    let tw: gsap.core.Tween | null = null;
+    nav.querySelector('.nav__marca')!.addEventListener('mouseenter', () => {
+      tw = gsap.to(tremor, { rotation: 3, duration: 0.15, repeat: -1, yoyo: true, ease: 'steps(1)' });
+    });
+    nav.querySelector('.nav__marca')!.addEventListener('mouseleave', () => {
+      tw?.kill();
+      gsap.to(tremor, { rotation: 0, duration: 0.3, ease: 'power2.out' });
+    });
+  }
+
+  // --------------------------------------------------- tema por seção
+  const definirTema = (tema: string) => {
+    nav.dataset.tema = tema;
+  };
+  // cada seção da página diz se a barra fica clara ou escura sobre ela (padrão: claro)
+  const secoes = document.querySelectorAll<HTMLElement>('main > section, main > div > section, footer.rodape');
+  const gatilhos = Array.from(secoes).map((secao) =>
+    ScrollTrigger.create({
+      trigger: secao,
+      start: 'top 46px',
+      end: 'bottom 46px',
+      onToggle: (st) => {
+        if (menuAberto) return;
+        if (st.isActive) definirTema(secao.dataset.nav || 'claro');
+        else if (!gatilhos.some((g) => g.isActive)) definirTema('claro');
+      },
+    }),
+  );
+
+  // ---------------------------------------- régua de progresso no botão
+  const listras = nav.querySelectorAll<HTMLElement>('.nav__regua i');
+  ScrollTrigger.create({
+    start: 0,
+    end: 'max',
+    onUpdate: (st) => {
+      const n = Math.round(st.progress * listras.length);
+      listras.forEach((l, i) => l.classList.toggle('cheia', i < n));
+    },
+  });
+
+  // --------------------------------------------- WhatsApp flutuante (mobile)
+  const flutuante = document.querySelector<HTMLElement>('.whats-flutuante');
+  if (flutuante) {
+    ScrollTrigger.create({
+      start: () => window.innerHeight * 0.6,
+      end: 'max',
+      onToggle: (st) => flutuante.classList.toggle('visivel', st.isActive),
+    });
+  }
+
+  // ------------------------------------------------------------- menu
+  const menu = document.getElementById('menu')!;
+  const botaoMenu = nav.querySelector<HTMLButtonElement>('.nav__menu')!;
+  const textoMenu = botaoMenu.querySelector<HTMLElement>('.nav__menu-texto')!;
+  const mural = menu.querySelector<HTMLElement>('.menu__mural svg');
+  let temaAntes = 'claro';
+  let split: SplitText | null = null;
+
+  ativarStatus(menu);
+
+  const origem = () => {
+    const r = botaoMenu.getBoundingClientRect();
+    return `${r.left + r.width / 2}px ${r.top + r.height / 2}px`;
+  };
+
+  const abrirMenu = () => {
+    menuAberto = true;
+    controles.forEach((c) => c.fechar());
+    botaoMenu.setAttribute('aria-expanded', 'true');
+    textoMenu.textContent = 'Fechar';
+    temaAntes = nav.dataset.tema || 'claro';
+    menu.hidden = false;
+    pausarScroll(true);
+    definirTema('escuro');
+    split?.revert();
+    split = SplitText.create(menu.querySelectorAll('.menu__rotulo'), { type: 'chars', mask: 'chars' });
+    const tl = gsap.timeline();
+    tl.fromTo(
+      menu,
+      { clipPath: `circle(0% at ${origem()})` },
+      { clipPath: `circle(150% at ${origem()})`, duration: reduzido ? 0.01 : 0.9, ease: 'expo.inOut' },
+    );
+    if (!reduzido) {
+      tl.from(split.chars, { yPercent: 110, duration: 0.7, stagger: 0.012, ease: 'creme' }, 0.35);
+      tl.from(menu.querySelectorAll('.menu__num, .menu__rodape > *'), { opacity: 0, y: 12, stagger: 0.05, duration: 0.5 }, 0.5);
+      if (mural) {
+        esconderTracos(mural);
+        tl.add(desenharTracos(mural, { stagger: 0.012, duracao: 0.9 }), 0.45);
+      }
+    }
+    menu.querySelector<HTMLElement>('.menu__link')?.focus({ preventScroll: true });
+  };
+
+  const fecharMenu = () => {
+    menuAberto = false;
+    botaoMenu.setAttribute('aria-expanded', 'false');
+    textoMenu.textContent = 'Menu';
+    gsap.to(menu, {
+      clipPath: `circle(0% at ${origem()})`,
+      duration: reduzido ? 0.01 : 0.7,
+      ease: 'expo.inOut',
+      onComplete: () => {
+        menu.hidden = true;
+        split?.revert();
+        split = null;
+      },
+    });
+    definirTema(temaAntes);
+    pausarScroll(false);
+    botaoMenu.focus({ preventScroll: true });
+  };
+
+  botaoMenu.addEventListener('click', () => (menuAberto ? fecharMenu() : abrirMenu()));
+  document.addEventListener('keydown', (e) => {
+    if (!menuAberto) return;
+    if (e.key === 'Escape') fecharMenu();
+    if (e.key === 'Tab') {
+      const focaveis = [botaoMenu, ...menu.querySelectorAll<HTMLElement>('a[href]')];
+      const i = focaveis.indexOf(document.activeElement as HTMLElement);
+      if (e.shiftKey && i <= 0) {
+        e.preventDefault();
+        focaveis[focaveis.length - 1].focus();
+      } else if (!e.shiftKey && i === focaveis.length - 1) {
+        e.preventDefault();
+        focaveis[0].focus();
+      }
+    }
+  });
+  document.addEventListener('crema:saindo', () => {
+    if (menuAberto) pausarScroll(false);
+  });
+</script>

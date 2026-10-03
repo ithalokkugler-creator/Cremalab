@@ -1,0 +1,233 @@
+---
+// "Aprendeu na Itália. Reescreveu em Curitiba." — o retrato da chef se desenha em linha
+// conforme a rolagem e a foto aparece por trás ("do traço à foto").
+import { Image } from 'astro:assets';
+import Seta from '../ui/Seta.astro';
+import retrato from '../../assets/marca/retrato-chef.json';
+import chef from '../../assets/fotos/chef-harlen.jpg';
+
+const marcos = [
+  { onde: 'San Marino', oque: 'Curso intensivo de gelato' },
+  { onde: 'Brescia', oque: 'Formação em tempo integral' },
+  { onde: '2024 · Batel', oque: 'Nasce a Crema Lab' },
+  { onde: 'Hoje', oque: 'Três casas em Curitiba: Batel, ParkShoppingBarigui e Shopping Mueller' },
+];
+---
+
+<section class="lab-teaser secao" data-mundo="pistache-creme" aria-labelledby="lab-titulo">
+  <div class="casca lab-teaser__grade">
+    <div class="lab-teaser__retrato">
+      <div class="lab-teaser__arco arco">
+        <Image
+          src={chef}
+          alt="A chef gelatiere Harlen Brandão, de dólmã branco, segurando um copo de sorbet"
+          class="lab-teaser__foto"
+          widths={[400, 600]}
+          sizes="(max-width: 899px) 86vw, 32vw"
+        />
+        <svg class="lab-teaser__linhas" viewBox={retrato.viewBox.join(' ')} aria-hidden="true" focusable="false">
+          <g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            {retrato.tracos.map((t) => <path d={t.d} />)}
+          </g>
+        </svg>
+      </div>
+      <p class="lab-teaser__nota t-anotacao" aria-hidden="true">
+        <span>pasta de avelã e de pistache feitas aqui</span>
+        <svg viewBox="0 0 120 70" fill="none" class="lab-teaser__nota-seta">
+          <path d="M112 6C92 30 60 52 14 58" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path>
+          <path d="M26 46 12 58l16 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </p>
+      <p class="lab-teaser__legenda t-rotulo">Harlen Tessari Brandão · chef gelatiere</p>
+    </div>
+
+    <div class="lab-teaser__texto">
+      <p class="t-eyebrow lab-teaser__eyebrow" data-anim="subir">A chef gelatiere</p>
+      <h2 id="lab-titulo" class="t-h2" data-anim="titulo">Aprendeu na Itália. Reescreveu em Curitiba.</h2>
+      <p class="t-lead lab-teaser__lead" data-anim="subir">
+        Harlen Tessari Brandão estudou com mestres gelatieri em San Marino e em Brescia e trouxe para Curitiba o método
+        purista: receitas autorais, ingredientes escolhidos a dedo e tudo feito do zero — à vista de quem passa pela
+        parede de vidro do laboratório.
+      </p>
+      <div class="linha-tempo">
+        <svg class="linha-tempo__linha" viewBox="0 0 10 400" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M5 0V400" stroke="currentColor" stroke-width="1.6" stroke-dasharray="1 7" stroke-linecap="round" fill="none"></path>
+        </svg>
+        <ol class="linha-tempo__lista" role="list">
+        {
+          marcos.map((m) => (
+            <li class="linha-tempo__item">
+              <span class="linha-tempo__ponto" aria-hidden="true" />
+              <span class="t-rotulo linha-tempo__onde">{m.onde}</span>
+              <span class="linha-tempo__oque">{m.oque}</span>
+            </li>
+          ))
+        }
+        </ol>
+      </div>
+      <a class="botao" href="/laboratorio" data-rabisco="caixa" data-rabisco-cor="#2b211c" data-ferver data-magnetico>
+        Conheça o laboratório <Seta />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lab-teaser__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(40px, 7vw, 120px);
+    align-items: center;
+  }
+  .lab-teaser__retrato {
+    position: relative;
+    width: min(100%, 460px);
+    justify-self: center;
+  }
+  .lab-teaser__arco {
+    position: relative;
+    aspect-ratio: 496 / 602;
+    background: var(--c-fior);
+    box-shadow: 0 30px 60px -36px rgb(43 33 28 / 0.6);
+  }
+  .lab-teaser__foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .lab-teaser__linhas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--c-cacau);
+  }
+  .lab-teaser__nota {
+    position: absolute;
+    right: -8%;
+    top: 14%;
+    display: grid;
+    justify-items: end;
+    max-width: 15ch;
+    text-align: right;
+    color: var(--c-telha);
+    rotate: 4deg;
+  }
+  .lab-teaser__nota-seta {
+    width: 92px;
+    margin-top: 2px;
+  }
+  .lab-teaser__legenda {
+    margin-top: 18px;
+    font-size: 0.66rem;
+    opacity: 0.7;
+  }
+  .lab-teaser__texto {
+    display: grid;
+    gap: 26px;
+    justify-items: start;
+  }
+  .lab-teaser__eyebrow {
+    color: var(--c-telha);
+  }
+  .lab-teaser__lead {
+    max-width: 42ch;
+  }
+  .linha-tempo {
+    position: relative;
+    padding-left: 34px;
+    margin: 6px 0 8px;
+  }
+  .linha-tempo__lista {
+    display: grid;
+    gap: 18px;
+  }
+  .linha-tempo__linha {
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    bottom: 10px;
+    width: 10px;
+    height: calc(100% - 20px);
+    color: var(--c-cacau);
+  }
+  .linha-tempo__item {
+    position: relative;
+    display: grid;
+    gap: 2px;
+  }
+  .linha-tempo__ponto {
+    position: absolute;
+    left: -34px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--c-cacau);
+    box-shadow: 0 0 0 5px var(--c-pistache-creme);
+  }
+  .linha-tempo__onde {
+    font-size: 0.72rem;
+  }
+  .linha-tempo__oque {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 899px) {
+    .lab-teaser__grade {
+      grid-template-columns: 1fr;
+    }
+    .lab-teaser__retrato {
+      width: min(86%, 420px);
+    }
+    .lab-teaser__nota {
+      right: -14%;
+      top: 4%;
+      font-size: 1.05rem;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido } from '../../scripts/nucleo';
+
+  const secao = document.querySelector<HTMLElement>('.lab-teaser');
+  if (secao && !reduzido) {
+    const linhas = Array.from(secao.querySelectorAll<SVGPathElement>('.lab-teaser__linhas path'));
+    const foto = secao.querySelector<HTMLElement>('.lab-teaser__foto')!;
+    const svgLinhas = secao.querySelector<SVGSVGElement>('.lab-teaser__linhas')!;
+    const nota = secao.querySelector<HTMLElement>('.lab-teaser__nota')!;
+    const pontos = secao.querySelectorAll<HTMLElement>('.linha-tempo__ponto');
+    const itens = secao.querySelectorAll<HTMLElement>('.linha-tempo__item > :not(.linha-tempo__ponto)');
+    const linhaTempo = secao.querySelector<SVGPathElement>('.linha-tempo__linha path')!;
+
+    gsap.set(linhas, { drawSVG: '0% 0%' });
+    gsap.set(foto, { opacity: 0, scale: 1.06 });
+    gsap.set(nota, { opacity: 0, y: 10 });
+
+    // do traço à foto: as linhas acompanham a rolagem; depois a foto aparece por trás
+    const tl = gsap.timeline({
+      scrollTrigger: { trigger: secao.querySelector('.lab-teaser__arco'), start: 'top 78%', end: 'bottom 52%', scrub: 0.8 },
+    });
+    linhas.forEach((p, i) => tl.to(p, { drawSVG: '0% 100%', duration: 0.5, ease: 'none' }, i * 0.035));
+    tl.to(foto, { opacity: 1, scale: 1, duration: 0.9, ease: 'none' }, '>-0.2')
+      .to(svgLinhas, { opacity: 0.18, duration: 0.6, ease: 'none' }, '<0.2')
+      .to(nota, { opacity: 1, y: 0, duration: 0.4 }, '<');
+
+    gsap.set(pontos, { scale: 0 });
+    gsap.set(itens, { opacity: 0, x: -10 });
+    gsap.set(linhaTempo, { scaleY: 0, transformOrigin: '50% 0%' });
+    ScrollTrigger.create({
+      trigger: secao.querySelector('.linha-tempo'),
+      start: 'top 80%',
+      once: true,
+      onEnter: () => {
+        gsap.to(linhaTempo, { scaleY: 1, duration: 1.4, ease: 'power2.inOut' });
+        gsap.to(pontos, { scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.45)', stagger: 0.22 });
+        gsap.to(itens, { opacity: 1, x: 0, duration: 0.7, ease: 'creme', stagger: 0.11, delay: 0.1 });
+      },
+    });
+  }
+</script>

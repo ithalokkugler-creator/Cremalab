@@ -1,0 +1,172 @@
+---
+// Topo das páginas internas: o mesmo card arredondado da Home, no mundo de cor da página.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Doodle from '../marca/Doodle.astro';
+import type { NomeDoodle } from '../marca/doodles';
+import type { Mundo } from '../../data/site';
+
+interface Props {
+  mundo: Mundo;
+  eyebrow: string;
+  linhas: string[];
+  obliqua?: number;
+  texto?: string;
+  imagem?: ImageMetadata;
+  alt?: string;
+  doodle?: NomeDoodle;
+  nav?: 'claro' | 'escuro';
+}
+const { mundo, eyebrow, linhas, obliqua, texto, imagem, alt = '', doodle, nav } = Astro.props;
+const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
+---
+
+<section class="hero-pagina" data-nav={nav ?? (escuro ? 'escuro' : 'claro')}>
+  <div class="hero-pagina__card" data-mundo={mundo}>
+    <div class="hero-pagina__textos">
+      <p class="t-eyebrow hero-pagina__eyebrow" data-hp-entra>{eyebrow}</p>
+      <h1 class="hero-pagina__titulo t-h1">
+        {linhas.map((l, i) => <span class:list={['hero-pagina__linha', { obliqua: obliqua === i }]}>{l}</span>)}
+      </h1>
+      {texto && <p class="t-lead hero-pagina__texto" data-hp-entra>{texto}</p>}
+      <slot />
+    </div>
+    {
+      imagem && (
+        <div class="hero-pagina__arco arco" data-hp-arco>
+          <Image src={imagem} alt={alt} widths={[420, 640, 900]} sizes="(max-width: 899px) 80vw, 34vw" loading="eager" fetchpriority="high" />
+        </div>
+      )
+    }
+    {
+      doodle && (
+        <span class="hero-pagina__doodle" aria-hidden="true">
+          <Doodle nome={doodle} tracoPx={2.4} desenho />
+        </span>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero-pagina {
+    padding: 12px;
+    background: var(--c-fior);
+  }
+  .hero-pagina__card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    align-items: end;
+    gap: clamp(24px, 4vw, 64px);
+    min-height: min(88svh, 860px);
+    padding: calc(var(--nav-h) + 64px) clamp(24px, 3.4vw, 56px) clamp(32px, 5vh, 56px);
+    border-radius: var(--raio);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero-pagina__textos {
+    display: grid;
+    gap: 22px;
+    align-content: end;
+  }
+  .hero-pagina__eyebrow {
+    color: var(--acento);
+  }
+  .hero-pagina__titulo {
+    display: grid;
+    font-size: clamp(2.8rem, 7.4vw, 8rem);
+    line-height: 0.9;
+  }
+  .hero-pagina__linha {
+    display: block;
+    width: fit-content;
+  }
+  .hero-pagina__texto {
+    max-width: 38ch;
+  }
+  .hero-pagina__arco {
+    align-self: stretch;
+    max-height: 70svh;
+    min-height: 360px;
+    box-shadow: 0 30px 60px -30px rgb(43 33 28 / 0.55);
+  }
+  .hero-pagina__doodle {
+    position: absolute;
+    right: clamp(24px, 4vw, 64px);
+    top: calc(var(--nav-h) + 30px);
+    width: clamp(64px, 7vw, 108px);
+    color: var(--ink);
+    opacity: 0.9;
+  }
+  .hero-pagina__card:has(.hero-pagina__arco) .hero-pagina__doodle {
+    right: auto;
+    left: 52%;
+  }
+  @media (max-width: 899px) {
+    .hero-pagina {
+      padding: 8px;
+    }
+    .hero-pagina__card {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      padding-top: calc(var(--nav-h) + 40px);
+    }
+    .hero-pagina__arco {
+      order: -1;
+      width: 78%;
+      min-height: 280px;
+      max-height: 46svh;
+      justify-self: center;
+    }
+    .hero-pagina__doodle {
+      top: calc(var(--nav-h) + 12px);
+      width: 54px;
+    }
+    .hero-pagina__card:has(.hero-pagina__arco) .hero-pagina__doodle {
+      left: auto;
+      right: 18px;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, SplitText, reduzido, aoEntrar } from '../../scripts/nucleo';
+  import { desenharTracos, esconderTracos } from '../../scripts/desenho';
+
+  const hero = document.querySelector<HTMLElement>('.hero-pagina');
+  if (hero) {
+    const linhas = hero.querySelectorAll<HTMLElement>('.hero-pagina__linha');
+    const entra = hero.querySelectorAll<HTMLElement>('[data-hp-entra], .hero-pagina__textos > :not(.hero-pagina__titulo):not([data-hp-entra])');
+    const arco = hero.querySelector<HTMLElement>('[data-hp-arco]');
+    const doodle = hero.querySelector<SVGSVGElement>('.hero-pagina__doodle svg');
+    if (doodle) esconderTracos(doodle);
+    if (!reduzido) {
+      const split = SplitText.create(linhas, { type: 'chars', mask: 'lines' });
+      gsap.set(split.chars, { yPercent: 115, rotation: () => gsap.utils.random(-8, 8) });
+      gsap.set(entra, { opacity: 0, y: 16 });
+      if (arco) {
+        gsap.set(arco, { clipPath: 'inset(100% 0% 0% 0% round 999px 999px 24px 24px)' });
+        gsap.set(arco.querySelector('img'), { scale: 1.15 });
+      }
+      aoEntrar(() => {
+        const tl = gsap.timeline();
+        tl.to(split.chars, { yPercent: 0, rotation: 0, duration: 0.95, ease: 'creme', stagger: 0.022 }, 0.05).to(
+          entra,
+          { opacity: 1, y: 0, duration: 0.9, ease: 'creme', stagger: 0.08 },
+          0.45,
+        );
+        if (arco) {
+          tl.to(arco, { clipPath: 'inset(0% 0% 0% 0% round 999px 999px 24px 24px)', duration: 1.2, ease: 'creme' }, 0).to(
+            arco.querySelector('img'),
+            { scale: 1, duration: 1.7, ease: 'creme' },
+            0,
+          );
+        }
+        if (doodle) tl.add(desenharTracos(doodle, { stagger: 0.03 }), 0.6);
+      });
+    } else if (doodle) {
+      desenharTracos(doodle);
+    }
+  }
+</script>

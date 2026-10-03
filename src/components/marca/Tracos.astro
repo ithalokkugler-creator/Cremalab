@@ -1,0 +1,96 @@
+---
+// Line art do mural da loja (vetorizada em linha central). Pode renderizar o mural inteiro
+// ou só alguns elementos (grupos) de um dos lados, como "doodles".
+import mural from '../../assets/marca/mural.json';
+
+type Lado = 'esq' | 'dir' | 'ambos';
+
+interface Props {
+  grupos?: string[];
+  lado?: Lado;
+  espelhar?: boolean;
+  class?: string;
+  /** espessura em px na tela (vector-effect: non-scaling-stroke). Sem ela, o traço escala com o desenho. */
+  tracoPx?: number;
+  margem?: number;
+  desenho?: boolean;
+  rotulo?: string;
+}
+
+const {
+  grupos,
+  lado = 'ambos',
+  espelhar = false,
+  class: classe,
+  tracoPx,
+  margem = 14,
+  desenho = false,
+  rotulo,
+} = Astro.props;
+
+const passa = (g: string, l: string) => (!grupos || grupos.includes(g)) && (lado === 'ambos' || l === lado);
+const tracos = mural.tracos.filter((t) => passa(t.grupo, t.lado));
+const pontos = mural.pontos.filter((p) => passa(p.grupo, p.lado));
+
+let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+for (const t of tracos) {
+  x0 = Math.min(x0, t.bbox[0]);
+  y0 = Math.min(y0, t.bbox[1]);
+  x1 = Math.max(x1, t.bbox[2]);
+  y1 = Math.max(y1, t.bbox[3]);
+}
+for (const p of pontos) {
+  x0 = Math.min(x0, p.cx - p.r);
+  y0 = Math.min(y0, p.cy - p.r);
+  x1 = Math.max(x1, p.cx + p.r);
+  y1 = Math.max(y1, p.cy + p.r);
+}
+if (!grupos && lado === 'ambos') [x0, y0, x1, y1] = [0, 0, mural.viewBox[2], mural.viewBox[3]];
+
+const vb = [x0 - margem, y0 - margem, x1 - x0 + 2 * margem, y1 - y0 + 2 * margem].map((v) => Math.round(v * 10) / 10);
+const transform = espelhar ? `matrix(-1 0 0 1 ${Math.round((x0 + x1) * 10) / 10} 0)` : undefined;
+const escala = tracoPx ? 'non-scaling-stroke' : undefined;
+---
+
+<svg
+  class:list={['tracos', classe]}
+  viewBox={vb.join(' ')}
+  data-tracos
+  data-desenhavel={desenho ? '' : undefined}
+  aria-hidden={rotulo ? undefined : 'true'}
+  role={rotulo ? 'img' : undefined}
+  aria-label={rotulo}
+  focusable="false"
+  style={tracoPx ? `--traco:${tracoPx}px` : undefined}
+>
+  <g transform={transform}>
+    <g
+      fill="none"
+      stroke="currentColor"
+      stroke-width={tracoPx ? undefined : mural.largura}
+      stroke-linecap="butt"
+      stroke-linejoin="round"
+      class:list={{ 'tracos--fixo': !!tracoPx }}
+    >
+      {
+        tracos.map((t) => (
+          <path d={t.d} data-grupo={t.grupo} data-lado={t.lado} vector-effect={escala} />
+        ))
+      }
+    </g>
+    <g fill="currentColor">
+      {pontos.map((p) => <circle cx={p.cx} cy={p.cy} r={p.r} data-grupo={p.grupo} data-lado={p.lado} />)}
+    </g>
+  </g>
+</svg>
+
+<style>
+  .tracos {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .tracos--fixo {
+    stroke-width: var(--traco, 2px);
+  }
+</style>

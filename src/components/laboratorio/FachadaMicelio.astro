@@ -1,0 +1,238 @@
+---
+// A fachada de micélio em Three.js: os painéis "crescem" com a rolagem e uma luz rasante segue o
+// cursor (no toque, passeia sozinha). Clique numa área e o relevo "respira".
+// Sem WebGL2 ou com movimento reduzido, fica a trama de losangos em CSS.
+const fatos = [
+  { titulo: 'Primeira do mundo', texto: 'segundo o designboom (set/2024), a primeira fachada comercial feita com painéis de micélio' },
+  { titulo: 'Resíduo vira parede', texto: 'o micélio cresce sobre resíduos agrícolas e vira painel' },
+  { titulo: 'Conforto', texto: 'isolamento térmico e acústico natural' },
+  { titulo: 'Volta pra terra', texto: 'absorve CO₂ na produção e biodegrada em até cerca de 90 dias' },
+];
+---
+
+<section class="micelio" id="fachada" data-mundo="terracota" data-nav="escuro" aria-labelledby="micelio-titulo">
+  <div class="micelio__fixo">
+    <div class="micelio__palco" aria-hidden="true">
+      <div class="micelio__trama"></div>
+      <canvas class="micelio__canvas"></canvas>
+    </div>
+    <span class="micelio__selo" aria-hidden="true">Texturas <b>Crema</b></span>
+
+    <div class="casca micelio__conteudo">
+      <p class="t-eyebrow micelio__eyebrow" data-anim="subir">A fachada</p>
+      <h2 id="micelio-titulo" class="t-h2 micelio__titulo" data-anim="titulo">Cresceu. Não foi construída.</h2>
+      <p class="t-corpo micelio__texto" data-anim="subir">
+        A casquinha da fachada é feita de micélio — a parte vegetativa dos cogumelos. Os painéis, da Furf Design Studio
+        com a startup Mush, têm textura inspirada na casquinha de sorvete. Nasceram no Batel e se repetem no
+        ParkShoppingBarigui.
+      </p>
+      <ul class="micelio__fatos" role="list">
+        {
+          fatos.map((f) => (
+            <li class="micelio__fato">
+              <span class="micelio__fato-titulo">{f.titulo}</span>
+              <span class="micelio__fato-texto">{f.texto}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="micelio__dica t-anotacao" aria-hidden="true">mexa o cursor: a luz mostra o relevo</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .micelio {
+    position: relative;
+    color: var(--c-fior);
+  }
+  .micelio__fixo {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: 100svh;
+    padding-block: calc(var(--nav-h) + 40px) 56px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .micelio__palco {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .micelio__trama,
+  .micelio__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  /* fallback: trama de losangos da casquinha em CSS */
+  .micelio__trama {
+    background:
+      repeating-linear-gradient(45deg, transparent 0 46px, rgb(91 42 32 / 0.38) 46px 50px, rgb(245 239 230 / 0.1) 50px 52px),
+      repeating-linear-gradient(-45deg, transparent 0 46px, rgb(91 42 32 / 0.38) 46px 50px, rgb(245 239 230 / 0.1) 50px 52px),
+      var(--c-terracota);
+  }
+  .micelio__canvas {
+    opacity: 0;
+    transition: opacity 0.8s;
+  }
+  .micelio.com-3d .micelio__canvas {
+    opacity: 1;
+  }
+  .micelio__fixo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to right, rgb(91 42 32 / 0.82) 0%, rgb(91 42 32 / 0.5) 42%, transparent 72%);
+    pointer-events: none;
+  }
+  .micelio__selo {
+    position: absolute;
+    right: clamp(16px, 4vw, 64px);
+    top: calc(var(--nav-h) + 24px);
+    display: grid;
+    justify-items: center;
+    padding: 10px 18px 12px;
+    background: var(--c-ambar);
+    color: var(--c-cacau);
+    font-family: var(--f-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    rotate: 4deg;
+  }
+  .micelio__selo b {
+    font-weight: inherit;
+    font-size: 2.4em;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: var(--c-fior);
+    -webkit-text-stroke: 1px var(--c-cacau);
+  }
+  .micelio__conteudo {
+    display: grid;
+    gap: 22px;
+    justify-items: start;
+    width: 100%;
+    pointer-events: none;
+  }
+  .micelio__conteudo > * {
+    max-width: 560px;
+  }
+  .micelio__eyebrow {
+    color: var(--c-ambar);
+  }
+  .micelio__titulo {
+    font-size: clamp(2.4rem, 5.4vw, 5.4rem);
+    max-width: 11ch;
+  }
+  .micelio__fatos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    pointer-events: auto;
+  }
+  .micelio__fato {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgb(43 33 28 / 0.38);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgb(245 239 230 / 0.16);
+  }
+  .micelio__fato-titulo {
+    font-family: var(--f-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--c-ambar);
+  }
+  .micelio__fato-texto {
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+  .micelio__dica {
+    font-size: 1.3rem;
+    color: var(--c-pistache-creme);
+    rotate: -2deg;
+  }
+  .micelio:not(.com-3d) .micelio__dica {
+    display: none;
+  }
+  @media (max-width: 899px) {
+    .micelio__fixo::after {
+      background: linear-gradient(to top, rgb(91 42 32 / 0.9) 0%, rgb(91 42 32 / 0.6) 60%, rgb(91 42 32 / 0.3) 100%);
+    }
+    .micelio__fatos {
+      grid-template-columns: 1fr;
+    }
+    .micelio__selo {
+      top: calc(var(--nav-h) + 8px);
+      font-size: 0.6rem;
+    }
+  }
+  @media (hover: none) {
+    .micelio__dica {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido, ponteiroFino } from '../../scripts/nucleo';
+  import { suporta3d } from '../../scripts/three/suporte';
+
+  const secao = document.querySelector<HTMLElement>('.micelio');
+  if (secao) {
+    const fixo = secao.querySelector<HTMLElement>('.micelio__fixo')!;
+    const fatos = secao.querySelectorAll<HTMLElement>('.micelio__fato');
+    let crescimento = reduzido ? 1 : 0;
+    let cena: { crescer: (v: number) => void; destruir: () => void } | null = null;
+
+    if (!reduzido) {
+      gsap.set(fatos, { opacity: 0, y: 24 });
+      const mm = gsap.matchMedia();
+      mm.add({ desktop: '(min-width: 900px)', mobile: '(max-width: 899px)' }, (ctx) => {
+        const { desktop } = ctx.conditions as { desktop: boolean };
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: secao,
+            pin: desktop ? fixo : false,
+            start: desktop ? 'top top' : 'top 70%',
+            end: desktop ? '+=110%' : 'bottom 60%',
+            scrub: 0.6,
+            onUpdate: (st) => {
+              crescimento = Math.min(1, st.progress * 1.35);
+              cena?.crescer(crescimento);
+            },
+          },
+        });
+        tl.to(fatos, { opacity: 1, y: 0, stagger: 0.18, duration: 0.4, ease: 'none' }, 0.25);
+      });
+    }
+
+    if (!reduzido && suporta3d()) {
+      const palco = secao.querySelector<HTMLElement>('.micelio__palco')!;
+      const canvas = secao.querySelector<HTMLCanvasElement>('.micelio__canvas')!;
+      const io = new IntersectionObserver(
+        async ([e]) => {
+          if (!e.isIntersecting) return;
+          io.disconnect();
+          const { iniciarMicelio } = await import('../../scripts/three/micelio');
+          // a luz e o clique vêm da seção inteira (o texto fica por cima do canvas)
+          cena = iniciarMicelio({ canvas, palco, alvoPonteiro: fixo, reduzido, ponteiroFino });
+          cena.crescer(crescimento);
+          secao.classList.add('com-3d');
+          ScrollTrigger.refresh();
+        },
+        { rootMargin: '600px 0px' },
+      );
+      io.observe(secao);
+    }
+  }
+</script>

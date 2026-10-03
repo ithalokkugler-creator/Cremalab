@@ -1,0 +1,23 @@
+---
+// Símbolos reutilizáveis (via <use>) — o wordmark impresso nos copos ilustrados, o monograma etc.
+import monograma from '../../assets/marca/monograma.json';
+import wordmark from '../../assets/marca/wordmark.json';
+---
+
+<svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
+  <symbol id="simbolo-wordmark" viewBox={wordmark.viewBox.join(' ')}>
+    {wordmark.partes.map((p) => <path d={p.d} fill-rule="evenodd" />)}
+  </symbol>
+  <symbol id="simbolo-monograma" viewBox={monograma.viewBox.join(' ')}>
+    {monograma.partes.map((p) => <path d={p.d} fill-rule="evenodd" />)}
+  </symbol>
+</svg>
+
+<style>
+  .sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+</style>
