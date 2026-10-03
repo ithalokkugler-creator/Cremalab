@@ -67,7 +67,7 @@ const schema = {
 };
 ---
 
-<Base titulo={u.nome} mundo={u.mundo} descricao={`${u.nome}: ${u.descricao} ${ondeFica}, ${u.bairro}, Curitiba.`} schema={schema}>
+<Base titulo={`Unidade ${u.nomeCurto}`} mundo={u.mundo} descricao={`${u.nome}: ${u.descricao} ${ondeFica}, ${u.bairro}, Curitiba.`} schema={schema}>
   <HeroPagina
     mundo={u.mundo}
     eyebrow={`${u.apelido} · ${u.bairro}`}

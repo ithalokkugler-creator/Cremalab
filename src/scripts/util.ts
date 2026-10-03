@@ -44,3 +44,10 @@ export function curvaSuave(pts: [number, number][], fechada = false, tensao = 1)
   }
   return fechada ? `${d}Z` : d;
 }
+
+/** Arredonda as coordenadas de um "d" de SVG (1 casa decimal): os traços do Rough.js ficam bem menores. */
+export const arredondarPath = (d: string) =>
+  d.replace(/-?\d*\.\d+/g, (n) => {
+    const r = Math.round(Number(n) * 10) / 10;
+    return Object.is(r, -0) ? '0' : String(r);
+  });

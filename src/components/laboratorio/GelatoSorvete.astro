@@ -3,6 +3,7 @@
 // Sem números de propósito — valores reais dependem da receita e precisam ser validados com a chef.
 import rough from 'roughjs';
 import { CORES } from '../../data/site';
+import { arredondarPath } from '../../scripts/util';
 
 const gen = rough.generator();
 const L = 600;
@@ -26,7 +27,7 @@ const linhas = [
           seed: semente,
         }),
       )
-      .map((p) => ({ d: p.d, stroke: p.stroke, largura: p.strokeWidth }));
+      .map((p) => ({ d: arredondarPath(p.d), stroke: p.stroke, largura: p.strokeWidth }));
   return {
     ...l,
     gelato: barra(l.gelato, 8, CORES.ambar, 'hachure', 40 + i),

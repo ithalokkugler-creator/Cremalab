@@ -4,6 +4,7 @@
 import rough from 'roughjs';
 import { unidadesAtivas } from '../../data/unidades';
 import { CORES } from '../../data/site';
+import { arredondarPath } from '../../scripts/util';
 
 interface Props {
   id: string;
@@ -14,7 +15,7 @@ const { id, class: classe } = Astro.props;
 type Info = { d: string; stroke: string; strokeWidth: number; fill?: string };
 const gen = rough.generator();
 const caminhos = (drawable: ReturnType<typeof gen.curve>): Info[] =>
-  gen.toPaths(drawable).map((p) => ({ d: p.d, stroke: p.stroke, strokeWidth: p.strokeWidth, fill: p.fill }));
+  gen.toPaths(drawable).map((p) => ({ d: arredondarPath(p.d), stroke: p.stroke, strokeWidth: p.strokeWidth, fill: p.fill }));
 
 const CACAU = '#2b211c';
 const quadras: Info[] = [];
@@ -93,7 +94,7 @@ const bairros = [
   { nome: 'Parque Barigui', x: 238, y: 405 },
   { nome: 'Mossunguê', x: 150, y: 460 },
   { nome: 'Batel', x: 598, y: 520 },
-  { nome: 'Centro Cívico', x: 752, y: 178 },
+  { nome: 'Centro Cívico', x: 808, y: 206 },
 ];
 ---
 
