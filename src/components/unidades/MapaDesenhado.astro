@@ -140,7 +140,11 @@ const bairros = [
           <use href="#simbolo-monograma" x="-8" y="-60" width="16" height="30" fill={u.mundo === 'terracota' ? CORES.fior : CACAU} />
           </g>
         </g>
-        <text x={u.mapa.x + 34} y={u.mapa.y - 34} class="mapa__rotulo">
+        <text
+          x={u.mapa.x > 640 ? u.mapa.x - 34 : u.mapa.x + 34}
+          y={u.mapa.y - 34}
+          text-anchor={u.mapa.x > 640 ? 'end' : 'start'}
+          class="mapa__rotulo">
           {u.nomeCurto.toUpperCase()}
         </text>
       </g>

@@ -1,0 +1,150 @@
+---
+// Perguntas frequentes: <details> nativo (acessível sem JS) com abertura animada e sublinhado Rough.
+interface Props {
+  perguntas: { p: string; r: string }[];
+}
+const { perguntas } = Astro.props;
+---
+
+<div class="faq">
+  {
+    perguntas.map((q) => (
+      <details class="faq__item">
+        <summary class="faq__pergunta">
+          <span class="faq__texto" data-rabisco="sublinhado" data-rabisco-gatilho="manual" data-rabisco-cor="#b26a5b">
+            {q.p}
+          </span>
+          <span class="faq__mais" aria-hidden="true" />
+        </summary>
+        <div class="faq__resposta">
+          <p set:html={q.r} />
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    display: grid;
+    border-top: 1.5px solid var(--c-cacau);
+  }
+  .faq__item {
+    border-bottom: 1.5px solid var(--c-cacau);
+  }
+  .faq__pergunta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 4px;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--f-display);
+    font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .faq__pergunta::-webkit-details-marker {
+    display: none;
+  }
+  .faq__texto {
+    position: relative;
+  }
+  .faq__mais {
+    position: relative;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    transition:
+      rotate 0.5s var(--ease-creme),
+      background 0.3s;
+  }
+  .faq__mais::before,
+  .faq__mais::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 1.6px;
+    background: currentColor;
+    translate: -50% -50%;
+  }
+  .faq__mais::after {
+    rotate: 90deg;
+  }
+  .faq__item[open] .faq__mais {
+    rotate: 45deg;
+    background: var(--c-ambar);
+  }
+  .faq__resposta {
+    overflow: hidden;
+  }
+  .faq__resposta p {
+    padding: 0 4px 24px;
+    max-width: 68ch;
+    font-size: 1.02rem;
+    line-height: 1.55;
+  }
+  .faq__resposta :global(a) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido } from '../../scripts/nucleo';
+  import { rabiscar, apagarRabisco } from '../../scripts/rabisco';
+
+  document.querySelectorAll<HTMLDetailsElement>('.faq__item').forEach((item) => {
+    const resumo = item.querySelector('summary')!;
+    const resposta = item.querySelector<HTMLElement>('.faq__resposta')!;
+    const texto = item.querySelector<HTMLElement>('.faq__texto')!;
+    let animando = false;
+
+    resumo.addEventListener('click', (e) => {
+      if (reduzido) {
+        requestAnimationFrame(() => (item.open ? rabiscar(texto) : apagarRabisco(texto)));
+        return;
+      }
+      e.preventDefault();
+      if (animando) return;
+      animando = true;
+      if (!item.open) {
+        item.open = true;
+        rabiscar(texto);
+        gsap.fromTo(
+          resposta,
+          { height: 0, opacity: 0 },
+          {
+            height: 'auto',
+            opacity: 1,
+            duration: 0.6,
+            ease: 'creme',
+            onComplete: () => {
+              animando = false;
+              ScrollTrigger.refresh();
+            },
+          },
+        );
+      } else {
+        apagarRabisco(texto);
+        gsap.to(resposta, {
+          height: 0,
+          opacity: 0,
+          duration: 0.45,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            item.open = false;
+            gsap.set(resposta, { clearProps: 'height,opacity' });
+            animando = false;
+            ScrollTrigger.refresh();
+          },
+        });
+      }
+    });
+  });
+</script>

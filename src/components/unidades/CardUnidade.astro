@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Seta from '../ui/Seta.astro';
-import { type Unidade, descreverHorarios, diasFechados, linkMapa } from '../../data/unidades';
+import { type Unidade, descreverHorarios, diasFechados, linkMapa, nomeQuebravel } from '../../data/unidades';
 
 interface Props {
   unidade: Unidade;
@@ -18,7 +18,7 @@ const Titulo = titulo;
   <div class="card-unidade__corpo">
     <p class="t-eyebrow card-unidade__apelido">{u.apelido}</p>
     <Titulo class="t-h3 card-unidade__nome">
-      <a href={`/unidades/${u.slug}`} data-cursor="ir">{u.nomeCurto}</a>
+      <a href={`/unidades/${u.slug}`} data-cursor="ir">{nomeQuebravel(u.nomeCurto)}</a>
     </Titulo>
     <address class="card-unidade__endereco">
       {u.endereco}{u.complemento ? <><br />{u.complemento}</> : null}<br />
@@ -58,7 +58,7 @@ const Titulo = titulo;
   {
     foto && (
       <div class="card-unidade__foto arco">
-        <Image src={u.foto} alt={`Loja ${u.nome}`} widths={[240, 360]} sizes="160px" />
+        <Image src={u.foto} alt={u.fotoAlt} widths={[240, 360]} sizes="160px" />
       </div>
     )
   }
@@ -161,7 +161,7 @@ const Titulo = titulo;
   }
   @media (max-width: 599px) {
     .card-unidade {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .card-unidade__foto {
       display: none;

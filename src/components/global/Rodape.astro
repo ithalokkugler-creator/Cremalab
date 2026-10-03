@@ -3,7 +3,7 @@ import Marca from '../marca/Marca.astro';
 import Selo from '../marca/Selo.astro';
 import Doodle from '../marca/Doodle.astro';
 import { SITE, NAV, linkWhatsApp } from '../../data/site';
-import { unidadesAtivas } from '../../data/unidades';
+import { unidadesAtivas, nomeQuebravel } from '../../data/unidades';
 
 const ano = new Date().getFullYear();
 const blobs = [
@@ -16,8 +16,8 @@ const stickers = [
   { doodle: 'nuvem', cor: 'var(--c-fior)', blob: 2, x: 47, y: 1.5, rot: -14 },
   { doodle: 'ramo', cor: 'var(--c-pistache-creme)', blob: 2, x: 86, y: 6, rot: 12 },
   { doodle: 'sol', cor: 'var(--c-rosa)', blob: 1, x: 88, y: 15, rot: -6 },
-  { doodle: 'onda', cor: 'var(--c-terracota)', blob: 0, x: 50, y: 50, rot: 8 },
-  { doodle: 'mono', cor: 'var(--c-ambar)', blob: 1, x: 68, y: 52, rot: 10 },
+  { doodle: 'onda', cor: 'var(--c-terracota)', blob: 0, x: 46, y: 69, rot: 8 },
+  { doodle: 'mono', cor: 'var(--c-ambar)', blob: 1, x: 62, y: 34, rot: 10 },
 ] as const;
 ---
 
@@ -61,7 +61,7 @@ const stickers = [
           unidadesAtivas().map((u) => (
             <li class="rodape__unidade" data-status={JSON.stringify(u.horarios)}>
               <a href={`/unidades/${u.slug}`} class="rodape__unidade-nome t-h3" data-cursor="ir">
-                {u.nomeCurto}
+                {nomeQuebravel(u.nomeCurto)}
               </a>
               <span class="rodape__endereco">
                 {u.endereco}
@@ -305,8 +305,17 @@ const stickers = [
       flex-direction: column;
       align-items: flex-start;
     }
+    .rodape {
+      padding-top: calc(var(--respiro) + 40px);
+    }
+    /* no celular os adesivos ficam numa faixa no topo, longe do texto */
     .sticker {
-      opacity: 0.85;
+      top: 18px;
+      width: 62px;
+      opacity: 0.9;
+    }
+    .sticker:nth-child(n + 4) {
+      display: none;
     }
   }
 </style>

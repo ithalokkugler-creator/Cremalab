@@ -6,7 +6,7 @@ import Bola from '../sabores/Bola.astro';
 import Tracos from '../marca/Tracos.astro';
 import { SITE, NAV, linkWhatsApp } from '../../data/site';
 import { saboresClassicos } from '../../data/sabores';
-import { unidadesAtivas, descreverHorarios } from '../../data/unidades';
+import { unidadesAtivas, descreverHorarios, nomeQuebravel } from '../../data/unidades';
 
 const wa = linkWhatsApp();
 const qr = await QRCode.toString(wa, {
@@ -142,7 +142,7 @@ const blob =
         unidadesAtivas().map((u) => (
           <li class="menu__unidade" data-status={JSON.stringify(u.horarios)} data-status-curto>
             <a href={`/unidades/${u.slug}`}>
-              <span class="t-rotulo">{u.nomeCurto}</span>
+              <span class="t-rotulo">{nomeQuebravel(u.nomeCurto)}</span>
               <span class="menu__status">
                 <i class="menu__ponto" aria-hidden="true" />
                 <span data-status-texto>{descreverHorarios(u.horarios)[0].dias}</span>
@@ -219,8 +219,12 @@ const blob =
     height: 100%;
     fill: var(--c-ambar);
     filter: drop-shadow(0 3px 0 rgb(43 33 28 / 0.16));
+    transition: fill 0.4s;
   }
   .nav__blob--whats .nav__blob-forma {
+    fill: var(--c-fior);
+  }
+  .nav[data-sob='ambar'] .nav__blob--sabores .nav__blob-forma {
     fill: var(--c-fior);
   }
   .nav__blob-rotulo {
@@ -436,7 +440,7 @@ const blob =
     min-width: 2.4em;
   }
   .menu__rotulo {
-    font-size: clamp(2.3rem, 6.6vw, 6.4rem);
+    font-size: clamp(1.8rem, 4.6vw, 5.2rem);
     display: inline-block;
   }
   .menu__link[aria-current='page'] .menu__rotulo {
@@ -530,7 +534,7 @@ const blob =
       height: 44px;
     }
     .menu {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       padding-top: calc(var(--nav-h) + 32px);
     }
     .menu__mural {
@@ -539,6 +543,9 @@ const blob =
       bottom: 24vh;
       opacity: 0.35;
     }
+    .menu__rotulo {
+      font-size: clamp(1.3rem, 6.4vw, 3.2rem);
+    }
     .whats-flutuante {
       display: inline-flex;
     }
@@ -546,7 +553,7 @@ const blob =
 </style>
 
 <script>
-  import { gsap, ScrollTrigger, SplitText, reduzido, ponteiroFino, pausarScroll } from '../../scripts/nucleo';
+  import { gsap, ScrollTrigger, SplitText, reduzido, ponteiroFino, pausarScroll, CLASSES_SPLIT } from '../../scripts/nucleo';
   import { desenharTracos, esconderTracos } from '../../scripts/desenho';
   import { ativarStatus } from '../../scripts/horarios';
 
@@ -640,8 +647,11 @@ const blob =
       end: 'bottom 46px',
       onToggle: (st) => {
         if (menuAberto) return;
-        if (st.isActive) definirTema(secao.dataset.nav || 'claro');
-        else if (!gatilhos.some((g) => g.isActive)) definirTema('claro');
+        if (st.isActive) {
+          definirTema(secao.dataset.nav || 'claro');
+          // a cor de fundo sob a barra (o blob âmbar some sobre fundo âmbar)
+          nav.dataset.sob = secao.dataset.mundo || secao.querySelector<HTMLElement>('[data-mundo]')?.dataset.mundo || '';
+        } else if (!gatilhos.some((g) => g.isActive)) definirTema('claro');
       },
     }),
   );
@@ -692,7 +702,7 @@ const blob =
     pausarScroll(true);
     definirTema('escuro');
     split?.revert();
-    split = SplitText.create(menu.querySelectorAll('.menu__rotulo'), { type: 'chars', mask: 'chars' });
+    split = SplitText.create(menu.querySelectorAll('.menu__rotulo'), { type: 'words,chars', mask: 'chars', ...CLASSES_SPLIT });
     const tl = gsap.timeline();
     tl.fromTo(
       menu,

@@ -13,6 +13,8 @@ html {
   text-size-adjust: 100%;
   background: var(--c-fior);
   scroll-behavior: auto;
+  /* nada (cartões girados, fitas, rabiscos) alarga a página no celular */
+  overflow-x: clip;
 }
 
 html.lenis,
@@ -303,6 +305,13 @@ button {
   background: var(--ink);
   color: var(--bg);
 }
+@media (max-width: 479px) {
+  .botao {
+    white-space: normal;
+    letter-spacing: 0.14em;
+    padding-inline: 22px;
+  }
+}
 .botao--cheio {
   background: var(--ink);
   color: var(--bg);
@@ -337,4 +346,13 @@ button {
   background: var(--pilula-bg, var(--c-fior));
   color: var(--pilula-tinta, var(--c-cacau));
   white-space: nowrap;
+}
+
+/* máscaras do SplitText: folga para acentos (Á, Ê, Ó) e cedilhas não serem cortados
+   pelas entrelinhas apertadas dos títulos */
+.line-mask,
+.word-mask,
+.char-mask {
+  padding-block: 0.18em 0.08em;
+  margin-block: -0.18em -0.08em;
 }

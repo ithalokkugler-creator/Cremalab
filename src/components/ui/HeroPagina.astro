@@ -19,13 +19,16 @@ interface Props {
 }
 const { mundo, eyebrow, linhas, obliqua, texto, imagem, alt = '', doodle, nav } = Astro.props;
 const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
+// o título cabe na coluna sem quebrar palavras: o tamanho acompanha a linha mais longa
+const maior = Math.max(...linhas.map((l) => l.length));
+const escala = `--hp-fs:min(7.4vw, ${(57 / maior).toFixed(2)}vw);--hp-fs-m:min(12vw, ${(84 / maior).toFixed(2)}vw)`;
 ---
 
 <section class="hero-pagina" data-nav={nav ?? (escuro ? 'escuro' : 'claro')}>
   <div class="hero-pagina__card" data-mundo={mundo}>
     <div class="hero-pagina__textos">
       <p class="t-eyebrow hero-pagina__eyebrow" data-hp-entra>{eyebrow}</p>
-      <h1 class="hero-pagina__titulo t-h1">
+      <h1 class="hero-pagina__titulo t-h1" style={escala}>
         {linhas.map((l, i) => <span class:list={['hero-pagina__linha', { obliqua: obliqua === i }]}>{l}</span>)}
       </h1>
       {texto && <p class="t-lead hero-pagina__texto" data-hp-entra>{texto}</p>}
@@ -35,6 +38,13 @@ const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
       imagem && (
         <div class="hero-pagina__arco arco" data-hp-arco>
           <Image src={imagem} alt={alt} widths={[420, 640, 900]} sizes="(max-width: 899px) 80vw, 34vw" loading="eager" fetchpriority="high" />
+        </div>
+      )
+    }
+    {
+      !imagem && Astro.slots.has('lado') && (
+        <div class="hero-pagina__lado">
+          <slot name="lado" />
         </div>
       )
     }
@@ -75,8 +85,8 @@ const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
   }
   .hero-pagina__titulo {
     display: grid;
-    font-size: clamp(2.8rem, 7.4vw, 8rem);
-    line-height: 0.9;
+    font-size: clamp(2.6rem, var(--hp-fs), 8rem);
+    line-height: 0.92;
   }
   .hero-pagina__linha {
     display: block;
@@ -90,6 +100,10 @@ const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
     max-height: 70svh;
     min-height: 360px;
     box-shadow: 0 30px 60px -30px rgb(43 33 28 / 0.55);
+  }
+  .hero-pagina__lado {
+    align-self: center;
+    min-width: 0;
   }
   .hero-pagina__doodle {
     position: absolute;
@@ -108,9 +122,12 @@ const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
       padding: 8px;
     }
     .hero-pagina__card {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       min-height: auto;
       padding-top: calc(var(--nav-h) + 40px);
+    }
+    .hero-pagina__titulo {
+      font-size: clamp(1.5rem, var(--hp-fs-m), 4.6rem);
     }
     .hero-pagina__arco {
       order: -1;
@@ -131,7 +148,7 @@ const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
 </style>
 
 <script>
-  import { gsap, SplitText, reduzido, aoEntrar } from '../../scripts/nucleo';
+  import { gsap, SplitText, reduzido, aoEntrar, CLASSES_SPLIT } from '../../scripts/nucleo';
   import { desenharTracos, esconderTracos } from '../../scripts/desenho';
 
   const hero = document.querySelector<HTMLElement>('.hero-pagina');
@@ -142,7 +159,7 @@ const escuro = ['terracota', 'telha', 'cacau'].includes(mundo);
     const doodle = hero.querySelector<SVGSVGElement>('.hero-pagina__doodle svg');
     if (doodle) esconderTracos(doodle);
     if (!reduzido) {
-      const split = SplitText.create(linhas, { type: 'chars', mask: 'lines' });
+      const split = SplitText.create(linhas, { type: 'lines,words,chars', mask: 'lines', ...CLASSES_SPLIT });
       gsap.set(split.chars, { yPercent: 115, rotation: () => gsap.utils.random(-8, 8) });
       gsap.set(entra, { opacity: 0, y: 16 });
       if (arco) {

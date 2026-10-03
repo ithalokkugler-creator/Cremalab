@@ -12,7 +12,9 @@ export type NomeIcone =
   | 'medalha'
   | 'taca'
   | 'presente'
-  | 'balao';
+  | 'balao'
+  | 'quadro'
+  | 'collab';
 
 export const ICONES: Record<NomeIcone, { paths: string[]; pontos?: [number, number, number][] }> = {
   limao: {
@@ -162,6 +164,25 @@ export const ICONES: Record<NomeIcone, { paths: string[]; pontos?: [number, numb
       'M56 82L60 90L64 82',
       'M60 90C54 98 66 104 58 112',
       'M44 32C48 26 54 24 58 24',
+    ],
+  },
+  quadro: {
+    paths: [
+      'M18 34H102V106H18Z',
+      'M28 44H92V96H28Z',
+      'M38 34L60 14L82 34',
+      'M48 66C48 58 53 54 60 54C67 54 72 58 72 66Z',
+      'M50 66L60 86L70 66',
+      'M55 72L65 72',
+    ],
+    pontos: [[60, 12, 3]],
+  },
+  collab: {
+    paths: [
+      'M46 32C63 32 76 46 76 63C76 80 63 94 46 94C29 94 16 80 16 63C16 46 29 32 46 32Z',
+      'M74 32C91 32 104 46 104 63C104 80 91 94 74 94C57 94 44 80 44 63C44 46 57 32 74 32Z',
+      'M101 8V22M94 15H108',
+      'M56 54L64 54M54 63H66M56 72H64',
     ],
   },
 };

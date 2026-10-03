@@ -1,0 +1,143 @@
+---
+// 404: o monograma se desenha, começa a derreter e pinga numa poça que cresce.
+import Base from '../layouts/Base.astro';
+import Marca from '../components/marca/Marca.astro';
+import Seta from '../components/ui/Seta.astro';
+---
+
+<Base titulo="Página não encontrada" mundo="ambar" descricao="Essa página derreteu. Mas a vitrine da Crema Lab continua cheia.">
+  <section class="derreteu" data-mundo="ambar" aria-labelledby="derreteu-titulo">
+    <div class="derreteu__cena" aria-hidden="true">
+      <div class="derreteu__mono">
+        <Marca tipo="monograma" id="mono-404" desenho decorativo />
+      </div>
+      <svg class="derreteu__gotas" viewBox="0 0 200 260">
+        <path class="derreteu__gota" d="M100 0C104 10 110 18 110 26A10 10 0 0 1 90 26C90 18 96 10 100 0Z"></path>
+        <path class="derreteu__gota" d="M100 0C104 10 110 18 110 26A10 10 0 0 1 90 26C90 18 96 10 100 0Z"></path>
+        <path class="derreteu__gota" d="M100 0C104 10 110 18 110 26A10 10 0 0 1 90 26C90 18 96 10 100 0Z"></path>
+      </svg>
+      <svg class="derreteu__poca" viewBox="0 0 300 60">
+        <path
+          d="M20 34C20 20 70 12 150 12S280 20 280 34C280 46 236 50 200 48C180 54 150 56 120 50C80 54 20 48 20 34Z"></path>
+      </svg>
+    </div>
+
+    <div class="derreteu__texto">
+      <p class="t-eyebrow derreteu__codigo">Erro 404</p>
+      <h1 id="derreteu-titulo" class="t-h1 derreteu__titulo">
+        Ops. Essa página <span class="obliqua">derreteu.</span>
+      </h1>
+      <p class="t-lead">Mas a vitrine continua cheia.</p>
+      <div class="derreteu__botoes">
+        <a class="botao botao--cheio" href="/" data-magnetico>Voltar pra vitrine <Seta /></a>
+        <a class="botao" href="/sabores" data-magnetico>Ver os sabores <Seta /></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .derreteu {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: clamp(24px, 5vw, 80px);
+    min-height: 100svh;
+    padding: calc(var(--nav-h) + 40px) var(--margem) 60px;
+  }
+  .derreteu__cena {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 300px);
+    display: grid;
+    justify-items: center;
+  }
+  .derreteu__mono {
+    width: 58%;
+    transform-origin: 50% 0;
+  }
+  .derreteu__mono :global(.marca) {
+    width: 100%;
+    height: auto;
+    color: var(--c-cacau);
+  }
+  .derreteu__gotas {
+    width: 60%;
+    margin-top: -6px;
+    overflow: visible;
+  }
+  .derreteu__gota {
+    fill: var(--c-cacau);
+    opacity: 0;
+  }
+  .derreteu__poca {
+    width: 100%;
+    margin-top: -40px;
+    overflow: visible;
+  }
+  .derreteu__poca path {
+    fill: var(--c-cacau);
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+  }
+  .derreteu__texto {
+    display: grid;
+    gap: 22px;
+    justify-items: start;
+  }
+  .derreteu__codigo {
+    color: var(--c-telha);
+  }
+  .derreteu__titulo {
+    font-size: clamp(2.6rem, 6vw, 6.4rem);
+    line-height: 0.95;
+  }
+  .derreteu__botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  @media (max-width: 899px) {
+    .derreteu {
+      grid-template-columns: minmax(0, 1fr);
+      text-align: left;
+    }
+    .derreteu__cena {
+      width: min(60%, 220px);
+    }
+  }
+</style>
+
+<script>
+  import { gsap, reduzido, aoEntrar } from '../scripts/nucleo';
+  import { desenharMarca, mostrarMarca } from '../scripts/desenho';
+
+  const mono = document.querySelector<SVGSVGElement>('.derreteu__mono svg');
+  const caixa = document.querySelector<HTMLElement>('.derreteu__mono');
+  const gotas = Array.from(document.querySelectorAll<SVGPathElement>('.derreteu__gota'));
+  const poca = document.querySelector<SVGPathElement>('.derreteu__poca path');
+  if (mono && caixa && poca) {
+    if (reduzido) {
+      mostrarMarca(mono);
+    } else {
+      gsap.set(poca, { scaleX: 0.15, scaleY: 0.4 });
+      aoEntrar(() => {
+        const tl = gsap.timeline();
+        tl.add(desenharMarca(mono, { duracao: 1.6 }))
+          // começa a derreter: estica para baixo e escorre
+          .to(caixa, { scaleY: 1.08, scaleX: 0.97, duration: 1.2, ease: 'power2.in' }, '+=0.2')
+          .to(poca, { scaleX: 1, scaleY: 1, duration: 2.4, ease: 'power2.out' }, '<');
+        // gotas caem em loop, cada uma num ritmo
+        gotas.forEach((g, i) => {
+          const queda = gsap.timeline({ repeat: -1, delay: 2.2 + i * 0.9, repeatDelay: 0.6 + i * 0.35 });
+          queda
+            .set(g, { x: (i - 1) * 22, y: 0, scale: 0.4, opacity: 1, transformOrigin: '50% 0%' })
+            .to(g, { scale: 1, duration: 0.6, ease: 'power1.in' })
+            .to(g, { y: 210, duration: 0.55, ease: 'power2.in' })
+            .to(g, { scaleY: 0.2, scaleX: 1.6, opacity: 0, duration: 0.18, ease: 'power1.out' })
+            .fromTo(poca, { scaleY: 1.18 }, { scaleY: 1, duration: 0.5, ease: 'elastic.out(1, 0.4)' }, '<');
+        });
+      });
+    }
+  }
+</script>

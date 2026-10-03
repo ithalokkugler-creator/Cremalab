@@ -1,0 +1,572 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import HeroPagina from '../components/ui/HeroPagina.astro';
+import Carrinho from '../components/eventos/Carrinho.astro';
+import FormCarrinho from '../components/eventos/FormCarrinho.astro';
+import Faq from '../components/eventos/Faq.astro';
+import Icone from '../components/marca/Icone.astro';
+import Seta from '../components/ui/Seta.astro';
+import type { NomeIcone } from '../components/marca/icones';
+import paraLevar from '../assets/fotos/para-levar.jpg';
+import { SITE, linkWhatsApp } from '../data/site';
+
+const inclui: { icone: NomeIcone; titulo: string; texto: string }[] = [
+  { icone: 'espatula', titulo: 'Gelato servido na hora', texto: 'Sabores da estação, trabalhados com espátula, do jeito da loja.' },
+  { icone: 'taca', titulo: 'Drinks com gelato', texto: 'Drinks exclusivos feitos com os nossos gelatos e sorbets.' },
+  { icone: 'presente', titulo: 'Para todo tipo de festa', texto: 'Casamentos, aniversários, eventos de empresa e lançamentos.' },
+];
+
+const encomendas: { icone: NomeIcone; titulo: string; texto: string }[] = [
+  {
+    icone: 'bowl',
+    titulo: 'Bowls de Natal',
+    texto:
+      'Sobremesas servidas em bowls metalizados criados com a Vanessa Taques Casa: meia esfera, para até 10 pessoas, ou a esfera inteira.',
+  },
+  { icone: 'taca', titulo: 'Sorbet de ameixa com ginja', texto: 'Sem lactose, com calda de ginja — uma das sobremesas do Natal.' },
+  { icone: 'pote', titulo: 'Gelato almendrado', texto: 'Creme de ovos com praliné de amêndoas, para fechar a ceia.' },
+];
+
+const dicas = [
+  'Leve direto para o freezer: gelato não gosta de passeio.',
+  'Guarde na parte mais fria do freezer, longe da porta.',
+  'Feche bem a embalagem, para não pegar cheiro nem formar cristais.',
+  'Na hora de servir, deixe de 5 a 10 minutos fora do freezer: a textura volta a ficar cremosa.',
+  'Derreteu? Não recongele — aproveite na hora.',
+];
+
+const collabs = [
+  { nome: 'Île de France', texto: 'Drinks com sorbet: maçã com Applejack, laranja e damasco com Cointreau, limão com vodka de baunilha.' },
+  { nome: 'Revival', texto: 'Uma collab de moda unida pela cor pistache.' },
+  { nome: 'Vanessa Taques Casa', texto: 'Os bowls metalizados do Natal, que depois viram peça da casa.' },
+];
+
+const perguntas = [
+  {
+    p: 'Com quanto tempo de antecedência peço o carrinho?',
+    r: 'Quanto antes, melhor — em datas festivas a agenda enche rápido. Mande a data pelo formulário e a equipe confirma a disponibilidade.',
+  },
+  {
+    p: 'O carrinho atende fora de Curitiba?',
+    r: 'Depende da data e da distância. Conte onde vai ser a festa e a equipe responde com as possibilidades.',
+  },
+  {
+    p: 'Dá para escolher os sabores?',
+    r: 'Sim. A equipe ajuda a montar a seleção a partir dos sabores da estação, incluindo sorbets feitos à base de água.',
+  },
+  {
+    p: 'Como funcionam as encomendas da estação?',
+    r: `Elas abrem em datas especiais, como o Natal, sempre com prazo para pedir. Os lançamentos saem primeiro no Instagram <a href="${SITE.instagram}" target="_blank" rel="noopener">${SITE.instagramUsuario}</a>.`,
+  },
+  {
+    p: 'Vocês têm opções sem lactose ou veganas?',
+    r: 'Vários sorbets são feitos à base de água, sem leite. Como os ingredientes variam, confirme com a equipe antes de pedir — principalmente em caso de alergia.',
+  },
+  {
+    p: 'Como guardo o gelato em casa?',
+    r: 'Direto para o freezer, bem fechado, e de 5 a 10 minutos fora antes de servir. As dicas completas estão <a href="#em-casa">logo acima</a>.',
+  },
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: perguntas.map((q) => ({
+    '@type': 'Question',
+    name: q.p,
+    acceptedAnswer: { '@type': 'Answer', text: q.r.replace(/<[^>]+>/g, '') },
+  })),
+};
+---
+
+<Base
+  titulo="Eventos & Encomendas"
+  mundo="rosa"
+  descricao="Leve a Crema Lab pra sua festa: carrinho de gelato para eventos, com drinks feitos com gelato, e sobremesas da estação sob encomenda. Peça um orçamento pelo WhatsApp."
+  schema={schema}>
+  <HeroPagina
+    mundo="rosa"
+    eyebrow="Eventos & encomendas"
+    linhas={['Leve a Crema Lab', 'pra sua festa.']}
+    obliqua={1}
+    texto="O carrinho de gelato vai até você — com drinks feitos com gelato — e, nas datas especiais, a sobremesa da estação vai pra sua mesa.">
+    <div class="eventos-hero__botoes" data-hp-entra>
+      <a class="botao botao--cheio" href="#carrinho" data-magnetico>Pedir orçamento <Seta direcao="baixo" /></a>
+      <a class="botao" href="#encomendas" data-magnetico>Encomendas <Seta direcao="baixo" /></a>
+    </div>
+    <div slot="lado" class="eventos-hero__carrinho" data-cursor="vrum">
+      <Carrinho />
+    </div>
+  </HeroPagina>
+
+  <section id="carrinho" class="carrinho-secao secao" data-mundo="fior" aria-labelledby="carrinho-titulo">
+    <div class="casca carrinho-secao__grade">
+      <div class="carrinho-secao__texto">
+        <p class="t-eyebrow carrinho-secao__eyebrow" data-anim="subir">Carrinho para eventos</p>
+        <h2 id="carrinho-titulo" class="t-h2" data-anim="titulo">Uma gelateria inteira, sobre rodas.</h2>
+        <p class="t-lead" data-anim="subir">
+          O carrinho da Crema Lab leva a vitrine para a sua festa: gelato servido na hora e drinks feitos com os nossos
+          gelatos e sorbets.
+        </p>
+        <ul class="inclui" role="list">
+          {
+            inclui.map((it) => (
+              <li class="inclui__item" data-anim="subir">
+                <span class="inclui__icone">
+                  <Icone nome={it.icone} desenho />
+                </span>
+                <div>
+                  <h3 class="inclui__titulo">{it.titulo}</h3>
+                  <p class="inclui__texto">{it.texto}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="carrinho-secao__form" data-anim="subir">
+        <p class="t-anotacao carrinho-secao__nota" aria-hidden="true">conta tudo pra gente!</p>
+        <FormCarrinho />
+      </div>
+    </div>
+  </section>
+
+  <section id="encomendas" class="encomendas secao" data-mundo="rosa" aria-labelledby="encomendas-titulo">
+    <div class="casca">
+      <div class="encomendas__cabeca">
+        <div>
+          <p class="t-eyebrow encomendas__eyebrow" data-anim="subir">Encomendas da estação</p>
+          <h2 id="encomendas-titulo" class="t-h2" data-anim="titulo">Sobremesa de data especial, feita no laboratório.</h2>
+        </div>
+        <p class="t-corpo encomendas__intro" data-anim="subir">
+          Em datas como o Natal, a Crema Lab abre encomendas de sobremesas da estação — sempre com prazo para pedir. Os
+          lançamentos saem primeiro no Instagram.
+        </p>
+      </div>
+      <p class="t-anotacao encomendas__passou" aria-hidden="true">já passou por aqui:</p>
+      <ul class="encomendas__lista" role="list">
+        {
+          encomendas.map((e, i) => (
+            <li class="encomenda" style={`--giro:${[-1.5, 1.2, -0.8][i]}deg`} data-anim="subir" data-atraso={i * 0.1}>
+              <span class="encomenda__icone">
+                <Icone nome={e.icone} desenho />
+              </span>
+              <h3 class="t-h3 encomenda__titulo">{e.titulo}</h3>
+              <p class="encomenda__texto">{e.texto}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="encomendas__botoes">
+        <a class="botao botao--cheio" href={SITE.instagram} target="_blank" rel="noopener" data-magnetico>
+          Acompanhar no Instagram <Seta direcao="diagonal" />
+        </a>
+        <a class="botao" href={linkWhatsApp('Olá, Crema Lab! Queria saber das encomendas da estação.')} target="_blank" rel="noopener" data-magnetico>
+          Perguntar no WhatsApp <Seta direcao="diagonal" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="em-casa" class="em-casa secao" data-mundo="pistache-creme" aria-labelledby="em-casa-titulo">
+    <div class="casca em-casa__grade">
+      <figure class="em-casa__foto">
+        <div class="arco em-casa__arco" data-anim="imagem">
+          <Image
+            src={paraLevar}
+            alt="Pote de gelato para levar da Crema Lab, com cinta terracota, saindo da sacola da marca"
+            widths={[400]}
+            sizes="(max-width: 899px) 70vw, 400px"
+          />
+        </div>
+        <figcaption class="t-anotacao em-casa__legenda">Crema para levar</figcaption>
+      </figure>
+      <div class="em-casa__texto">
+        <p class="t-eyebrow em-casa__eyebrow" data-anim="subir">Crema em casa</p>
+        <h2 id="em-casa-titulo" class="t-h2 em-casa__titulo" data-anim="titulo">Pediu ou comprou Crema para consumir em casa?</h2>
+        <p class="t-lead" data-anim="subir">Saiba como armazenar o seu gelato para aproveitar ao máximo.</p>
+        <ol class="dicas" role="list">
+          {
+            dicas.map((d, i) => (
+              <li class="dica" data-anim="subir">
+                <span class="dica__num" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <span>{d}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="collabs secao" data-mundo="fior" aria-labelledby="collabs-titulo">
+    <div class="casca">
+      <div class="collabs__cabeca">
+        <span class="collabs__icone" aria-hidden="true"><Icone nome="collab" desenho /></span>
+        <h2 id="collabs-titulo" class="t-h2" data-anim="titulo">Collabs</h2>
+      </div>
+      <ul class="collabs__lista" role="list">
+        {
+          collabs.map((c) => (
+            <li class="collab" data-anim="subir">
+              <h3 class="collab__nome">{c.nome}</h3>
+              <p class="collab__texto">{c.texto}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="collabs__cta t-corpo" data-anim="subir">
+        Sua marca combina com gelato?
+        <a href={linkWhatsApp('Olá, Crema Lab! Tenho uma ideia de collab.')} target="_blank" rel="noopener" data-rabisco="sublinhado" data-rabisco-gatilho="hover" data-rabisco-cor="#b26a5b">
+          Fale com a gente
+        </a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="faq-secao secao" data-mundo="fior" aria-labelledby="faq-titulo">
+    <div class="casca faq-secao__grade">
+      <div>
+        <p class="t-eyebrow faq-secao__eyebrow" data-anim="subir">Dúvidas</p>
+        <h2 id="faq-titulo" class="t-h2 faq-secao__titulo" data-anim="titulo">Perguntas frequentes</h2>
+      </div>
+      <Faq perguntas={perguntas} />
+    </div>
+  </section>
+
+  <section class="eventos-cta" data-mundo="terracota" data-nav="escuro" aria-labelledby="eventos-cta-titulo">
+    <div class="casca eventos-cta__grade">
+      <h2 id="eventos-cta-titulo" class="t-h1 eventos-cta__titulo" data-anim="titulo">Bora marcar?</h2>
+      <div class="eventos-cta__botoes">
+        <a class="botao botao--cheio" href="#carrinho" data-magnetico>Pedir orçamento do carrinho <Seta direcao="baixo" /></a>
+        <a class="botao" href={linkWhatsApp()} target="_blank" rel="noopener" data-magnetico>WhatsApp <Seta direcao="diagonal" /></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .eventos-hero__botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .eventos-hero__carrinho {
+    width: min(100%, 540px);
+    margin-inline: auto;
+    color: var(--c-cacau);
+  }
+
+  .carrinho-secao__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+  .carrinho-secao__texto {
+    display: grid;
+    gap: 22px;
+  }
+  .carrinho-secao__eyebrow {
+    color: var(--c-telha);
+  }
+  .inclui {
+    display: grid;
+    gap: 18px;
+    margin-top: 8px;
+  }
+  .inclui__item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+  .inclui__icone {
+    width: 64px;
+    color: var(--c-cacau);
+  }
+  .inclui__titulo {
+    font-family: var(--f-display);
+    font-size: 0.92rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .inclui__texto {
+    color: var(--suave);
+  }
+  .carrinho-secao__form {
+    position: relative;
+  }
+  .carrinho-secao__nota {
+    position: absolute;
+    right: 18px;
+    top: -34px;
+    font-size: 1.5rem;
+    color: var(--c-telha);
+    rotate: -3deg;
+  }
+
+  .encomendas__cabeca {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    align-items: end;
+    gap: 24px 48px;
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .encomendas__eyebrow {
+    color: var(--c-telha);
+    margin-bottom: 14px;
+  }
+  .encomendas__intro {
+    max-width: 44ch;
+  }
+  .encomendas__passou {
+    font-size: 1.5rem;
+    color: var(--c-telha);
+    margin-bottom: 14px;
+  }
+  .encomendas__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+  }
+  .encomenda {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: 26px 24px 30px;
+    border-radius: var(--raio);
+    background: var(--c-fior);
+    rotate: var(--giro);
+    box-shadow: 0 24px 50px -36px rgb(43 33 28 / 0.6);
+  }
+  .encomenda__icone {
+    width: 84px;
+    color: var(--c-terracota);
+  }
+  .encomenda__titulo {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+  }
+  .encomenda__texto {
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+  .encomendas__botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: clamp(32px, 4vw, 52px);
+  }
+
+  .em-casa__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+  }
+  .em-casa__foto {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 400px);
+  }
+  .em-casa__arco {
+    aspect-ratio: 400 / 460;
+    box-shadow: 0 30px 60px -36px rgb(43 33 28 / 0.6);
+  }
+  .em-casa__legenda {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--c-telha);
+  }
+  .em-casa__texto {
+    display: grid;
+    gap: 20px;
+  }
+  .em-casa__eyebrow {
+    color: var(--c-telha);
+  }
+  .em-casa__titulo {
+    font-size: clamp(2rem, 3.8vw, 3.8rem);
+  }
+  .dicas {
+    display: grid;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .dica {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 14px;
+    align-items: baseline;
+    font-size: 1.05rem;
+    line-height: 1.45;
+  }
+  .dica__num {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--c-cacau);
+    color: var(--c-pistache-creme);
+    font-family: var(--f-display);
+    font-size: 0.8rem;
+  }
+
+  .collabs__cabeca {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: clamp(28px, 4vw, 48px);
+  }
+  .collabs__icone {
+    width: clamp(64px, 6vw, 88px);
+  }
+  .collabs__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 3vw, 44px);
+  }
+  .collab {
+    display: grid;
+    gap: 10px;
+    padding-top: 18px;
+    border-top: 1.5px solid var(--c-cacau);
+  }
+  .collab__nome {
+    font-family: var(--f-display);
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .collab__texto {
+    color: var(--suave);
+    line-height: 1.5;
+  }
+  .collabs__cta {
+    margin-top: clamp(28px, 4vw, 48px);
+    font-size: 1.15rem;
+  }
+  .collabs__cta a {
+    position: relative;
+    font-weight: 500;
+  }
+
+  .faq-secao__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(28px, 5vw, 80px);
+    align-items: start;
+  }
+  .faq-secao__eyebrow {
+    color: var(--c-telha);
+    margin-bottom: 14px;
+  }
+  .faq-secao__titulo {
+    font-size: clamp(2rem, 3.2vw, 3.2rem);
+  }
+
+  .eventos-cta {
+    padding-block: clamp(80px, 11vw, 160px);
+  }
+  .eventos-cta__grade {
+    display: grid;
+    justify-items: center;
+    gap: 28px;
+    text-align: center;
+  }
+  .eventos-cta__titulo {
+    font-size: clamp(3rem, 10vw, 9rem);
+  }
+  .eventos-cta__botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  @media (max-width: 899px) {
+    .carrinho-secao__grade,
+    .encomendas__cabeca,
+    .encomendas__lista,
+    .em-casa__grade,
+    .collabs__lista,
+    .faq-secao__grade {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .eventos-hero__carrinho {
+      width: min(92%, 420px);
+    }
+    .carrinho-secao__nota {
+      position: static;
+      display: block;
+      margin-bottom: 6px;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, reduzido, aoEntrar, ponteiroFino } from '../scripts/nucleo';
+  import { desenharAoRolar } from '../scripts/desenho';
+
+  document
+    .querySelectorAll<SVGSVGElement>('.inclui__icone svg, .encomenda__icone svg, .collabs__icone svg')
+    .forEach((svg, i) => desenharAoRolar(svg, { stagger: 0.06, atraso: (i % 3) * 0.12 }));
+
+  // inclinação dos cartões de encomenda passa a ser do GSAP
+  document.querySelectorAll<HTMLElement>('.encomenda').forEach((el) => {
+    const giro = parseFloat(getComputedStyle(el).getPropertyValue('--giro')) || 0;
+    el.style.rotate = 'none';
+    gsap.set(el, { rotation: giro });
+  });
+
+  // o carrinho entra rodando da esquerda, freia e abre o guarda-sol
+  const caixa = document.querySelector<HTMLElement>('.eventos-hero__carrinho');
+  const svg = caixa?.querySelector<SVGSVGElement>('svg');
+  if (caixa && svg) {
+    const rodas = Array.from(svg.querySelectorAll<SVGGElement>('.carrinho__roda'));
+    const guardaSol = svg.querySelector<SVGGElement>('.carrinho__guarda-sol')!;
+    const corpo = svg.querySelector<SVGGElement>('.carrinho__balanco')!;
+    // giro proporcional à distância percorrida (rola sem escorregar)
+    const giroDaRoda = (roda: SVGGElement, distanciaPx: number) => {
+      const escala = svg.getBoundingClientRect().width / 420;
+      const r = Number(roda.querySelector('circle')!.getAttribute('r')) * escala;
+      return (distanciaPx / (2 * Math.PI * r)) * 360;
+    };
+    const girar = (dist: number, duracao: number, ease: string) =>
+      rodas.map((roda) =>
+        gsap.to(roda, { rotation: `+=${giroDaRoda(roda, dist)}`, svgOrigin: roda.dataset.centro, duration: duracao, ease }),
+      );
+
+    if (!reduzido) {
+      const distancia = () => caixa.getBoundingClientRect().right + 40;
+      gsap.set(caixa, { x: () => -distancia() });
+      gsap.set(guardaSol, { scaleY: 0.08, scaleX: 0.3, transformOrigin: '50% 100%' });
+      aoEntrar(() => {
+        const d = distancia();
+        const tl = gsap.timeline({ delay: 0.25 });
+        tl.to(caixa, { x: 0, duration: 2.1, ease: 'power3.out' }, 0);
+        rodas.forEach((roda) =>
+          tl.to(roda, { rotation: giroDaRoda(roda, d), svgOrigin: roda.dataset.centro, duration: 2.1, ease: 'power3.out' }, 0),
+        );
+        // freada: o corpo balança para a frente e volta
+        tl.to(corpo, { rotation: 2.5, svgOrigin: '330 344', duration: 0.25, ease: 'power2.out' }, 1.55)
+          .to(corpo, { rotation: 0, svgOrigin: '330 344', duration: 0.9, ease: 'elastic.out(1, 0.4)' }, 1.8)
+          .to(guardaSol, { scaleY: 1, scaleX: 1, duration: 0.9, ease: 'back.out(2.4)' }, 1.95);
+      });
+
+      // passar o mouse dá uma "acelerada" no lugar
+      if (ponteiroFino) {
+        caixa.addEventListener('mouseenter', () => {
+          girar(140, 0.9, 'power2.out');
+          gsap.fromTo(guardaSol, { rotation: -4 }, { rotation: 0, transformOrigin: '50% 100%', duration: 1, ease: 'elastic.out(1, 0.3)' });
+        });
+      }
+    }
+  }
+</script>

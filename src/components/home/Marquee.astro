@@ -152,7 +152,7 @@ const colB = blocos.filter((_, i) => i % 2 === 1).reverse();
   }
   @media (max-width: 899px) {
     .marquee__grade {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .marquee__colunas {
       height: 420px;

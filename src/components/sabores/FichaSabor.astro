@@ -116,4 +116,19 @@ const filtros = [s.categoria, s.temporada ? 'sazonal' : 'casa', ...(s.tags ?? []
   .ficha__tags .ficha__unidade {
     --pilula-bg: var(--c-ambar);
   }
+  /* no celular a ficha fica deitada: bola à esquerda, anotações à direita */
+  @media (max-width: 599px) {
+    .ficha {
+      grid-template-columns: 34% minmax(0, 1fr);
+      align-items: center;
+      gap: 16px;
+      padding: 16px 16px 18px 12px;
+    }
+    .ficha__bola {
+      width: 100%;
+    }
+    .ficha__desc {
+      font-size: 0.9rem;
+    }
+  }
 </style>

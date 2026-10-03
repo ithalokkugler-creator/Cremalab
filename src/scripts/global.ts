@@ -1,6 +1,6 @@
 // Comportamentos globais: revelações declarativas (data-anim), selos girando,
 // rabiscos, status das lojas e o título da aba que "derrete".
-import { gsap, ScrollTrigger, SplitText, reduzido, aoEntrar, scroll } from './nucleo';
+import { gsap, ScrollTrigger, SplitText, reduzido, aoEntrar, scroll, CLASSES_SPLIT } from './nucleo';
 import { desenharAoRolar } from './desenho';
 import { iniciarRabiscos } from './rabisco';
 import { ativarStatus } from './horarios';
@@ -9,7 +9,7 @@ import { ativarStatus } from './horarios';
 function revelarTitulos() {
   document.querySelectorAll<HTMLElement>('[data-anim="titulo"]').forEach((el) => {
     if (reduzido) return;
-    const split = SplitText.create(el, { type: 'lines,words', mask: 'lines', aria: 'auto' });
+    const split = SplitText.create(el, { type: 'lines,words', mask: 'lines', aria: 'auto', ...CLASSES_SPLIT });
     gsap.set(split.lines, { yPercent: 105 });
     const entrar = () =>
       gsap.to(split.lines, { yPercent: 0, duration: 1, stagger: 0.08, ease: 'creme', delay: Number(el.dataset.atraso || 0) });

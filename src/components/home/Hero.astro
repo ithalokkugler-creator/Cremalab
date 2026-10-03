@@ -332,10 +332,11 @@ const fotos = [
       min-height: 280px;
     }
     .hero__titulo {
-      bottom: 168px;
+      bottom: 232px;
     }
     .hero__linha {
-      font-size: clamp(2.6rem, 13.4vw, 5rem);
+      /* "FELICIDADE" (10 letras largas) precisa caber inteira numa linha */
+      font-size: clamp(2rem, 9.2vw, 5rem);
     }
     .hero__doodle--sol {
       right: 14px;
@@ -370,7 +371,7 @@ const fotos = [
 </style>
 
 <script>
-  import { gsap, ScrollTrigger, SplitText, reduzido, aoEntrar } from '../../scripts/nucleo';
+  import { gsap, ScrollTrigger, SplitText, reduzido, aoEntrar, CLASSES_SPLIT } from '../../scripts/nucleo';
   import { desenharTracos, esconderTracos } from '../../scripts/desenho';
 
   const hero = document.querySelector<HTMLElement>('.hero');
@@ -456,7 +457,7 @@ const fotos = [
     doodles.forEach((d) => esconderTracos(d));
     let split: SplitText | null = null;
     if (!reduzido) {
-      split = SplitText.create(linhas, { type: 'chars', mask: 'lines' });
+      split = SplitText.create(linhas, { type: 'lines,words,chars', mask: 'lines', ...CLASSES_SPLIT });
       gsap.set(split.chars, { yPercent: 115, rotation: () => gsap.utils.random(-9, 9) });
       gsap.set(entra, { opacity: 0, y: 16 });
       gsap.set(arco, { clipPath: 'inset(100% 0% 0% 0% round 999px 999px 18px 18px)' });

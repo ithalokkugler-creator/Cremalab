@@ -101,6 +101,7 @@ const PASSOS: { titulo: string; icone: NomeIcone; texto: string; nota: string }[
   }
   .processo__fixo {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-content: center;
     gap: clamp(28px, 4vh, 56px);
     min-height: 100svh;
@@ -195,6 +196,23 @@ const PASSOS: { titulo: string; icone: NomeIcone; texto: string; nota: string }[
     flex: none;
   }
 
+  /* sem movimento (desktop): os seis passos ficam numa grade, sem trilho horizontal */
+  @media (min-width: 900px) {
+    :global(.sem-movimento) .processo__trilho {
+      width: auto;
+    }
+    :global(.sem-movimento) .processo__lista {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 56px;
+    }
+    :global(.sem-movimento) .passo {
+      width: auto;
+    }
+    :global(.sem-movimento) .processo__pontilhado {
+      display: none;
+    }
+  }
   @media (max-width: 899px) {
     .processo__fixo {
       min-height: auto;
@@ -268,26 +286,32 @@ const PASSOS: { titulo: string; icone: NomeIcone; texto: string; nota: string }[
           0,
         );
         const animTrilho = tl.getChildren()[0] as gsap.core.Tween;
+        // passos que já aparecem antes de o trilho andar se desenham quando a seção chega
+        const limite = window.innerWidth * 0.86;
+        const iniciais = passos.filter((p) => p.getBoundingClientRect().left < limite);
+        const entrarPasso = (p: HTMLElement, i: number) => {
+          desenharTracos(icones[i], { stagger: 0.06 });
+          gsap.fromTo(p.querySelector('.passo__nota'), { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.8, ease: 'creme', delay: 0.5 });
+          gsap.fromTo(p.querySelector('.passo__conta'), { scale: 0 }, { scale: 1, duration: 0.6, ease: 'elastic.out(1, 0.45)' });
+        };
+        passos.forEach((p) => {
+          gsap.set(p.querySelector('.passo__nota'), { opacity: 0 });
+          gsap.set(p.querySelector('.passo__conta'), { scale: 0 });
+        });
+        ScrollTrigger.create({
+          trigger: secao,
+          start: 'top 45%',
+          once: true,
+          onEnter: () => iniciais.forEach((p) => entrarPasso(p, passos.indexOf(p))),
+        });
         passos.forEach((p, i) => {
-          gsap.from(p.querySelector('.passo__conta'), {
-            scale: 0,
-            duration: 0.6,
-            ease: 'elastic.out(1, 0.45)',
-            scrollTrigger: { trigger: p, containerAnimation: animTrilho, start: 'left 88%', toggleActions: 'play none none reverse' },
-          });
+          if (iniciais.includes(p)) return;
           ScrollTrigger.create({
             trigger: p,
             containerAnimation: animTrilho,
-            start: 'left 78%',
+            start: 'left 86%',
             once: true,
-            onEnter: () => desenharTracos(icones[i], { stagger: 0.06 }),
-          });
-          gsap.from(p.querySelector('.passo__nota'), {
-            opacity: 0,
-            x: -14,
-            duration: 0.8,
-            ease: 'creme',
-            scrollTrigger: { trigger: p, containerAnimation: animTrilho, start: 'left 62%', toggleActions: 'play none none reverse' },
+            onEnter: () => entrarPasso(p, i),
           });
         });
         return () => icones.forEach((svg) => gsap.set(svg.querySelectorAll('path'), { drawSVG: '0% 100%' }));

@@ -7,8 +7,8 @@ import interior from '../../assets/fotos/interior-mural.jpg';
 // posições em % da foto (1336 × 1380 visíveis)
 const PONTOS = [
   {
-    x: 17.2,
-    y: 50,
+    x: 18,
+    y: 34,
     titulo: 'Tradição · Inovação · E sabor',
     texto: 'O manifesto da casa, pintado na coluna logo na entrada.',
   },
@@ -19,8 +19,8 @@ const PONTOS = [
     texto: 'Arcos e abóbadas em terracota que lembram as cúpulas das capelas e palácios italianos.',
   },
   {
-    x: 75.6,
-    y: 45,
+    x: 52,
+    y: 36,
     titulo: 'O mural de traço',
     texto: 'Arco, xícara, ramo, réguas e pontilhados — o mesmo desenho que se desenha neste site.',
   },
@@ -233,7 +233,7 @@ const PONTOS = [
   }
   @media (max-width: 899px) {
     .espaco__grade {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .espaco__ponto {
       width: 40px;

@@ -195,8 +195,25 @@ const wmY = 828;
       bottom: 18px;
     }
   }
+  /* sem movimento: o mural aparece inteiro, já desenhado, na largura da tela */
   :global(.sem-movimento) .mural-digital__palco {
     height: auto;
+  }
+  :global(.sem-movimento) .mural-digital__svg {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3597 / 1984;
+    margin-top: 18px;
+  }
+  :global(.sem-movimento) .mural-digital__original {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    justify-self: end;
+    margin: 16px var(--margem) 0 0;
   }
 </style>
 

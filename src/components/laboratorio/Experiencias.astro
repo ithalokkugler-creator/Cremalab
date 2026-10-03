@@ -1,10 +1,8 @@
 ---
 // Experiências: exposições, festivais, edições especiais e collabs numa galeria arrastável
 // (rolagem nativa + arraste com inércia no mouse; os cartões entortam com a velocidade).
-import Doodle from '../marca/Doodle.astro';
 import Icone from '../marca/Icone.astro';
 import Seta from '../ui/Seta.astro';
-import type { NomeDoodle } from '../marca/doodles';
 import type { NomeIcone } from '../marca/icones';
 import type { Mundo } from '../../data/site';
 import { SITE } from '../../data/site';
@@ -14,7 +12,7 @@ type Experiencia = {
   quando: string;
   texto: string;
   mundo: Mundo;
-  desenho: { doodle?: NomeDoodle; icone?: NomeIcone };
+  icone: NomeIcone;
   nota?: string;
 };
 
@@ -25,7 +23,7 @@ const EXPERIENCIAS: Experiencia[] = [
     texto:
       'Inaugurada no Dia do Sorvete (23/09), ocupou as paredes da Piazza com fotos, mapas de ingredientes, adesivos e textos sobre como um gelato nasce.',
     mundo: 'pistache-creme',
-    desenho: { doodle: 'arco' },
+    icone: 'quadro',
     nota: 'gelato também se aprende',
   },
   {
@@ -34,7 +32,7 @@ const EXPERIENCIAS: Experiencia[] = [
     texto:
       'Um São João italiano, em homenagem ao padroeiro de Florença: gelato de pipoca doce com caramelo salgado, arroz-doce português com gelato de canela e panini de pão de queijo com raclette de Witmarsum.',
     mundo: 'ambar',
-    desenho: { icone: 'balao' },
+    icone: 'balao',
   },
   {
     titulo: 'Dia do Sorvete',
@@ -42,7 +40,7 @@ const EXPERIENCIAS: Experiencia[] = [
     texto:
       'Chocolate com azeite e flor de sal, baunilha com bacon crocante e Doppio di Latte com farofa de batata frita e chocolate. Duram pouco — de propósito.',
     mundo: 'rosa',
-    desenho: { icone: 'taca' },
+    icone: 'taca',
     nota: 'quem provou, provou',
   },
   {
@@ -51,7 +49,7 @@ const EXPERIENCIAS: Experiencia[] = [
     texto:
       'Sobremesas de Natal sob encomenda, servidas em bowls metalizados criados com a Vanessa Taques Casa. Depois da festa, a peça fica na sua mesa.',
     mundo: 'terracota',
-    desenho: { icone: 'bowl' },
+    icone: 'bowl',
   },
   {
     titulo: 'Collabs',
@@ -59,7 +57,7 @@ const EXPERIENCIAS: Experiencia[] = [
     texto:
       'Drinks com sorbet com a Île de France, cafés da Lucca, o limoncello da Casa Limoncello no Limonello e até moda com a Revival, unidas pela cor pistache.',
     mundo: 'fior',
-    desenho: { doodle: 'xicara' },
+    icone: 'collab',
     nota: 'pistache combina com tudo',
   },
 ];
@@ -88,8 +86,7 @@ const EXPERIENCIAS: Experiencia[] = [
         EXPERIENCIAS.map((x, i) => (
           <li class="experiencia" data-mundo={x.mundo} style={`--giro:${i % 2 ? 1.6 : -1.4}deg`}>
             <div class="experiencia__desenho" aria-hidden="true">
-              {x.desenho.doodle && <Doodle nome={x.desenho.doodle} tracoPx={2.2} />}
-              {x.desenho.icone && <Icone nome={x.desenho.icone} />}
+              <Icone nome={x.icone} />
             </div>
             <p class="experiencia__quando t-rotulo">{x.quando}</p>
             <h3 class="experiencia__titulo t-h3">{x.titulo}</h3>
@@ -185,8 +182,8 @@ const EXPERIENCIAS: Experiencia[] = [
     margin-bottom: 10px;
   }
   .experiencia__desenho :global(svg) {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
   }
   .experiencia__quando {
     font-size: 0.6rem;
@@ -228,7 +225,7 @@ const EXPERIENCIAS: Experiencia[] = [
   }
   @media (max-width: 899px) {
     .experiencias__cabeca {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .experiencia {
       width: 80vw;

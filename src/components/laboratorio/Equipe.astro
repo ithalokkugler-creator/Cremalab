@@ -100,10 +100,19 @@ import equipe from '../../assets/fotos/equipe.jpg';
   }
   @media (max-width: 899px) {
     .equipe__grade {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .equipe__foto {
       width: min(86%, 400px);
+    }
+    .equipe__fita {
+      width: 84px;
+    }
+    .equipe__fita--a {
+      left: -14px;
+    }
+    .equipe__fita--b {
+      right: -14px;
     }
   }
 </style>

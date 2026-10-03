@@ -12,6 +12,7 @@ export default defineConfig({
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   build: { inlineStylesheets: 'auto' },
   vite: {
-    build: { assetsInlineLimit: 2048 },
+    // o three.js (~560 kB) só é baixado quando uma cena 3D entra na tela (import dinâmico)
+    build: { assetsInlineLimit: 2048, chunkSizeWarningLimit: 650 },
   },
 });

@@ -6,6 +6,9 @@ import lojaPkb from '../assets/fotos/loja-pkb.jpg';
 import vitrineCubas from '../assets/fotos/vitrine-cubas.jpg';
 import lojaMueller from '../assets/fotos/loja-mueller.jpg';
 import copoFrutas from '../assets/fotos/copo-frutas-vermelhas.jpg';
+import muralFoto from '../assets/fotos/mural-foto.jpg';
+import copoMangaCoco from '../assets/fotos/copo-manga-coco.jpg';
+import sorbetMelancia from '../assets/fotos/sorbet-melancia.jpg';
 
 export type Horario = { dias: number[]; abre: string; fecha: string };
 
@@ -30,7 +33,8 @@ export type Unidade = {
   descricao: string;
   destaque: string;
   foto: ImageMetadata;
-  galeria: ImageMetadata[];
+  fotoAlt: string;
+  galeria: { src: ImageMetadata; alt: string }[];
   abertura: string;
 };
 
@@ -58,7 +62,11 @@ export const UNIDADES: Unidade[] = [
       'A primeira casa: fachada de micélio com textura de casquinha, o laboratório à vista atrás da parede de vidro e a Piazza para ficar sem pressa.',
     destaque: 'Pistache clássico em sorbet, com farofinha de pistache.',
     foto: fachadaBatel,
-    galeria: [interiorMural, fachadaBatel],
+    fotoAlt: 'Fachada da Crema Lab Batel, com os painéis de micélio em losango e os toldos amarelos',
+    galeria: [
+      { src: interiorMural, alt: 'Salão do Batel com a coluna do manifesto, o mural de traço e o piso de cacos' },
+      { src: muralFoto, alt: 'O mural de traço da Crema Lab, com o logotipo e a assinatura da chef' },
+    ],
     abertura: '2024',
   },
   {
@@ -83,7 +91,11 @@ export const UNIDADES: Unidade[] = [
       'No terceiro piso do ParkShoppingBarigui, a fachada de micélio se repete — e a vitrine guarda um pistache que só existe aqui.',
     destaque: 'Exclusivo: pistache com chocolate branco e um toque de laranja.',
     foto: lojaPkb,
-    galeria: [lojaPkb, vitrineCubas],
+    fotoAlt: 'A loja da Crema Lab no ParkShoppingBarigui, com a fachada de micélio e o piso de cacos',
+    galeria: [
+      { src: vitrineCubas, alt: 'Cubas de gelato na vitrine, trabalhadas com espátula' },
+      { src: copoMangaCoco, alt: 'Copo compostável da Crema Lab com duas bolas de gelato' },
+    ],
     abertura: 'novembro de 2025',
   },
   {
@@ -108,7 +120,11 @@ export const UNIDADES: Unidade[] = [
       'A casa mais nova, no Piso L2 do Shopping Mueller, no Centro Cívico: os mesmos arcos, o mesmo granilite e a mesma felicidade atemporal.',
     destaque: 'Pertinho do Centro Cívico, para a pausa do meio da tarde.',
     foto: lojaMueller,
-    galeria: [lojaMueller, copoFrutas],
+    fotoAlt: 'A loja da Crema Lab no Shopping Mueller, com o letreiro iluminado e a vitrine de gelatos',
+    galeria: [
+      { src: copoFrutas, alt: 'Copo de gelato com calda de frutas vermelhas' },
+      { src: sorbetMelancia, alt: 'Sorbet de melancia no copo compostável da Crema Lab' },
+    ],
     abertura: 'recém-inaugurada',
   },
 ];
@@ -135,3 +151,6 @@ export function diasFechados(h: Horario[]): string[] {
   const abertos = new Set(h.flatMap((x) => x.dias));
   return [0, 1, 2, 3, 4, 5, 6].filter((d) => !abertos.has(d)).map((d) => NOMES_DIAS[d]);
 }
+
+/** Nome com pontos de quebra invisíveis entre as palavras coladas (ParkShoppingBarigui), para não estourar em telas estreitas. */
+export const nomeQuebravel = (nome: string) => nome.replace(/(?<=[a-z])(?=[A-Z])/g, '\u200B');

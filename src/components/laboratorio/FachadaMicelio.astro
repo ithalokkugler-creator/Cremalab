@@ -49,6 +49,7 @@ const fatos = [
   .micelio__fixo {
     position: relative;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
     min-height: 100svh;
     padding-block: calc(var(--nav-h) + 40px) 56px;
@@ -116,18 +117,17 @@ const fatos = [
     display: grid;
     gap: 22px;
     justify-items: start;
-    width: 100%;
     pointer-events: none;
   }
-  .micelio__conteudo > * {
+  .micelio__conteudo > :not(.micelio__titulo) {
     max-width: 560px;
   }
   .micelio__eyebrow {
     color: var(--c-ambar);
   }
   .micelio__titulo {
-    font-size: clamp(2.4rem, 5.4vw, 5.4rem);
-    max-width: 11ch;
+    font-size: clamp(2.2rem, 4.6vw, 5rem);
+    max-width: 12.5ch;
   }
   .micelio__fatos {
     display: grid;
@@ -169,7 +169,7 @@ const fatos = [
       background: linear-gradient(to top, rgb(91 42 32 / 0.9) 0%, rgb(91 42 32 / 0.6) 60%, rgb(91 42 32 / 0.3) 100%);
     }
     .micelio__fatos {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .micelio__selo {
       top: calc(var(--nav-h) + 8px);
@@ -199,20 +199,30 @@ const fatos = [
       const mm = gsap.matchMedia();
       mm.add({ desktop: '(min-width: 900px)', mobile: '(max-width: 899px)' }, (ctx) => {
         const { desktop } = ctx.conditions as { desktop: boolean };
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: secao,
-            pin: desktop ? fixo : false,
-            start: desktop ? 'top top' : 'top 70%',
-            end: desktop ? '+=110%' : 'bottom 60%',
-            scrub: 0.6,
-            onUpdate: (st) => {
-              crescimento = Math.min(1, st.progress * 1.35);
-              cena?.crescer(crescimento);
-            },
+        const pino = ScrollTrigger.create({
+          trigger: secao,
+          pin: desktop ? fixo : false,
+          start: desktop ? 'top top' : 'top 70%',
+          end: desktop ? '+=110%' : 'bottom 60%',
+        });
+        // o micélio começa a crescer assim que a seção aparece e termina junto com o pin
+        ScrollTrigger.create({
+          trigger: secao,
+          start: 'top 85%',
+          end: () => pino.end,
+          onUpdate: (st) => {
+            crescimento = 0.18 + st.progress * 0.82;
+            cena?.crescer(crescimento);
           },
         });
-        tl.to(fatos, { opacity: 1, y: 0, stagger: 0.18, duration: 0.4, ease: 'none' }, 0.25);
+        gsap.to(fatos, {
+          opacity: 1,
+          y: 0,
+          stagger: 0.12,
+          duration: 0.9,
+          ease: 'creme',
+          scrollTrigger: { trigger: secao, start: desktop ? 'top 20%' : 'top 40%', toggleActions: 'play none none reverse' },
+        });
       });
     }
 

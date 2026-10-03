@@ -29,7 +29,7 @@ const FRAG = /* glsl */ `
     vec2 u = f * f * (3.0 - 2.0 * f);
     return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
   }
-  float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ v += a * noise(p); p *= 2.07; a *= 0.5; } return v; }
+  float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 4; i++){ v += a * noise(p); p *= 2.07; a *= 0.5; } return v + 0.03; }
 
   const float AMP = 0.035;
 
@@ -83,9 +83,21 @@ const FRAG = /* glsl */ `
     float cresceu = smoothstep(n - 0.012, n + 0.012, limiar);
     float borda = smoothstep(0.07, 0.0, abs(n - limiar));
     float fios = smoothstep(0.55, 0.75, noise(vUv * vec2(160.0, 110.0) + n * 7.0));
-    vec3 substrato = uPapel * (0.92 + fbm(p * 7.0) * 0.12);
-    vec3 col = mix(substrato, painel, cresceu);
-    col = mix(col, uFio, clamp(borda * (0.5 + fios), 0.0, 1.0) * (1.0 - cresceu * 0.55));
+    vec3 col = painel;
+    if (cresceu < 0.999) {
+      // substrato: resíduo agrícola com uma rede de hifas (ruído "em crista")
+      float torce = fbm(p * 2.2);
+      vec2 w = p * 1.6 + vec2(torce, noise(p * 2.2 + 7.3)) * 1.4;
+      float hifa1 = 1.0 - smoothstep(0.0, 0.05, abs(noise(w * 3.0) - 0.5));
+      float hifa2 = 1.0 - smoothstep(0.0, 0.04, abs(noise(w * 7.0 + 3.1) - 0.5));
+      float rede = max(hifa1, hifa2 * 0.7);
+      // perto da frente de crescimento as hifas engrossam e clareiam
+      float perto = smoothstep(-0.35, 0.0, limiar - n);
+      vec3 substrato = uPapel * (0.86 + torce * 0.16);
+      substrato = mix(substrato, uFio, rede * (0.35 + perto * 0.5));
+      col = mix(substrato, painel, cresceu);
+    }
+    col = mix(col, uFio, clamp(borda * (0.55 + fios), 0.0, 1.0) * (1.0 - cresceu * 0.55));
     gl_FragColor = vec4(col, 1.0);
     #include <colorspace_fragment>
   }
@@ -93,7 +105,7 @@ const FRAG = /* glsl */ `
 
 export function iniciarMicelio({ canvas, palco, alvoPonteiro = palco, reduzido, ponteiroFino }: Opcoes) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const cena = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -143,16 +155,18 @@ export function iniciarMicelio({ canvas, palco, alvoPonteiro = palco, reduzido, 
   alvoPonteiro.addEventListener('pointerdown', clicar);
 
   let visivel = true;
-  const io = new IntersectionObserver(([e]) => (visivel = e.isIntersecting), { rootMargin: '100px' });
+  const io = new IntersectionObserver((entradas) => (visivel = entradas[entradas.length - 1].isIntersecting), { rootMargin: '100px' });
   io.observe(palco);
 
   let alvoCrescer = uniforms.uCrescer.value;
   const relogio = new THREE.Timer();
+  relogio.connect(document);
   let passeio = 0;
-  renderer.setAnimationLoop((tempo) => {
-    relogio.update(tempo);
+  renderer.setAnimationLoop(() => {
+    relogio.update();
     if (!visivel || document.hidden) return;
-    const dt = Math.min(relogio.getDelta(), 0.05);
+    // o primeiro quadro pode vir com intervalo negativo (compilação de shader): limita a [0, 50 ms]
+    const dt = Math.min(Math.max(relogio.getDelta(), 0), 0.05);
     uniforms.uTempo.value += dt;
     uniforms.uOnda.value.z += dt;
     if (!ponteiroFino && !reduzido) {
@@ -171,6 +185,7 @@ export function iniciarMicelio({ canvas, palco, alvoPonteiro = palco, reduzido, 
     },
     destruir() {
       renderer.setAnimationLoop(null);
+      relogio.disconnect();
       alvoPonteiro.removeEventListener('pointermove', mover);
       alvoPonteiro.removeEventListener('pointerdown', clicar);
       ro.disconnect();

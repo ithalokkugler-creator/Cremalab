@@ -177,14 +177,15 @@ const marcos = [
 
   @media (max-width: 899px) {
     .lab-teaser__grade {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .lab-teaser__retrato {
       width: min(86%, 420px);
     }
     .lab-teaser__nota {
-      right: -14%;
+      right: -3%;
       top: 4%;
+      max-width: 11ch;
       font-size: 1.05rem;
     }
   }

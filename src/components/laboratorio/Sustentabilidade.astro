@@ -48,7 +48,7 @@ const ITENS: { icone: NomeIcone; titulo: string; texto: string }[] = [
   .sustentavel__cabeca {
     display: grid;
     gap: 16px;
-    max-width: 820px;
+    max-width: 1080px;
     margin-bottom: clamp(40px, 5vw, 72px);
   }
   .sustentavel__eyebrow {
@@ -77,7 +77,7 @@ const ITENS: { icone: NomeIcone; titulo: string; texto: string }[] = [
   }
   @media (max-width: 899px) {
     .sustentavel__lista {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

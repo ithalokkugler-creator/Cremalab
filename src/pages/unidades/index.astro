@@ -1,0 +1,173 @@
+---
+import Base from '../../layouts/Base.astro';
+import HeroPagina from '../../components/ui/HeroPagina.astro';
+import UnidadesSecao from '../../components/unidades/UnidadesSecao.astro';
+import Icone from '../../components/marca/Icone.astro';
+import Seta from '../../components/ui/Seta.astro';
+import fachada from '../../assets/fotos/fachada-batel.jpg';
+import { unidadesAtivas } from '../../data/unidades';
+import { SITE, linkWhatsApp } from '../../data/site';
+
+const diferencas = [
+  {
+    slug: 'batel',
+    titulo: 'Batel',
+    itens: ['o laboratório envidraçado', 'a Piazza para ficar sem pressa', 'a fachada de micélio original'],
+  },
+  {
+    slug: 'parkshoppingbarigui',
+    titulo: 'ParkShopping Barigui',
+    itens: ['um pistache que só existe lá', 'perto do Parque Barigui', 'a fachada de micélio replicada'],
+  },
+  {
+    slug: 'shopping-mueller',
+    titulo: 'Shopping Mueller',
+    itens: ['a casa mais nova', 'no Centro Cívico', 'para a pausa do meio da tarde'],
+  },
+];
+const ativas = unidadesAtivas();
+---
+
+<Base
+  titulo="Unidades"
+  mundo="terracota"
+  descricao="As três casas da Crema Lab em Curitiba: Batel, ParkShoppingBarigui e Shopping Mueller. Endereços, horários, como chegar e o que cada uma tem de especial.">
+  <HeroPagina
+    mundo="terracota"
+    eyebrow={`${ativas.length} casas em ${SITE.cidade}`}
+    linhas={['Três casas.', 'O mesmo', 'laboratório.']}
+    obliqua={2}
+    texto="Batel, ParkShoppingBarigui e Shopping Mueller: o mesmo gelato feito do zero, em três endereços de Curitiba."
+    imagem={fachada}
+    alt="Fachada da Crema Lab Batel, com painéis de micélio em losango"
+    doodle="sol"
+  />
+
+  <UnidadesSecao titulo="Escolha sua vitrine" eyebrow="Mapa desenhado à mão" id="mapa" />
+
+  <section class="diferencas secao" data-mundo="pistache-creme" aria-labelledby="diferencas-titulo">
+    <div class="casca">
+      <h2 id="diferencas-titulo" class="t-h2 diferencas__titulo" data-anim="titulo">Cada casa tem o seu jeito.</h2>
+      <ol class="diferencas__lista" role="list">
+        {
+          diferencas.map((d, i) => (
+            <li class="diferenca" data-anim="subir" data-atraso={i * 0.1}>
+              <span class="diferenca__numero" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="t-h3 diferenca__nome">
+                <a href={`/unidades/${d.slug}`}>{d.titulo}</a>
+              </h3>
+              <ul class="diferenca__itens" role="list">
+                {d.itens.map((it) => (
+                  <li>{it}</li>
+                ))}
+              </ul>
+              <a class="diferenca__link t-rotulo" href={`/unidades/${d.slug}`}>
+                Ver a casa <Seta />
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="aviso-horario" data-mundo="fior" aria-labelledby="aviso-titulo">
+    <div class="casca aviso-horario__grade">
+      <span class="aviso-horario__icone" aria-hidden="true"><Icone nome="relogio" desenho /></span>
+      <div>
+        <h2 id="aviso-titulo" class="t-h3">Feriado ou dia especial?</h2>
+        <p class="t-corpo aviso-horario__texto">
+          Os horários podem mudar em feriados e datas comemorativas. Na dúvida, confira no Instagram ou chame no WhatsApp
+          antes de sair de casa.
+        </p>
+      </div>
+      <div class="aviso-horario__botoes">
+        <a class="botao" href={SITE.instagram} target="_blank" rel="noopener">Instagram <Seta direcao="diagonal" /></a>
+        <a class="botao botao--cheio" href={linkWhatsApp('Olá, Crema Lab! Qual o horário de hoje?')} target="_blank" rel="noopener">
+          WhatsApp <Seta direcao="diagonal" />
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .diferencas__titulo {
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .diferencas__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 48px);
+  }
+  .diferenca {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    padding-top: 20px;
+    border-top: 1.5px solid var(--c-cacau);
+  }
+  .diferenca__numero {
+    font-family: var(--f-display);
+    font-size: clamp(3rem, 5vw, 4.6rem);
+    line-height: 0.85;
+    color: var(--c-terracota);
+  }
+  .diferenca__nome {
+    overflow-wrap: anywhere;
+  }
+  .diferenca__nome a:hover {
+    color: var(--c-telha);
+  }
+  .diferenca__itens {
+    display: grid;
+    gap: 6px;
+    font-size: 1.02rem;
+  }
+  .diferenca__itens li::before {
+    content: '+ ';
+    font-family: 'Blair Mais', var(--f-texto);
+    color: var(--c-telha);
+  }
+  .diferenca__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: 0.66rem;
+  }
+  .aviso-horario {
+    padding-block: clamp(56px, 7vw, 96px);
+  }
+  .aviso-horario__grade {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: clamp(20px, 3vw, 48px);
+  }
+  .aviso-horario__icone {
+    width: clamp(70px, 7vw, 100px);
+  }
+  .aviso-horario__texto {
+    max-width: 56ch;
+    margin-top: 8px;
+  }
+  .aviso-horario__botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  @media (max-width: 899px) {
+    .diferencas__lista,
+    .aviso-horario__grade {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  import { desenharAoRolar } from '../../scripts/desenho';
+  document.querySelectorAll<SVGSVGElement>('.aviso-horario__icone svg').forEach((svg) => desenharAoRolar(svg, { stagger: 0.08 }));
+</script>

@@ -22,7 +22,7 @@ import { PREMIOS } from '../../data/site';
             <span class="premio__categoria">{p.categoria}</span>
             <span
               class:list={['premio__resultado', 'pilula', { 'premio__resultado--ouro': p.resultado === 'Vencedora' }]}
-              data-rabisco="circulo"
+              data-rabisco="elipse"
               data-rabisco-cor="#2b211c"
               data-rabisco-atraso={0.5 + i * 0.2}>
               {p.resultado}
@@ -98,7 +98,7 @@ import { PREMIOS } from '../../data/site';
   }
   @media (max-width: 899px) {
     .premios__lista {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .premio {
       max-width: 420px;

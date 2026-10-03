@@ -366,7 +366,7 @@ export function iniciarEspatula({ canvas, palco, sabor, reduzido }: Opcoes) {
   ro.observe(palco);
 
   let visivel = true;
-  const io = new IntersectionObserver(([e]) => (visivel = e.isIntersecting), { rootMargin: '120px' });
+  const io = new IntersectionObserver((entradas) => (visivel = entradas[entradas.length - 1].isIntersecting), { rootMargin: '120px' });
   io.observe(palco);
 
   const mouse = { x: 0, y: 0 };
@@ -377,10 +377,12 @@ export function iniciarEspatula({ canvas, palco, sabor, reduzido }: Opcoes) {
   });
 
   const relogio = new THREE.Timer();
-  renderer.setAnimationLoop((tempo) => {
-    relogio.update(tempo);
+  relogio.connect(document);
+  renderer.setAnimationLoop(() => {
+    relogio.update();
     if (!visivel || document.hidden) return;
-    const dt = Math.min(relogio.getDelta(), 0.05);
+    // o primeiro quadro pode vir com intervalo negativo (compilação de shader): limita a [0, 50 ms]
+    const dt = Math.min(Math.max(relogio.getDelta(), 0), 0.05);
 
     if (mexeu && uvAtual) {
       const a = uvAnterior ?? uvAtual;
@@ -433,6 +435,7 @@ export function iniciarEspatula({ canvas, palco, sabor, reduzido }: Opcoes) {
     },
     destruir() {
       renderer.setAnimationLoop(null);
+      relogio.disconnect();
       ro.disconnect();
       io.disconnect();
       [ler, escrever, base].forEach((t) => t.dispose());

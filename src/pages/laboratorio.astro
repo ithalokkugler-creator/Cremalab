@@ -20,7 +20,7 @@ const marcos = [
   { quando: 'Itália', onde: 'San Marino', oque: 'Curso intensivo de gelato' },
   { quando: 'Itália', onde: 'Brescia', oque: 'Formação em tempo integral, com mestres do gelato artesanal' },
   { quando: '2024', onde: 'Batel', oque: 'Nasce a Crema Lab, com o laboratório à vista' },
-  { quando: 'Nov. 2025', onde: 'ParkShoppingBarigui', oque: 'A segunda casa, com um pistache exclusivo' },
+  { quando: 'Nov. 2025', onde: 'ParkShopping Barigui', oque: 'A segunda casa, com um pistache exclusivo' },
   { quando: 'Agora', onde: 'Shopping Mueller', oque: 'A casa mais nova, no Centro Cívico' },
 ];
 
@@ -69,7 +69,7 @@ const schema = {
         <span class="tradicao__furo" aria-hidden="true"></span>
         <p class="t-rotulo tradicao__rotulo">Verbete</p>
         <p class="tradicao__palavra" lang="it">crema</p>
-        <p class="t-anotacao tradicao__fonetica">/ˈkrɛ.ma/ · do italiano, subst. fem.</p>
+        <p class="t-anotacao tradicao__fonetica">/kré·ma/ · do italiano, subst. fem.</p>
         <ol class="tradicao__defs">
           <li>Creme; cremosidade.</li>
           <li>Nas gelaterias italianas, um dos sabores mais clássicos: o gelato de creme.</li>
@@ -127,8 +127,7 @@ const schema = {
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          stroke-linecap="round"
-          vector-effect="non-scaling-stroke"></path>
+          stroke-linecap="round"></path>
       </svg>
       <ol class="chef__marcos" role="list">
         {
@@ -261,8 +260,8 @@ const schema = {
   }
   .chef__nota {
     position: absolute;
-    right: -6%;
-    bottom: 12%;
+    right: -4%;
+    top: 0;
     display: grid;
     justify-items: end;
     font-size: 1.6rem;
@@ -359,21 +358,21 @@ const schema = {
   @media (max-width: 899px) {
     .tradicao__grade,
     .chef__grade {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .chef__retrato {
       width: min(84%, 420px);
       justify-self: center;
     }
     .chef__nota {
-      right: -10%;
+      right: -12%;
       font-size: 1.3rem;
     }
     .chef__onda {
       display: none;
     }
     .chef__marcos {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: 26px;
       padding-left: 34px;
       border-left: 2px dotted var(--c-cacau);
@@ -389,13 +388,16 @@ const schema = {
       margin: 0;
     }
     .lab-cta__grade {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>
 
 <script>
   import { gsap, reduzido } from '../scripts/nucleo';
+  import { desenharAoRolar } from '../scripts/desenho';
+
+  document.querySelectorAll<SVGSVGElement>('.lab-cta__doodle svg').forEach((svg) => desenharAoRolar(svg, { stagger: 0.05 }));
 
   // linha do tempo da chef: a onda se desenha com a rolagem e os marcos acendem em sequência
   const linha = document.querySelector<HTMLElement>('.chef__linha-tempo');

@@ -1,0 +1,219 @@
+---
+// Pedido de orçamento do carrinho: sem backend — o envio monta a mensagem e abre o WhatsApp.
+// Nada é armazenado pelo site (ver aviso abaixo do botão).
+import Seta from '../ui/Seta.astro';
+import { SITE } from '../../data/site';
+
+const tipos = ['Casamento', 'Aniversário', 'Evento corporativo', 'Lançamento ou ativação', 'Outro'];
+---
+
+<form class="form-carrinho" data-form-carrinho data-whats={SITE.whatsapp} novalidate>
+  <div class="form-carrinho__grade">
+    <label class="campo">
+      <span class="campo__rotulo">Seu nome</span>
+      <input name="nome" type="text" autocomplete="name" required />
+    </label>
+    <label class="campo">
+      <span class="campo__rotulo">Data do evento</span>
+      <input name="data" type="date" required />
+    </label>
+    <label class="campo">
+      <span class="campo__rotulo">Cidade ou local</span>
+      <input name="local" type="text" placeholder="Ex.: Curitiba, Santa Felicidade" required />
+    </label>
+    <label class="campo">
+      <span class="campo__rotulo">Convidados (aprox.)</span>
+      <input name="convidados" type="number" inputmode="numeric" min="1" step="1" placeholder="Ex.: 80" required />
+    </label>
+    <fieldset class="campo campo--largo">
+      <legend class="campo__rotulo">Tipo de evento</legend>
+      <div class="campo__opcoes">
+        {
+          tipos.map((t, i) => (
+            <label class="opcao">
+              <input type="radio" name="tipo" value={t} required={i === 0} />
+              <span>{t}</span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+    <label class="campo campo--largo">
+      <span class="campo__rotulo">Conte um pouco mais <i>(opcional)</i></span>
+      <textarea name="mensagem" rows="3" placeholder="Horário, sabores que vocês amam, drinks com gelato…"></textarea>
+    </label>
+  </div>
+  <p class="form-carrinho__erro" role="alert" hidden data-erro></p>
+  <div class="form-carrinho__rodape">
+    <button class="botao botao--cheio" type="submit" data-magnetico>
+      Enviar pelo WhatsApp <Seta direcao="diagonal" />
+    </button>
+    <p class="t-legenda form-carrinho__aviso">
+      O botão abre o WhatsApp com a mensagem pronta. Nada fica salvo neste site.
+    </p>
+  </div>
+</form>
+
+<style>
+  .form-carrinho {
+    display: grid;
+    gap: 22px;
+    padding: clamp(22px, 3vw, 40px);
+    border-radius: var(--raio);
+    background: var(--c-fior);
+    color: var(--c-cacau);
+    box-shadow: 0 30px 60px -40px rgb(43 33 28 / 0.6);
+  }
+  .form-carrinho__grade {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+  }
+  .campo {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .campo--largo {
+    grid-column: 1 / -1;
+  }
+  .campo__rotulo {
+    font-family: var(--f-display);
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0;
+  }
+  .campo__rotulo i {
+    font-family: var(--f-texto);
+    font-style: normal;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    opacity: 0.6;
+  }
+  .campo input,
+  .campo textarea {
+    width: 100%;
+    padding: 12px 2px 10px;
+    border: 0;
+    border-bottom: 1.5px solid color-mix(in srgb, var(--c-cacau) 35%, transparent);
+    background: transparent;
+    font: inherit;
+    font-size: 1.05rem;
+    color: inherit;
+    border-radius: 0;
+    transition: border-color 0.3s;
+  }
+  .campo textarea {
+    resize: vertical;
+  }
+  .campo input:focus,
+  .campo textarea:focus {
+    outline: none;
+    border-bottom-color: var(--c-terracota);
+  }
+  .campo input:focus-visible,
+  .campo textarea:focus-visible {
+    box-shadow: 0 3px 0 -1px var(--c-terracota);
+  }
+  .campo [aria-invalid='true'] {
+    border-bottom-color: #b3261e;
+  }
+  .campo__opcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .opcao {
+    position: relative;
+  }
+  .opcao input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .opcao span {
+    display: inline-block;
+    padding: 10px 16px 9px;
+    border-radius: 999px;
+    border: 1.5px solid color-mix(in srgb, var(--c-cacau) 25%, transparent);
+    font-size: 0.95rem;
+    transition:
+      background 0.3s,
+      color 0.3s,
+      border-color 0.3s;
+  }
+  .opcao input:checked + span {
+    background: var(--c-cacau);
+    border-color: var(--c-cacau);
+    color: var(--c-fior);
+  }
+  .opcao input:focus-visible + span {
+    outline: 3px solid var(--c-ambar);
+    outline-offset: 2px;
+  }
+  .form-carrinho__erro {
+    color: #b3261e;
+    font-size: 0.95rem;
+  }
+  .form-carrinho__rodape {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+  }
+  .form-carrinho__aviso {
+    max-width: 34ch;
+    opacity: 0.7;
+  }
+  @media (max-width: 599px) {
+    .form-carrinho__grade {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-form-carrinho]');
+  if (form) {
+    const data = form.querySelector<HTMLInputElement>('input[name="data"]')!;
+    const hoje = new Date();
+    const iso = new Date(hoje.getTime() - hoje.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    data.min = iso;
+    const erro = form.querySelector<HTMLElement>('[data-erro]')!;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const campos = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea'));
+      campos.forEach((c) => c.removeAttribute('aria-invalid'));
+      const invalidos = campos.filter((c) => !c.checkValidity());
+      if (invalidos.length) {
+        invalidos.forEach((c) => c.setAttribute('aria-invalid', 'true'));
+        erro.textContent = 'Preencha nome, data (a partir de hoje), local, número de convidados e o tipo de evento.';
+        erro.hidden = false;
+        invalidos[0].focus();
+        return;
+      }
+      erro.hidden = true;
+      const f = new FormData(form);
+      const [ano, mes, dia] = String(f.get('data')).split('-');
+      const linhas = [
+        'Olá, Crema Lab! Quero um orçamento do carrinho de gelato.',
+        '',
+        `Nome: ${f.get('nome')}`,
+        `Data: ${dia}/${mes}/${ano}`,
+        `Local: ${f.get('local')}`,
+        `Convidados: ${f.get('convidados')}`,
+        `Tipo de evento: ${f.get('tipo')}`,
+      ];
+      const msg = String(f.get('mensagem') || '').trim();
+      if (msg) linhas.push('', msg);
+      const url = `https://wa.me/${form.dataset.whats}?text=${encodeURIComponent(linhas.join('\n'))}`;
+      window.open(url, '_blank', 'noopener');
+    });
+  }
+</script>

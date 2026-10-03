@@ -1,0 +1,432 @@
+---
+// Mini-landing de cada unidade: topo na cor da casa, status ao vivo, horários, mapa desenhado,
+// sabores da vitrine, galeria e as outras casas. Gera um schema IceCreamShop por unidade.
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import HeroPagina from '../../components/ui/HeroPagina.astro';
+import MapaDesenhado from '../../components/unidades/MapaDesenhado.astro';
+import CardUnidade from '../../components/unidades/CardUnidade.astro';
+import FichaSabor from '../../components/sabores/FichaSabor.astro';
+import Icone from '../../components/marca/Icone.astro';
+import Seta from '../../components/ui/Seta.astro';
+import {
+  type Unidade,
+  unidadesAtivas,
+  descreverHorarios,
+  diasFechados,
+  linkMapa,
+} from '../../data/unidades';
+import { saboresClassicos, SABORES } from '../../data/sabores';
+import { SITE, linkWhatsApp, type Mundo } from '../../data/site';
+
+export function getStaticPaths() {
+  return unidadesAtivas().map((u) => ({ params: { slug: u.slug }, props: { unidade: u } }));
+}
+
+interface Props {
+  unidade: Unidade;
+}
+const { unidade: u } = Astro.props;
+
+// "ParkShoppingBarigui" → ["ParkShopping", "Barigui"]; "Shopping Mueller" → ["Shopping", "Mueller"]
+const partes = u.nomeCurto.split(/\s+|(?<=[a-z])(?=[A-Z][a-z]+$)/).filter(Boolean);
+const linhas = ['Crema Lab', ...partes];
+const horarios = descreverHorarios(u.horarios);
+const fechados = diasFechados(u.horarios);
+const daCasa = SABORES.filter((s) => s.unidade?.slug === u.slug);
+const vitrine = [...daCasa, ...saboresClassicos().filter((s) => !daCasa.some((d) => d.id === s.id))].slice(0, 3);
+const outras = unidadesAtivas().filter((o) => o.slug !== u.slug);
+const aberturaTexto = /\d/.test(u.abertura) ? `aberta desde ${u.abertura}` : u.abertura;
+const ondeFica = u.complemento ? `${u.complemento} — ${u.endereco}` : u.endereco;
+const mundoInfo: Mundo = ({ terracota: 'rosa', ambar: 'pistache-creme', 'pistache-creme': 'ambar' } as Partial<Record<Mundo, Mundo>>)[u.mundo] ?? 'rosa';
+
+const DIAS_SCHEMA = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'IceCreamShop',
+  name: u.nome,
+  url: new URL(`/unidades/${u.slug}`, Astro.site).toString(),
+  image: new URL(u.foto.src, Astro.site).toString(),
+  servesCuisine: ['Gelato', 'Café'],
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: u.complemento ? `${u.endereco}, ${u.complemento}` : u.endereco,
+    addressLocality: 'Curitiba',
+    addressRegion: 'PR',
+    postalCode: u.cep,
+    addressCountry: 'BR',
+  },
+  openingHoursSpecification: u.horarios.map((h) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: h.dias.map((d) => DIAS_SCHEMA[d]),
+    opens: h.abre,
+    closes: h.fecha,
+  })),
+  parentOrganization: { '@type': 'Organization', name: SITE.nome, url: new URL('/', Astro.site).toString() },
+  sameAs: [SITE.instagram],
+};
+---
+
+<Base titulo={u.nome} mundo={u.mundo} descricao={`${u.nome}: ${u.descricao} ${ondeFica}, ${u.bairro}, Curitiba.`} schema={schema}>
+  <HeroPagina
+    mundo={u.mundo}
+    eyebrow={`${u.apelido} · ${u.bairro}`}
+    linhas={linhas}
+    obliqua={linhas.length - 1}
+    texto={u.descricao}
+    imagem={u.foto}
+    alt={u.fotoAlt}>
+    <div class="unidade-hero__extra" data-hp-entra>
+      <p class="unidade-hero__status" data-status={JSON.stringify(u.horarios)}>
+        <i aria-hidden="true"></i>
+        <span data-status-texto>Confira os horários</span>
+      </p>
+      <div class="unidade-hero__botoes">
+        <a class="botao botao--cheio" href={linkMapa(u)} target="_blank" rel="noopener" data-magnetico>
+          Como chegar <Seta direcao="diagonal" />
+        </a>
+        <a
+          class="botao"
+          href={linkWhatsApp(`Olá, Crema Lab ${u.nomeCurto}! Vim pelo site.`)}
+          target="_blank"
+          rel="noopener"
+          data-magnetico>
+          WhatsApp <Seta direcao="diagonal" />
+        </a>
+      </div>
+    </div>
+  </HeroPagina>
+
+  <section class="visita secao" data-mundo="fior" aria-labelledby="visita-titulo">
+    <div class="casca visita__grade">
+      <div class="visita__info">
+        <h2 id="visita-titulo" class="t-h2" data-anim="titulo">Planeje a visita</h2>
+        <div class="visita__bloco" data-anim="subir">
+          <h3 class="t-rotulo visita__rotulo">Endereço</h3>
+          <address class="visita__endereco">
+            {u.endereco}
+            {u.complemento && <><br />{u.complemento}</>}
+            <br />
+            {u.bairro} · {u.cidade} · CEP {u.cep}
+          </address>
+          <a class="visita__link" href={linkMapa(u)} target="_blank" rel="noopener" data-rabisco="sublinhado" data-rabisco-gatilho="hover">
+            Abrir no mapa <Seta direcao="diagonal" />
+          </a>
+        </div>
+        <div class="visita__bloco" data-anim="subir">
+          <h3 class="t-rotulo visita__rotulo">Horários</h3>
+          <dl class="visita__horarios">
+            {
+              horarios.map((h) => (
+                <div>
+                  <dt>{h.dias}</dt>
+                  <dd>{h.horas}</dd>
+                </div>
+              ))
+            }
+            {
+              fechados.length > 0 && (
+                <div>
+                  <dt>{fechados.join(', ')}</dt>
+                  <dd>fechado</dd>
+                </div>
+              )
+            }
+          </dl>
+          <p class="visita__status" data-status={JSON.stringify(u.horarios)}>
+            <i aria-hidden="true"></i>
+            <span data-status-texto>Confira os horários</span>
+          </p>
+          <p class="t-legenda visita__nota">Horários podem mudar em feriados — confirme no Instagram ou no WhatsApp.</p>
+        </div>
+      </div>
+      <div class="visita__mapa" data-unidade-atual={u.slug}>
+        <MapaDesenhado id={`mapa-${u.slug}`} />
+        <p class="t-legenda visita__mapa-nota">Mapa ilustrativo — use “Como chegar” para a rota.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="vitrine-casa secao" data-mundo={mundoInfo} aria-labelledby="vitrine-casa-titulo">
+    <div class="casca">
+      <div class="vitrine-casa__cabeca">
+        <span class="vitrine-casa__icone" aria-hidden="true"><Icone nome="espatula" desenho /></span>
+        <div>
+          <p class="t-eyebrow vitrine-casa__eyebrow" data-anim="subir">Na vitrine desta casa</p>
+          <h2 id="vitrine-casa-titulo" class="t-h2" data-anim="titulo">{u.destaque}</h2>
+        </div>
+      </div>
+      <div class="vitrine-casa__grade">
+        {vitrine.map((s) => <FichaSabor sabor={s} />)}
+      </div>
+      <a class="botao vitrine-casa__botao" href="/sabores" data-magnetico>Todos os sabores <Seta /></a>
+    </div>
+  </section>
+
+  <section class="galeria-casa secao" data-mundo="fior" aria-labelledby="galeria-titulo">
+    <div class="casca galeria-casa__grade">
+      <div class="galeria-casa__texto">
+        <p class="t-eyebrow galeria-casa__eyebrow" data-anim="subir">Um pedaço da casa</p>
+        <h2 id="galeria-titulo" class="t-h2 galeria-casa__titulo" data-anim="titulo">{partes.join(' ')}</h2>
+        <p class="galeria-casa__nota t-anotacao" aria-hidden="true">{aberturaTexto}</p>
+      </div>
+      {
+        u.galeria.map((g, i) => (
+          <figure class:list={['galeria-casa__item', `galeria-casa__item--${i}`]}>
+            <div class="galeria-casa__foto arco" data-anim="imagem">
+              <Image src={g.src} alt={g.alt} widths={[320, 480, 640]} sizes="(max-width: 899px) 45vw, 340px" />
+            </div>
+          </figure>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="outras secao" data-mundo="fior" aria-labelledby="outras-titulo">
+    <div class="casca">
+      <h2 id="outras-titulo" class="t-h2 outras__titulo" data-anim="titulo">As outras casas</h2>
+      <div class="outras__grade">
+        {outras.map((o) => <CardUnidade unidade={o} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .unidade-hero__extra {
+    display: grid;
+    gap: 18px;
+    justify-items: start;
+  }
+  .unidade-hero__status,
+  .visita__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 10%, transparent);
+    font-family: var(--f-display);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .unidade-hero__status i,
+  .visita__status i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  :global(.esta-aberto) > i {
+    background: #3f9b52 !important;
+    opacity: 1 !important;
+    box-shadow: 0 0 0 4px rgb(63 155 82 / 0.25);
+  }
+  :global(.esta-fechado) > i {
+    background: var(--c-telha) !important;
+    opacity: 1 !important;
+  }
+  .unidade-hero__botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .visita__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+  .visita__info {
+    display: grid;
+    gap: clamp(28px, 3vw, 40px);
+  }
+  .visita__bloco {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+    padding-top: 18px;
+    border-top: 1.5px solid var(--c-cacau);
+  }
+  .visita__rotulo {
+    font-size: 0.64rem;
+    opacity: 0.7;
+  }
+  .visita__endereco {
+    font-style: normal;
+    font-size: 1.15rem;
+    line-height: 1.5;
+  }
+  .visita__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+  }
+  .visita__horarios {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .visita__horarios div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed color-mix(in srgb, var(--c-cacau) 25%, transparent);
+    font-size: 1.05rem;
+  }
+  .visita__horarios dt {
+    font-weight: 500;
+  }
+  .visita__nota {
+    opacity: 0.7;
+  }
+  .visita__mapa {
+    position: sticky;
+    top: calc(var(--nav-h) + 30px);
+    padding: clamp(12px, 2vw, 24px);
+    border-radius: 26px;
+    background: color-mix(in srgb, var(--c-pistache-creme) 45%, var(--c-fior));
+  }
+  .visita__mapa-nota {
+    margin-top: 8px;
+    opacity: 0.6;
+    text-align: right;
+  }
+
+  .vitrine-casa__cabeca {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: clamp(18px, 3vw, 40px);
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+  .vitrine-casa__icone {
+    width: clamp(70px, 8vw, 110px);
+  }
+  .vitrine-casa__eyebrow {
+    color: var(--c-telha);
+    margin-bottom: 12px;
+  }
+  .vitrine-casa__cabeca .t-h2 {
+    font-size: clamp(1.8rem, 3.6vw, 3.4rem);
+    max-width: 22ch;
+  }
+  .vitrine-casa__grade {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+  }
+  .vitrine-casa__botao {
+    margin-top: clamp(28px, 4vw, 48px);
+  }
+
+  .galeria-casa__grade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 340px) minmax(0, 300px);
+    gap: clamp(20px, 3vw, 48px);
+    align-items: end;
+  }
+  .galeria-casa__texto {
+    display: grid;
+    gap: 14px;
+    align-self: center;
+  }
+  .galeria-casa__eyebrow {
+    color: var(--c-telha);
+  }
+  .galeria-casa__titulo {
+    font-size: clamp(2rem, 4vw, 3.8rem);
+  }
+  .galeria-casa__foto {
+    aspect-ratio: 4 / 5;
+    box-shadow: 0 30px 60px -36px rgb(43 33 28 / 0.6);
+  }
+  .galeria-casa__item--1 {
+    margin-bottom: clamp(40px, 6vw, 96px);
+  }
+  .galeria-casa__nota {
+    font-size: 1.6rem;
+    color: var(--c-telha);
+    rotate: -3deg;
+    justify-self: start;
+  }
+
+  .outras__titulo {
+    margin-bottom: clamp(28px, 4vw, 48px);
+  }
+  .outras__grade {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  @media (max-width: 899px) {
+    .visita__grade,
+    .vitrine-casa__grade,
+    .outras__grade {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .visita__mapa {
+      position: relative;
+      top: auto;
+    }
+    .galeria-casa__grade {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .galeria-casa__texto {
+      grid-column: 1 / -1;
+    }
+    .galeria-casa__item--1 {
+      margin-bottom: 40px;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, reduzido } from '../../scripts/nucleo';
+  import { desenharAoRolar } from '../../scripts/desenho';
+
+  document.querySelectorAll<SVGSVGElement>('.vitrine-casa__icone svg').forEach((svg) => desenharAoRolar(svg, { stagger: 0.08 }));
+
+  // mapa: as ruas se desenham e o círculo marca só a casa desta página
+  const caixa = document.querySelector<HTMLElement>('[data-unidade-atual]');
+  if (caixa) {
+    const atual = caixa.dataset.unidadeAtual;
+    const mapa = caixa.querySelector<SVGSVGElement>('[data-mapa]')!;
+    const tracos = mapa.querySelectorAll<SVGPathElement>('.mapa__ruas path, .mapa__parque path, .mapa__quadras path');
+    const circulos = Array.from(mapa.querySelectorAll<SVGGElement>('.mapa__unidade'));
+    circulos.forEach((g) => {
+      const meu = g.dataset.unidade === atual;
+      const c = g.querySelectorAll('.mapa__circulo path');
+      gsap.set(c, { drawSVG: meu && reduzido ? '0% 100%' : '0% 0%' });
+      if (!meu) gsap.set(g, { opacity: 0.45 });
+    });
+    if (!reduzido) {
+      gsap.set(tracos, { drawSVG: '0% 0%' });
+      ScrollTrigger.create({
+        trigger: mapa,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          const tl = gsap.timeline();
+          tl.to(tracos, { drawSVG: '0% 100%', duration: 1.4, ease: 'espatula', stagger: 0.01 });
+          const meu = circulos.find((g) => g.dataset.unidade === atual);
+          if (meu) {
+            tl.to(meu.querySelectorAll('.mapa__circulo path'), { drawSVG: '0% 100%', duration: 0.9, ease: 'espatula', stagger: 0.2 }, '-=0.5').from(
+              meu.querySelector('.mapa__pino'),
+              { y: -40, duration: 0.9, ease: 'bounce.out' },
+              '<',
+            );
+          }
+        },
+      });
+    }
+  }
+</script>

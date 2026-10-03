@@ -93,4 +93,7 @@ export function duracaoDoTraco(comprimentoPx: number) {
 
 export { aleatorio, hash } from './util';
 
+/** Classes dos pedaços do SplitText: as máscaras viram .line-mask/.word-mask/.char-mask (ver base.css). */
+export const CLASSES_SPLIT = { linesClass: 'line', wordsClass: 'word', charsClass: 'char' } as const;
+
 export { gsap, ScrollTrigger, SplitText };

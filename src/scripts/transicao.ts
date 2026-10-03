@@ -56,6 +56,12 @@ function aplicarCor(mundo: Mundo) {
   camada.style.setProperty('--cor-mono-transicao', TINTA[mundo]);
 }
 
+/** Promessa que resolve quando a animação termina. */
+const fim = (anim: gsap.core.Animation) =>
+  new Promise<void>((resolve) => {
+    anim.then(() => resolve());
+  });
+
 /** Cobre a tela com a espatulada (≈ 0,85 s). */
 export function cobrir(mundo: Mundo): Promise<void> {
   aplicarCor(mundo);
@@ -63,7 +69,7 @@ export function cobrir(mundo: Mundo): Promise<void> {
   gsap.killTweensOf([traco, solido, caixaMono]);
   if (reduzido) {
     gsap.set(caixaMono, { opacity: 0 });
-    return gsap.fromTo(solido, { opacity: 0 }, { opacity: 1, duration: 0.22 }).then(() => undefined);
+    return fim(gsap.fromTo(solido, { opacity: 0 }, { opacity: 1, duration: 0.22 }));
   }
   gsap.set(solido, { opacity: 0 });
   gsap.set(traco, { visibility: 'visible', drawSVG: '0% 0%', attr: { 'stroke-width': LARGURA_MIN } });
@@ -73,7 +79,7 @@ export function cobrir(mundo: Mundo): Promise<void> {
     .to(traco, { attr: { 'stroke-width': LARGURA_MAX }, duration: 0.85, ease: 'power2.inOut' }, 0)
     .add(desenharMarca(mono, { duracao: 0.62 }), 0.32)
     .set(solido, { opacity: 1 });
-  return tl.then(() => undefined);
+  return fim(tl);
 }
 
 /** Revela a página (≈ 1,1 s) e libera as animações de entrada. */
@@ -85,9 +91,7 @@ export function revelar(): Promise<void> {
   gsap.set(caixaMono, { opacity: 1, scale: 1 });
   if (reduzido) {
     liberarEntrada();
-    return gsap
-      .to([solido, caixaMono], { opacity: 0, duration: 0.25, onComplete: () => camada.classList.remove('ativa') })
-      .then(() => undefined);
+    return fim(gsap.to([solido, caixaMono], { opacity: 0, duration: 0.25, onComplete: () => camada.classList.remove('ativa') }));
   }
   gsap.set(traco, { visibility: 'visible', drawSVG: '0% 100%', attr: { 'stroke-width': LARGURA_MAX } });
   const tl = gsap.timeline({
@@ -101,7 +105,7 @@ export function revelar(): Promise<void> {
     .to(traco, { drawSVG: '100% 100%', duration: 1.05, ease: 'power2.inOut' }, 0.06)
     .to(traco, { attr: { 'stroke-width': LARGURA_MIN }, duration: 1.05, ease: 'power2.inOut' }, 0.06)
     .call(liberarEntrada, undefined, 0.32);
-  return tl.then(() => undefined);
+  return fim(tl);
 }
 
 const espera = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
