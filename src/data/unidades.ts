@@ -40,6 +40,8 @@ export type Unidade = {
 
 const maps = (q: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
 
+// CONFIRMAR: horários das três casas (as fontes públicas divergem, principalmente no Batel) e a data de
+// abertura do Shopping Mueller. Enquanto isso, horariosConfirmar fica true.
 export const UNIDADES: Unidade[] = [
   {
     slug: 'batel',
